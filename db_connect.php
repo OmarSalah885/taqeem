@@ -1,15 +1,18 @@
 <?php
-$host = "sql113.infinityfree.com";  // Your MySQL hostname
-$username = "if0_38497686";        // Your MySQL username
-$password = "bh55ioWpTbXLr";       // Your MySQL password
-$database = "if0_38497686_teqeem"; // Your MySQL database name
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-$conn = new mysqli($host, $username, $password, $database);
+$host = "sql113.infinityfree.com";
+$dbname = "if0_38497686_teqeem";
+$username = "if0_38497686";
+$password = "bh55ioWpTbXLr";
+
+// Create connection
+$conn = new mysqli($host, $username, $password, $dbname);
 
 // Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-
-echo "Connected successfully";
+echo "Connected successfully!";
 ?>
