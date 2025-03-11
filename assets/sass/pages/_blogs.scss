@@ -1,0 +1,81 @@
+.blogs {
+    display: flex;
+    align-items: center;
+    margin-top: 12.4rem;
+    flex-direction: column;
+
+    &_grid {
+        @include container; // Container mixin for consistent layout
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 2rem;
+
+        @include respond(small) {
+            grid-template-columns: 1fr;
+        }
+
+        @include respond(medium) {
+            grid-template-columns: 1fr;
+        }
+
+        @include respond(large) {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        @include respond(x-large) {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    &_indicator {
+        margin-top: 4.8rem;
+        justify-content: center;
+        width: fit-content;
+        display: block;
+
+        .blog_indicator {
+            list-style: none;
+            display: flex;
+            gap: 2.4rem;
+
+            .indicator_item {
+                width: 3.6rem;
+                height: 3.6rem;
+
+                a {
+                    display: block;
+                    font-size: $F-M;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    text-decoration: none;
+                    width: 3.6rem;
+                    height: 3.6rem;
+                    color: $red-900;
+                    transition: all .3s;
+
+                    &:hover {
+                        color: $red-500;
+                    }
+                }
+
+                &.active {
+                    background-color: $red-500;
+
+                    a {
+                        color: $red-00;
+                    }
+
+                    &:hover {
+                        a {
+                            color: $red-00;
+                        }
+
+                    }
+                }
+
+            }
+        }
+    }
+
+}

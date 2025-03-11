@@ -1,0 +1,30 @@
+// =============================================================================
+// Mixins
+// =============================================================================
+// The main.scss file includes  all the partials and styles for the theme.
+
+// abstracts imports
+@import "abstracts/mixins";
+@import "abstracts/variables";
+
+// base imports
+@import "base/base";
+
+//components imports
+@import "components/buttons";
+@import "components/header";
+@import "components/footer";
+@import "components/carousel";
+@import "components/categories";
+@import "components/activitys";
+@import "components/aboutUsHome";
+@import "components/homeBlog";
+
+//pages imports
+@import "pages/blogs";
+@import "pages/single-blog";
+@import "pages/listing.scss";
+@import "pages/single-place";
+@import "pages/profile";
+@import "pages/edit-profile";
+@import "pages/add-place";

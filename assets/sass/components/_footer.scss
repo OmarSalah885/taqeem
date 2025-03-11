@@ -1,0 +1,84 @@
+.footer {
+    margin-top: 12.4rem;
+
+    &_color {
+        width: 100%;
+        background-color: $gray-700;
+        padding: 2.4rem 0rem;
+    }
+
+    &_top {
+        display: flex;
+        align-items: self-start;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        @include container; // Container mixin for consistent layout
+        gap: 2.4rem;
+
+        &--logo {
+            max-width: 37rem;
+
+            img {
+                width: 17.3rem;
+                margin-bottom: 2.4rem;
+            }
+
+            p {
+                font-size: $F-S;
+                color: $white;
+            }
+        }
+
+        &--links {
+            display: flex;
+            flex-direction: column;
+            gap: 2.4rem;
+
+            @include respond(small) {
+                width: 100%;
+            }
+
+            @include respond(medium) {
+                width: 100%;
+            }
+
+            h4 {
+                font-size: $F-M;
+                font-weight: 600;
+                color: $white;
+            }
+
+            div {
+                display: flex;
+                flex-direction: column;
+                gap: 1.6rem;
+
+                a {
+                    color: $red-100;
+                    font-size: $F-S;
+                    text-decoration: none;
+                    transition: all .3s;
+
+                    &:hover {
+                        color: $red-00;
+                    }
+                }
+            }
+        }
+    }
+
+
+    &_rights {
+        background-color: $red-900;
+        height: 7.4rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        h4 {
+            color: $white;
+            font-size: $F-M;
+            font-weight: 600;
+        }
+    }
+}

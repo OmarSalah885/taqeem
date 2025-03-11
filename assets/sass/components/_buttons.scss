@@ -1,0 +1,105 @@
+// =============================================================================
+// Mixins
+// =============================================================================
+// This file contains all the styles for the buttons .
+
+.btn {
+    font-family: inherit;
+    cursor: pointer;
+    width: fit-content;
+    transition: all .3s;
+    text-decoration: none;
+    text-transform: uppercase;
+    text-align: center;
+    line-height: 1.1;
+    font-weight: 600;
+
+    ////////////////////////
+    //transparent buttons styling
+    ////////////////////////
+    &__transparent {
+        background-color: transparent;
+        outline: .3rem solid $red-500;
+        outline-offset: -.3rem;
+        color: $red-500;
+
+        &:hover {
+            outline: .3rem solid transparent;
+            background-color: $red-500;
+            color: $red-00;
+
+        }
+    }
+
+    ////////////////////////
+    //dark buttons styling
+    ////////////////////////
+    &__dark {
+        background-color: $red-900;
+        color: $red-00;
+        border: none;
+        transform: translate(0px, 0px);
+
+        &:hover {
+            background-color: $red-700;
+
+        }
+
+
+    }
+
+    ////////////////////////
+    //green buttons styling
+    ////////////////////////
+    &__red {
+        background-color: $red-500;
+        color: $red-00;
+        border: none;
+
+        &:hover {
+            background-color: $red-600;
+
+
+        }
+
+
+    }
+
+    ////////////////////////
+    //buttons sizes styling
+    ////////////////////////
+    &__transparent,
+    &__dark,
+    &__red {
+        &--l {
+            font-size: $F-M;
+            padding: 1rem 1.6rem;
+        }
+
+        &--m {
+            font-size: $F-S;
+            padding: 1rem 1.6rem;
+        }
+
+        &--s {
+            font-size: $F-XS;
+            padding: 1rem 1.6rem;
+        }
+    }
+}
+
+
+////////////////////////
+//buttons classes
+////////////////////////
+//btn__transparent--l btn__transparent btn
+//btn__transparent--m btn__transparent btn
+//btn__transparent--s btn__transparent btn
+
+//btn__dark--l btn__dark btn
+//btn__dark--m btn__dark btn
+//btn__dark--s btn__dark btn
+
+//btn__red--l btn__red btn
+//btn__red--m btn__red btn
+//btn__red--s btn__red btn

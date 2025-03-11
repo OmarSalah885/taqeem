@@ -1,0 +1,469 @@
+.navbar {
+    width: 100%;
+    height: fit-content;
+    border-bottom: solid $red-00 .1rem;
+
+    &_container {
+        @include container; // Container mixin for consistent layout
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 8.4rem;
+        display: none;
+
+        @include respond(xl-large) {
+            display: flex;
+        }
+
+        @include respond(xx-large) {
+            display: flex;
+        }
+
+        &--menu-L {
+            display: flex;
+            gap: 2.4rem;
+
+            a {
+                font-size: $F-XS;
+                text-decoration: none;
+                text-transform: uppercase;
+                color: $black;
+                font-weight: 600;
+                transition: color .3s;
+
+                &:hover {
+                    color: $red-500;
+                }
+            }
+        }
+
+        &--logo {
+            img {
+                width: 17.833rem;
+            }
+        }
+
+        &--menu-R {
+            display: flex;
+            gap: 2.4rem;
+            align-items: center;
+
+            &_links {
+                font-size: $F-XS;
+                text-decoration: none;
+                text-transform: uppercase;
+                color: $black;
+                font-weight: 600;
+                transition: color .3s;
+
+                &:hover {
+                    color: $red-500;
+                }
+            }
+        }
+    }
+
+    &_mobile {
+        @include container; // Container mixin for consistent layout
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 8.4rem;
+        display: flex;
+
+        @include respond(xl-large) {
+            display: none;
+        }
+
+        @include respond(xx-large) {
+            display: none;
+        }
+
+        &--logo {
+            img {
+                width: 14rem;
+            }
+        }
+
+        &--search {
+            width: 50%;
+            align-self: center;
+            display: flex;
+            align-items: center;
+            border-bottom: $red-500 solid .2rem;
+            transition: border-bottom .3s;
+
+            input {
+                font-family: inherit;
+                height: 3.2rem;
+                width: 90%;
+                border: none;
+                font-size: $F-XS;
+                padding: .8rem;
+
+                &:focus {
+                    outline: none;
+                }
+            }
+
+            button {
+                height: 3.2rem;
+                width: 10%;
+                border: none;
+                background-color: transparent;
+                font-size: 1.6rem;
+                cursor: pointer;
+
+                &:hover {
+                    color: $red-500;
+                }
+            }
+
+            &:focus-within {
+                border-bottom: $red-900 solid .2rem;
+            }
+        }
+
+
+        &--menu {
+            font-size: $F-L;
+            color: $red-800;
+            text-decoration: none;
+            transition: color .3s;
+
+            &:hover {
+                color: $red-500;
+            }
+        }
+    }
+
+
+
+    &_search--overlay {
+
+        width: 100%;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.5);
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all .3s;
+
+        &.show {
+            display: block;
+            opacity: 1;
+            visibility: visible;
+            opacity: 0;
+            visibility: hidden;
+
+            .navbar_search--overlay-content {
+                top: 5%;
+            }
+
+            @include respond(xl-large) {
+                opacity: 1;
+                visibility: visible;
+            }
+
+            @include respond(xx-large) {
+                opacity: 1;
+                visibility: visible;
+            }
+        }
+
+        &-content {
+            width: 80rem;
+            height: 4.8rem;
+            background-color: $white;
+            position: relative;
+            top: -5%;
+            left: 50%;
+            translate: -50% -50%;
+            display: flex;
+            align-items: center;
+            transition: all .3s;
+            border: transparent solid .3rem;
+            transition: all .3s;
+
+            input {
+                width: 90%;
+                height: 4.8rem;
+                font-family: inherit;
+                font-size: $F-S;
+                padding: 1.6rem;
+                border: none;
+                background-color: transparent;
+
+                &:focus {
+                    outline: none;
+                }
+
+            }
+
+            button {
+                width: 10%;
+                height: 4.8rem;
+                font-size: $F-L;
+                border: none;
+                background-color: transparent;
+                cursor: pointer;
+                transition: color .3s;
+
+                &:hover {
+                    color: $red-500;
+                }
+            }
+
+            &:focus-within {
+                border: $red-700 solid .3rem;
+            }
+        }
+
+        a {
+            position: relative;
+            top: 7.5%;
+            left: 90%;
+            translate: -50% -50%;
+            font-size: $F-XXL;
+            color: $white;
+            text-decoration: none;
+            transition: color .3s;
+
+            &:hover {
+                color: $red-600;
+            }
+        }
+    }
+}
+
+.LogOverlay {
+
+    opacity: 0;
+    visibility: hidden;
+    position: fixed;
+    width: 100%;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    transition: all .3s;
+
+
+    &__content {
+        position: absolute;
+        top: 10rem;
+        left: 50%;
+        translate: -50%;
+        background-color: $white;
+        width: 60rem;
+        padding: 2.4rem;
+        transition: all .3s;
+
+        @include respond(small) {
+            width: 94%;
+        }
+
+        @include respond(medium) {
+            width: 94%;
+        }
+
+        &--links {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6.4rem;
+
+            &_logins {
+                display: flex;
+                align-items: center;
+                gap: 2.4rem;
+
+                div {
+                    border-bottom: 4px solid transparent;
+                    transition: all .3s;
+                }
+
+                .active {
+                    border-bottom: 4px solid $red-500;
+                }
+
+                a {
+                    font-size: $F-M;
+                    text-decoration: none;
+                    font-weight: 600;
+                    color: $red-900;
+                    transition: color .3s;
+
+                    &:hover {
+                        color: $red-500;
+                    }
+                }
+
+
+            }
+
+            &_close {
+                font-size: $F-L;
+                text-decoration: none;
+                font-weight: 600;
+                color: $red-900;
+                transition: color .3s;
+
+                &:hover {
+                    color: $red-500;
+                }
+            }
+        }
+
+        &--login {
+            display: none;
+            flex-direction: column;
+            gap: 3.6rem;
+
+
+            p {
+                font-size: $F-XS;
+
+                a {
+                    text-decoration: none;
+                    font-weight: 600;
+                    color: $red-500;
+                    transition: color .3s;
+
+                    &:hover {
+                        color: $red-700;
+                    }
+                }
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+
+        input {
+            font-family: inherit;
+            padding: 1rem;
+            font-size: $F-XS;
+            width: 100%;
+            border: none;
+            border-bottom: .2rem $red-300 solid;
+            transition: all .3s;
+
+            &:focus {
+                outline: none;
+                border-bottom: .2rem $red-900 solid;
+            }
+        }
+
+        &--signup {
+            flex-direction: column;
+            gap: 3.6rem;
+            display: none;
+
+
+            &_role {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 3.2rem;
+
+                a {
+                    width: 100%;
+                }
+            }
+
+            &_name {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 3.2rem;
+            }
+
+
+            button {
+                width: 100%;
+            }
+        }
+    }
+}
+
+.LogOverlay.show {
+    opacity: 1;
+    visibility: visible;
+    z-index: 10000;
+}
+
+.LogOverlay__content--signup.show {
+    display: flex;
+}
+
+.LogOverlay__content--login.show {
+    display: flex;
+}
+
+.mobile_overlay {
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    position: fixed;
+    top: 0;
+    left: 0;
+    visibility: hidden;
+    opacity: 0;
+    transition: all .3s;
+    z-index: 100;
+
+    &--content {
+        background-color: $white;
+        position: absolute;
+        top: 0%;
+        right: 0%;
+        width: 50%;
+        height: 100vh;
+
+        &-close {
+            position: absolute;
+            right: 2.4rem;
+            top: 2.4rem;
+            font-size: $F-L;
+            font-weight: 600;
+            text-decoration: none;
+            color: $red-900;
+            transition: color .3s;
+
+            &:hover {
+                color: $red-500;
+            }
+        }
+
+        &_links {
+            margin-left: 2.4rem;
+            margin-top: 14.4rem;
+            display: flex;
+            flex-direction: column;
+            gap: 3.6rem;
+
+            a {
+                text-decoration: none;
+                font-size: $F-M;
+                color: $red-900;
+                text-transform: uppercase;
+                transition: color .3s;
+
+                &:hover {
+                    color: $red-500;
+                }
+            }
+        }
+    }
+}
+
+.mobile_overlay.show {
+    visibility: visible;
+    opacity: 1;
+}

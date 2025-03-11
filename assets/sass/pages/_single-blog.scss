@@ -1,0 +1,263 @@
+.single-blog {
+    &_img {
+        width: 100%;
+        height: 60rem;
+        margin-bottom: 1.8rem;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    &_tages {
+        width: 100%;
+        height: fit-content;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1.6rem;
+
+        a {
+            color: $red-00;
+            background-color: $red-500;
+            text-transform: uppercase;
+            font-size: $F-S;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all .3s;
+            margin-bottom: 4.8rem;
+            padding: 1rem 1.6rem;
+
+            &:hover {
+                color: $red-200;
+                background-color: $red-700;
+            }
+        }
+    }
+
+    &_title {
+        font-size: $F-XL;
+        color: $red-900;
+        font-weight: 600;
+        margin-bottom: 6.4rem;
+        width: 100%;
+        text-align: center;
+    }
+
+    &_content {
+        @include container; // Container mixin for consistent layout
+        display: flex;
+        flex-direction: column;
+        gap: 4.8rem;
+        margin-bottom: 4.8rem;
+
+        &--paragraph {
+            display: flex;
+            flex-direction: column;
+            gap: 1.6rem;
+
+        }
+
+    }
+
+
+    P {
+        font-size: $F-S;
+        color: $gray-600;
+    }
+
+    h2 {
+        font-size: $F-M;
+        color: $red-900;
+        font-weight: 600;
+    }
+
+    a {
+        text-decoration-color: $red-500;
+
+        h2 {
+            color: $red-500;
+            transition: color .3s;
+
+            &:hover {
+                color: $red-900;
+            }
+        }
+    }
+
+    ul {
+        font-size: $F-S;
+        color: $gray-600;
+        display: flex;
+        flex-direction: column;
+        gap: 2.4rem;
+    }
+
+
+    ol {
+        font-size: $F-S;
+        color: $gray-600;
+        display: flex;
+        flex-direction: column;
+        gap: 2.4rem;
+    }
+
+    &_comments {
+        padding-top: 4.8rem;
+        border-top: .1rem $gray-00 solid;
+
+        .comments {
+            @include container; // Container mixin for consistent layout
+
+            &_counter {
+                font-size: $F-L;
+                color: $red-900;
+                font-weight: 600;
+                margin-bottom: 4.8rem;
+            }
+
+            &_container {
+                display: flex;
+                flex-direction: column;
+                gap: 3.6rem;
+
+                &--single {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 1.6rem;
+
+                    .comment {
+                        padding: 2rem 2.4rem;
+                        display: flex;
+                        align-items: center;
+                        gap: 4.8rem;
+                        background-color: $red-00;
+
+                        @include respond(small) {
+                            align-items: self-start;
+                            gap: 2.4rem;
+                        }
+
+                        @include respond(medium) {
+                            align-items: self-start;
+                            gap: 2.4rem;
+                        }
+
+                        &_img {
+                            width: 12.6rem;
+                            height: 12.6rem;
+                            border-radius: 100%;
+
+                            img {
+                                height: 100%;
+                                border-radius: 100%;
+                                object-fit: cover;
+                            }
+
+                            @include respond(small) {
+                                width: 8.4rem;
+                                height: 8.4rem;
+                            }
+
+                            @include respond(medium) {
+                                width: 8.4rem;
+                                height: 8.4rem;
+                            }
+                        }
+
+                        &_content {
+                            display: flex;
+                            flex-direction: column;
+                            gap: 1.2rem;
+
+                            &--name {
+                                color: $red-900;
+                                font-size: $F-S;
+                                font-weight: 600;
+                            }
+
+                            &--date {
+                                color: $gray-300;
+                                font-size: $F-XXS;
+                            }
+
+                            &--text {
+                                color: $gray-700;
+                                font-size: $F-XS;
+
+                                @include respond(small) {
+                                    font-size: $F-XS;
+                                }
+
+                                @include respond(medium) {
+                                    font-size: $F-XS;
+                                }
+                            }
+
+
+                            &--replay {
+                                color: $red-500;
+                                font-size: $F-XXS;
+                                text-decoration: none;
+                                transition: all .3s;
+
+                                &:hover {
+                                    color: $red-900;
+                                }
+                            }
+                        }
+                    }
+
+                    .reply-comment {
+                        margin-left: 6.4rem;
+
+                        @include respond(small) {
+                            margin-left: 0;
+                        }
+
+                        @include respond(medium) {
+                            margin-left: 0;
+                        }
+
+                    }
+                }
+
+            }
+        }
+    }
+
+    &_thought {
+        @include container; // Container mixin for consistent layout
+        margin-top: 6.4rem;
+
+        &--title {
+            color: $red-900;
+            font-size: $F-L;
+        }
+
+        textarea {
+            margin-top: 3.2rem;
+            margin-bottom: 2.4rem;
+            resize: none;
+            width: 100%;
+            height: 30rem;
+            padding: 1.6rem;
+            border: .1rem solid $gray-200;
+            transition: all .3s;
+            font-size: $F-S;
+            font-family: inherit;
+
+            &:focus {
+                outline: none;
+                border: .1rem solid $red-500;
+            }
+
+            &::placeholder {
+                color: $gray-500;
+                text-transform: capitalize;
+            }
+        }
+    }
+}

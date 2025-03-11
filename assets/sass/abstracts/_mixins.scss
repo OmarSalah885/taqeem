@@ -1,0 +1,96 @@
+// =============================================================================
+// Mixins
+// =============================================================================
+// This file contains all the mixins used throughout the project.
+
+
+// A mixin to handle responsive design breakpoints
+@mixin respond($breakpoint) {
+
+    // Small breakpoint (max-width: 480px)
+    @if $breakpoint==small {
+        @media only screen and (max-width: 30em) {
+            @content
+        }
+
+        ;
+    }
+
+    // Medium breakpoint (min-width: 480px, max-width: 768px)
+    @if $breakpoint==medium {
+        @media only screen and (min-width: 30em) and (max-width: 48em) {
+            @content
+        }
+
+        ;
+    }
+
+    // Large breakpoint (min-width: 768px, max-width: 992px)
+    @if $breakpoint==large {
+        @media only screen and (min-width: 48em) and (max-width: 62em) {
+            @content
+        }
+
+        ;
+    }
+
+    // Extra-Large breakpoint (min-width: 992px, max-width: 1200px)
+    @if $breakpoint==x-large {
+        @media only screen and (min-width: 62em) and (max-width: 75em) {
+            @content
+        }
+
+        ;
+    }
+
+    // Extra-Extra-Large breakpoint (min-width: 1200px, max-width: 1400px) - New breakpoint
+    @if $breakpoint==xl-large {
+        @media only screen and (min-width: 75em) and (max-width: 87.5em) {
+            @content
+        }
+
+        ;
+    }
+
+    // Extra-Extra-Extra-Large breakpoint (min-width: 1400px)
+    @if $breakpoint==xx-large {
+        @media only screen and (min-width: 87.5em) {
+            @content
+        }
+
+        ;
+    }
+}
+
+// A mixin to define a responsive container
+@mixin container {
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+
+    @include respond(small) {
+        max-width: 100%;
+    }
+
+    @include respond(medium) {
+        max-width: 720px;
+    }
+
+    @include respond(large) {
+        max-width: 960px;
+    }
+
+    @include respond(x-large) {
+        max-width: 1140px;
+    }
+
+    @include respond(xl-large) {
+        max-width: 1300px;
+    }
+
+    @include respond(xx-large) {
+        max-width: 1540px;
+    }
+}

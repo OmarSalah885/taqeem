@@ -1,0 +1,115 @@
+// =============================================================================
+// base
+// =============================================================================
+/* Reset default browser styles */
+*,
+*::after,
+*::before {
+    margin: 0;
+    padding: 0;
+    box-sizing: inherit;
+}
+
+/* Set root font size and family*/
+html {
+    font-family: "Lexend Tera", serif;
+    font-size: 62.5%; // 1 rem = 10px
+    scroll-behavior: smooth;
+
+    @include respond(small) {
+        font-size: 50%; //1 rem = 8px, 8/16 = 50%
+    }
+
+    @include respond(medium) {
+        font-size: 56.25%; //1 rem = 9px, 9/16 = 50% 
+    }
+
+}
+
+/* Set box model for body */
+body {
+    box-sizing: border-box;
+    background-color: $white;
+
+    p {
+        font-size: 16px;
+    }
+}
+
+//Change Text Selection Color
+::-moz-selection {
+    background: $red-900;
+    color: $white;
+}
+
+//Change Text Selection Color
+::selection {
+    background: $red-900;
+    color: $white;
+}
+
+
+
+.home-title {
+    font-size: $F-XL;
+    width: 100%;
+    text-align: center;
+    color: $red-900;
+    text-transform: capitalize;
+    margin-bottom: 6.4rem;
+}
+
+.pageinfo {
+    width: 100%;
+    height: 22.4rem;
+    background-color: $red-00;
+
+    &_content {
+        @include container; // Container mixin for consistent layout
+        display: flex;
+        align-items: center;
+        position: relative;
+        height: 100%;
+
+        h2 {
+            font-size: $F-XL;
+            color: $red-900;
+            scroll-behavior: smooth;
+        }
+
+        .breadcrumb {
+            position: absolute;
+            left: 1.5rem;
+            bottom: 1.6rem;
+            list-style: none;
+            display: flex;
+            gap: .6rem;
+
+            &-item {
+                a {
+                    text-decoration: none;
+                    color: $gray-500;
+                    font-size: $F-XS;
+                    transition: all .3s;
+
+                    &:hover {
+                        color: $red-900;
+                    }
+                }
+
+                span {
+                    margin-left: .6rem;
+                }
+            }
+
+            .active {
+                a {
+                    color: $red-900;
+                    text-transform: uppercase;
+                }
+
+            }
+        }
+    }
+
+}

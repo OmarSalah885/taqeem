@@ -1,0 +1,103 @@
+.homeBlog {
+    margin-top: 12.4rem;
+
+    &_blogs {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        align-items: first baseline;
+        gap: 2rem;
+        @include container; // Container mixin for consistent layout
+
+
+        @include respond(small) {
+            grid-template-columns: 1fr;
+        }
+
+        @include respond(medium) {
+            grid-template-columns: 1fr;
+        }
+
+        @include respond(large) {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        &--item {
+            &:hover {
+                .homeBlog_blogs--item-img_img {
+                    img {
+                        scale: 1.1;
+                    }
+                }
+            }
+
+            &-img {
+                width: 100%;
+                height: 32rem;
+                position: relative;
+                overflow: hidden;
+
+                &_img {
+                    width: 100%;
+                    height: 100%;
+                    display: block;
+
+                    img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                        transition: all .3s;
+                    }
+                }
+
+                &_tags {
+                    position: absolute;
+                    bottom: .8rem;
+                    left: .8rem;
+                    display: flex;
+                    gap: .8rem;
+
+                    a {
+                        display: block;
+                        padding: .8rem;
+                        background-color: $white;
+                        color: $red-900;
+                        transition: all .3s;
+                        text-decoration: none;
+                        font-size: $F-XS;
+
+                        &:hover {
+                            padding: 1.2rem;
+                        }
+                    }
+                }
+            }
+
+            &-text {
+                padding: 1.2rem;
+                height: fit-content;
+                display: flex;
+                flex-direction: column;
+                gap: 1.8rem;
+
+                &_title {
+                    text-decoration: none;
+                    color: $red-900;
+                    font-size: $F-S;
+                    transition: all .3s;
+
+                    &:hover {
+                        color: $red-900;
+                    }
+
+                }
+
+                p {
+                    font-size: $F-XS;
+                    color: $gray-300;
+                }
+            }
+
+
+        }
+    }
+}

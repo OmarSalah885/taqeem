@@ -1,0 +1,16 @@
+.listing_filter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 3.2rem;
+  padding-bottom: 3.2rem;
+}
+.listing_filter-L {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.custom-select option {
+  font-family: inherit;
+}/*# sourceMappingURL=listing.css.map */

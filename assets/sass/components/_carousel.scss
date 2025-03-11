@@ -1,0 +1,137 @@
+.carousel {
+    position: relative;
+    width: 100%;
+    height: 87rem;
+    overflow: hidden;
+    background-color: $black;
+
+}
+
+.carousel-inner {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.5s ease;
+}
+
+.carousel-item {
+    min-width: 100%;
+    position: relative;
+
+    &_img {
+        width: 100%;
+        height: 100%;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    }
+
+    &_content {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        background-color: #00000030;
+
+
+
+        &-div {
+            @include container; // Container mixin for consistent layout
+            display: flex;
+            flex-direction: column;
+            gap: 6.4rem;
+            max-width: 83.6rem;
+
+            @include respond(small) {
+                justify-content: center;
+                align-items: center;
+            }
+
+            @include respond(medium) {
+                justify-content: center;
+                align-items: center;
+            }
+
+            h1 {
+                color: $white;
+                font-size: $F-XXXL;
+                max-width: 83.6rem;
+
+                @include respond(small) {
+                    text-align: center;
+                    font-size: $F-XXL;
+                }
+
+                @include respond(medium) {
+                    text-align: center;
+                    font-size: $F-XXL;
+                }
+            }
+
+            .btn {
+                font-size: $F-L;
+
+            }
+        }
+
+    }
+}
+
+.carousel-control {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    color: white;
+    border: none;
+    font-size: 12rem;
+    cursor: pointer;
+    transition: color .3s;
+
+    &:hover {
+        color: $red-300;
+    }
+
+    display: none;
+
+    @include respond(xx-large) {
+        display: block;
+    }
+}
+
+.carousel-control.prev {
+    left: 2.4rem;
+}
+
+.carousel-control.next {
+    right: 2.4rem;
+}
+
+.carousel-indicators {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+}
+
+.indicator {
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 50%;
+    background-color: $red-00;
+    cursor: pointer;
+    transition: color .3s;
+}
+
+.indicator.active {
+    background-color: $red-600;
+}
