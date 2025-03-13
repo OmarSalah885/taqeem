@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3307
--- Generation Time: Mar 11, 2025 at 07:21 PM
+-- Generation Time: Mar 13, 2025 at 02:06 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -35,6 +35,14 @@ CREATE TABLE `blogs` (
   `content` text NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `blogs`
+--
+
+INSERT INTO `blogs` (`id`, `title`, `image`, `tags`, `content`, `created_at`) VALUES
+(1, 'the big book', 'the big book', 'the big book', 'the big bookthe big bookthe big bookthe big bookthe big bookthe big bookthe big bookthe big bookthe big book', '2025-03-13 13:06:02'),
+(2, 'the big book', 'the big book', 'the big book', 'the big bookthe big bookthe big bookthe big bookthe big bookthe big bookthe big bookthe big bookthe big book', '2025-03-13 13:06:07');
 
 -- --------------------------------------------------------
 
@@ -289,7 +297,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `blogs`
 --
 ALTER TABLE `blogs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `blog_comments`
