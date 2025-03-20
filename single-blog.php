@@ -1,5 +1,5 @@
 <?php include 'header.php'; ?>
-<?php include 'navbar.php'; ?>
+
 <main>
         <div class="single-blog">
             <div class="single-blog_img">

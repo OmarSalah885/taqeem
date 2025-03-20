@@ -1,5 +1,5 @@
 <?php include 'header.php'; ?>
-<?php include 'navbar.php'; ?>
+
 <main>
     <div class="pageinfo">
         <div class="pageinfo_content">

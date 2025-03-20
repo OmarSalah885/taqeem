@@ -1,5 +1,5 @@
 <?php include 'header.php'; ?>
-<?php include 'navbar.php'; ?>
+
     <main class="add-place">
         <div class="add-place_sidebar">
             <a href="#add-place-general">GENERAL</a>

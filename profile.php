@@ -1,5 +1,5 @@
 <?php include 'header.php'; ?>
-<?php include 'navbar.php'; ?>
+
         <main class="profile">
             <div class="profile_sidebar">
                 <div class="profile_sidebar--img">

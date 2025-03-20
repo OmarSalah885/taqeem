@@ -1,5 +1,5 @@
 <?php include 'header.php'; ?>
-<?php include 'navbar.php'; ?>
+
         <main class="place">
             <div class="place_gallery">
                 <button class="gallery-btn left-btn">‹</button>
