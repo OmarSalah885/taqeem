@@ -67,7 +67,45 @@ if (isset($stmt)) {
                 </ol>
             </div>
         </div>
-
+        <div class="listing_filter">
+            <div class="listing_filter-L">
+                <select class="custom-select">
+                    <option value disabled selected>price</option>
+                    <option value="1">$</option>
+                    <option value="2">$$</option>
+                    <option value="3">$$$</option>
+                </select>
+                <select class="custom-select">
+                    <option value disabled selected>Categories</option>
+                    <option value="1">RESTURANTS</option>
+                    <option value="2">SHOPPING</option>
+                    <option value="3">ACTIVE LIFE</option>
+                    <option value="4">HOME SERVICES</option>
+                    <option value="5">COFFEE</option>
+                    <option value="6">PETS</option>
+                    <option value="7">PLANTS SHOP</option>
+                    <option value="8">ART</option>
+                    <option value="9">HOTELS</option>
+                    <option value="10">EDUCATION</option>
+                    <option value="11">HEALTH</option>
+                    <option value="12">WORKSPACE</option>
+                </select>
+                <select class="custom-select">
+                    <option value disabled selected>stars</option>
+                    <option value="1">1 and more</option>
+                    <option value="2">2 and more</option>
+                    <option value="3">3 and more</option>
+                    <option value="4">4 and more</option>
+                    <option value="5">5</option>
+                </select>
+            </div>
+            <select class="custom-select">
+                <option value disabled selected>sort by</option>
+                <option value="1">stars</option>
+                <option value="2">newest</option>
+                <option value="3">price</option>
+            </select>
+        </div>
         <!-- Display Places -->
         <div class="listing_grid">
             <?php foreach ($places as $place): ?>
@@ -90,8 +128,9 @@ if (isset($stmt)) {
                     <a href="single-place.php?id=<?php echo $place['id']; ?>" class="listing_grid--item-img_img">
                         <img src="<?php echo $place['featured_image']; ?>" alt="<?php echo $place['name']; ?>">
                     </a>
-                    <a href="listing.php?category_id=<?php echo $place['category_id']; ?>" class="listing_grid--item-img_category">
-                        <i class="<?php echo htmlspecialchars($category_icon); ?>"></i>  <!-- Dynamic Icon -->
+                    <a href="listing.php?category_id=<?php echo $place['category_id']; ?>"
+                        class="listing_grid--item-img_category">
+                        <i class="<?php echo htmlspecialchars($category_icon); ?>"></i> <!-- Dynamic Icon -->
                     </a>
                     <a href="#" class="listing_grid--item-img_save"><i class="fa-solid fa-bookmark"></i></a>
                 </div>
@@ -100,9 +139,9 @@ if (isset($stmt)) {
                         <?php 
                         $tags = explode(',', $place['tags']);
                         foreach ($tags as $tag): ?>
-                            <a href="listing.php?search=<?php echo urlencode(trim($tag)); ?>">
-                                <?php echo htmlspecialchars(trim($tag)); ?>
-                            </a>
+                        <a href="listing.php?search=<?php echo urlencode(trim($tag)); ?>">
+                            <?php echo htmlspecialchars(trim($tag)); ?>
+                        </a>
                         <?php endforeach; ?>
                     </div>
                     <a class="listing_grid--item-content_name" href="single-place.php?id=<?php echo $place['id']; ?>">
@@ -113,11 +152,11 @@ if (isset($stmt)) {
                     </a>
                     <div class="listing_grid--item-content_stars">
                         <div class="listing_grid--item-content_stars-stars">
-                            <?php 
-                            $rating = $place['rating'] ?? 0;  
-                            for ($i = 0; $i < $rating; $i++): ?>
-                                <i class="fa-solid fa-star"></i>
-                            <?php endfor; ?>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
                         </div>
                         <h4 class="listing_grid--item-content_stars-price"><?php echo $place['price']; ?></h4>
                     </div>
@@ -125,7 +164,15 @@ if (isset($stmt)) {
             </div>
             <?php endforeach; ?>
         </div>
+        <div class="listing_indicator">
+            <div class="listing_indicator">
+                <li class="indicator_item"><a href="#"><i class="fa-solid fa-chevron-left"></i></a></li>
+                <li class="indicator_item"><a href>1</a></li>
+                <li class="indicator_item active"><a href>2</a></li>
+            </div>
+        </div>
     </div>
+
 </main>
 
 <?php
