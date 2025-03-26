@@ -171,11 +171,11 @@
                         }
 
                         .activity_stars {
-                            display: flex;
-                            gap: .8rem;
                             font-size: $F-S;
-                            color: $red-600;
-
+                            display: inline-block;
+                            background: linear-gradient(90deg, $red-600 var(--rating, 92%), $gray-100 var(--rating, 8%));
+                            -webkit-background-clip: text;
+                            -webkit-text-fill-color: transparent;
                         }
                     }
 
