@@ -51,7 +51,7 @@
     <div class="categories">
         <h2 class="home-title">categories </h2>
         <div class="categories_grid">
-            <div class="categories_grid--item"><a href="./listing.php?category_id=1""><img
+            <div class="categories_grid--item"><a href="./listing.php?category_id=1"><img
                      src=" assets/images/categories/RESTURANTS (1).jpg" alt></a><a class="categories_grid--item_link"
                     href="./listing.html">RESTURANTS</a></div>
             <div class="categories_grid--item"><a href="./listing.php?category_id=2""><img
@@ -96,249 +96,43 @@
                     href="./listing.html">WORKSPACE</a></div>
         </div>
     </div>
-    <div class="activity">
-        <h2 class="home-title">Recent Activity </h2>
-        <div class="activity_grid">
-            <div class="activity_grid--item">
-                <div class="activity_grid--item_img">
-                    <a class="activity_grid--item_img_user" href="#">
-                        <img src="assets/images/user.jpg" alt>
-                        <p>Abed Ulrhman Alshafee</p>
-                    </a>
-                    <a href="#"><img class="activity_grid--item_img_user-img" src="assets/images/rev.jpg" alt></a>
-                    <a class="activity_grid--item_img_like" href><i class="fa-solid fa-heart"></i></a>
-                </div>
-                <div class="activity_grid--item_content">
-                    <div class="activity_grid--item_content-info" ">
-                     <div class=" activity_grid--item_content-info_name">
-                        <a href>
-                            <h3>Jebena Cafe</h3>
-                        </a>
-                        <div class="activity_stars">
-                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                                class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                                class="fa-solid fa-star"></i>
-                        </div>
-                    </div>
-                    <a class="activity_grid--item_content-info_link" href="#"><i class="fa-solid fa-mug-saucer"></i></a>
-                </div>
-                <p>recently
-                    visited Jebena Cafe,
-                    and it was an absolute delight ! The ambiance was
-                    warm and inviting,
-                    with soft lighting ...
-                </p>
-            </div>
-        </div>
-        <div class="activity_grid--item">
-            <div class="activity_grid--item_img">
-                <a class="activity_grid--item_img_user" href="#">
-                    <img src="assets/images/user.jpg" alt>
-                    <p>Abed Ulrhman Alshafee</p>
-                </a>
-                <a href="#"><img class="activity_grid--item_img_user-img" src="assets/images/rev.jpg" alt></a><a
-                    class="activity_grid--item_img_like" href><i class="fa-solid fa-heart"></i></a>
-            </div>
-            <div class="activity_grid--item_content">
-                <div class="activity_grid--item_content-info" ">
-                     <div class=" activity_grid--item_content-info_name">
-                    <a href>
-                        <h3>Jebena Cafe</h3>
-                    </a>
-                    <div class="activity_stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                            class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                            class="fa-solid fa-star"></i></div>
-                </div>
-                <a class="activity_grid--item_content-info_link" href="#"><i class="fa-solid fa-mug-saucer"></i></a>
-            </div>
-            <p>recently
-                visited Jebena Cafe,
-                and it was an absolute delight ! The ambiance was
-                warm and inviting,
-                with soft lighting ...
-            </p>
-        </div>
-    </div>
-    <div class="activity_grid--item">
-        <div class="activity_grid--item_img">
-            <a class="activity_grid--item_img_user" href="#">
-                <img src="assets/images/user.jpg" alt>
-                <p>Abed Ulrhman Alshafee</p>
-            </a>
-            <a href="#"><img class="activity_grid--item_img_user-img" src="assets/images/rev.jpg" alt></a><a
-                class="activity_grid--item_img_like" href><i class="fa-solid fa-heart"></i></a>
-        </div>
-        <div class="activity_grid--item_content">
-            <div class="activity_grid--item_content-info" ">
-                     <div class=" activity_grid--item_content-info_name">
-                <a href>
-                    <h3>Jebena Cafe</h3>
-                </a>
-                <div class="activity_stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                        class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-                </div>
-            </div>
-            <a class="activity_grid--item_content-info_link" href="#"><i class="fa-solid fa-mug-saucer"></i></a>
-        </div>
-        <p>recently
-            visited Jebena Cafe,
-            and it was an absolute delight ! The ambiance was
-            warm and inviting,
-            with soft lighting ...
-        </p>
-    </div>
-    </div>
 
-    <div class="activity_grid--item">
-        <div class="activity_grid--item_img">
-            <a class="activity_grid--item_img_user" href="#">
-                <img src="assets/images/user.jpg" alt>
-                <p>Abed Ulrhman Alshafee</p>
-            </a>
-            <a href="#"><img class="activity_grid--item_img_user-img" src="assets/images/rev.jpg" alt></a><a
-                class="activity_grid--item_img_like" href><i class="fa-solid fa-heart"></i></a>
-        </div>
-        <div class="activity_grid--item_content">
-            <div class="activity_grid--item_content-info">
-                <div class="activity_grid--item_content-info_name">
-                    <a href>
-                        <h3>Jebena Cafe</h3>
-                    </a>
-                    <div class="activity_stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                            class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                            class="fa-solid fa-star"></i></div>
-                </div>
-                <a class="activity_grid--item_content-info_link" href="#"><i class="fa-solid fa-mug-saucer"></i></a>
-            </div>
-            <p>recently
-                visited Jebena Cafe,
-                and it was an absolute delight ! The ambiance was
-                warm and inviting,
-                with soft lighting ...
-            </p>
-        </div>
-    </div>
-    <div class="activity_grid--item">
-        <div class="activity_grid--item_img">
-            <a class="activity_grid--item_img_user" href="#">
-                <img src="assets/images/user.jpg" alt>
-                <p>Abed Ulrhman Alshafee</p>
-            </a>
-            <a href="#"><img class="activity_grid--item_img_user-img" src="assets/images/rev.jpg" alt></a><a
-                class="activity_grid--item_img_like" href><i class="fa-solid fa-heart"></i></a>
-        </div>
-        <div class="activity_grid--item_content">
-            <div class="activity_grid--item_content-info" ">
-                     <div class=" activity_grid--item_content-info_name">
-                <a href>
-                    <h3>Jebena Cafe</h3>
-                </a>
-                <div class="activity_stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                        class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-                </div>
-            </div>
-            <a class="activity_grid--item_content-info_link" href="#"><i class="fa-solid fa-mug-saucer"></i></a>
-        </div>
-        <p>recently
-            visited Jebena Cafe,
-            and it was an absolute delight ! The ambiance was
-            warm and inviting,
-            with soft lighting ...
-        </p>
-    </div>
-    </div>
-    <div class="activity_grid--item">
-        <div class="activity_grid--item_img">
-            <a class="activity_grid--item_img_user" href="#">
-                <img src="assets/images/user.jpg" alt>
-                <p>Abed Ulrhman Alshafee</p>
-            </a>
-            <a href="#"><img class="activity_grid--item_img_user-img" src="assets/images/rev.jpg" alt></a><a
-                class="activity_grid--item_img_like" href><i class="fa-solid fa-heart"></i></a>
-        </div>
-        <div class="activity_grid--item_content">
-            <div class="activity_grid--item_content-info">
-                <div class="activity_grid--item_content-info_name">
-                    <a href>
-                        <h3>Jebena Cafe</h3>
-                    </a>
-                    <div class="activity_stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                            class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                            class="fa-solid fa-star"></i></div>
-                </div>
-                <a class="activity_grid--item_content-info_link" href="#"><i class="fa-solid fa-mug-saucer"></i></a>
-            </div>
-            <p>recently
-                visited Jebena Cafe,
-                and it was an absolute delight ! The ambiance was
-                warm and inviting,
-                with soft lighting ...
-            </p>
-        </div>
-    </div>
+    <?php
+$limit = 8; // Initial limit
+?>
+<div class="activity">
+    <h2 class="home-title">Recent Activity</h2>
+    <div class="activity_grid" id="activity_grid">
+        <?php
+       
 
-    <div class="activity_grid--item">
-        <div class="activity_grid--item_img">
-            <a class="activity_grid--item_img_user" href="#">
-                <img src="assets/images/user.jpg" alt>
-                <p>Abed Ulrhman Alshafee</p>
-            </a>
-            <a href="#"><img class="activity_grid--item_img_user-img" src="assets/images/rev.jpg" alt></a><a
-                class="activity_grid--item_img_like" href><i class="fa-solid fa-heart"></i></a>
-        </div>
-        <div class="activity_grid--item_content">
-            <div class="activity_grid--item_content-info">
-                <div class="activity_grid--item_content-info_name">
-                    <a href>
-                        <h3>Jebena Cafe</h3>
-                    </a>
-                    <div class="activity_stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                            class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                            class="fa-solid fa-star"></i></div>
-                </div>
-                <a class="activity_grid--item_content-info_link" href="#"><i class="fa-solid fa-mug-saucer"></i></a>
-            </div>
-            <p>recently
-                visited Jebena Cafe,
-                and it was an absolute delight ! The ambiance was
-                warm and inviting,
-                with soft lighting ...
-            </p>
-        </div>
+        $query = "SELECT r.id AS review_id, r.review_text, r.rating, r.created_at, 
+                  p.name AS place_name, CONCAT(u.first_name, ' ', u.last_name) AS user_name, 
+                  u.profile_image AS user_profile_image, ri.image_url AS review_image, c.icon AS icon_class
+                  FROM reviews r
+                  JOIN places p ON r.place_id = p.id
+                  JOIN users u ON r.user_id = u.id
+                  JOIN review_images ri ON r.id = ri.review_id  -- INNER JOIN to filter only reviews with images
+                  JOIN categories c ON p.category_id = c.id
+                  ORDER BY r.created_at DESC
+                  LIMIT $limit";
+
+        $result = mysqli_query($conn, $query);
+        if (mysqli_num_rows($result) > 0) {
+            while ($row = mysqli_fetch_assoc($result)) {
+                include 'review_card.php'; // Load review card template
+            }
+        } else {
+            echo "<p>No reviews found.</p>";
+        }
+        ?>
     </div>
-    <div class="activity_grid--item">
-        <div class="activity_grid--item_img">
-            <a class="activity_grid--item_img_user" href="#">
-                <img src="assets/images/user.jpg" alt>
-                <p>Abed Ulrhman Alshafee</p>
-            </a>
-            <a href="#"><img class="activity_grid--item_img_user-img" src="assets/images/rev.jpg" alt></a><a
-                class="activity_grid--item_img_like" href><i class="fa-solid fa-heart"></i></a>
-        </div>
-        <div class="activity_grid--item_content">
-            <div class="activity_grid--item_content-info">
-                <div class="activity_grid--item_content-info_name">
-                    <a href>
-                        <h3>Jebena Cafe</h3>
-                    </a>
-                    <div class="activity_stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                            class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                            class="fa-solid fa-star"></i></div>
-                </div>
-                <a class="activity_grid--item_content-info_link" href="#"><i class="fa-solid fa-mug-saucer"></i></a>
-            </div>
-            <p>recently
-                visited Jebena Cafe,
-                and it was an absolute delight ! The ambiance was
-                warm and inviting,
-                with soft lighting ...
-            </p>
-        </div>
-    </div>
-    </div>
-    <a class="btn__transparent--l btn__transparent btn" href="#">Load
-        more</a>
-    </div>
+    <button class="btn__transparent--l btn__transparent btn" id="loadMore">Load more</button>
+</div>
+
+
+
+
     <div id="aboutUs" class="aboutUs">
         <div class="aboutUs_text">
             <h2>ABOUT US</h2>
@@ -357,6 +151,7 @@
             <img src="assets/images/aboutus.jpg" alt="about Us">
         </div>
     </div>
+
     <div class="homeBlog">
         <h2 class="home-title">categories </h2>
         <div class="homeBlog_blogs">
