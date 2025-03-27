@@ -106,7 +106,7 @@ $limit = 8; // Initial limit
         <?php
        
 
-        $query = "SELECT r.id AS review_id, r.review_text, r.rating, r.created_at, 
+        $query = "SELECT r.id AS review_id, r.review_text, r.rating, 
                   p.name AS place_name, CONCAT(u.first_name, ' ', u.last_name) AS user_name, 
                   u.profile_image AS user_profile_image, ri.image_url AS review_image, c.icon AS icon_class
                   FROM reviews r
