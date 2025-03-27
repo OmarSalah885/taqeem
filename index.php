@@ -114,7 +114,7 @@ $limit = 8; // Initial limit
                   JOIN users u ON r.user_id = u.id
                   JOIN review_images ri ON r.id = ri.review_id  -- INNER JOIN to filter only reviews with images
                   JOIN categories c ON p.category_id = c.id
-                  ORDER BY r.created_at DESC
+                  ORDER BY rand()
                   LIMIT $limit";
 
         $result = mysqli_query($conn, $query);
