@@ -97,25 +97,24 @@
         </div>
     </div>
 
-    <?php
-$limit = 8; // Initial limit
-?>
+    
 <div class="activity">
     <h2 class="home-title">Recent Activity</h2>
     <div class="activity_grid" id="activity_grid">
         <?php
-       
+    
+       $limit = 8; // Initial limit
 
         $query = "SELECT r.id AS review_id, r.review_text, r.rating, 
-                  p.name AS place_name, CONCAT(u.first_name, ' ', u.last_name) AS user_name, 
-                  u.profile_image AS user_profile_image, ri.image_url AS review_image, c.icon AS icon_class
-                  FROM reviews r
-                  JOIN places p ON r.place_id = p.id
-                  JOIN users u ON r.user_id = u.id
-                  JOIN review_images ri ON r.id = ri.review_id  -- INNER JOIN to filter only reviews with images
-                  JOIN categories c ON p.category_id = c.id
-                  ORDER BY rand()
-                  LIMIT $limit";
+                p.name AS place_name, CONCAT(u.first_name, ' ', u.last_name) AS user_name, 
+                u.profile_image AS user_profile_image, ri.image_url AS review_image, c.icon AS icon_class
+                FROM reviews r
+                JOIN places p ON r.place_id = p.id
+                JOIN users u ON r.user_id = u.id
+                JOIN review_images ri ON r.id = ri.review_id  -- INNER JOIN to filter only reviews with images
+                JOIN categories c ON p.category_id = c.id
+                ORDER BY rand()
+                LIMIT $limit";
 
         $result = mysqli_query($conn, $query);
         if (mysqli_num_rows($result) > 0) {
@@ -153,67 +152,59 @@ $limit = 8; // Initial limit
     </div>
 
     <div class="homeBlog">
-        <h2 class="home-title">categories </h2>
-        <div class="homeBlog_blogs">
-            <div class="homeBlog_blogs--item">
-                <div class="homeBlog_blogs--item-img">
-                    <a href="#" class="homeBlog_blogs--item-img_img">
-                        <img src="assets/images/blogimg (2).jpg" alt="#">
-                    </a>
-                    <div class="homeBlog_blogs--item-img_tags">
-                        <a href="#">TRAVEL</a>
-                        <a href="#">CAR</a>
-                        <a href="#">AMMAN</a>
-                    </div>
-                </div>
-                <div class="homeBlog_blogs--item-text">
-                    <a href="#" class="homeBlog_blogs--item-text_title">this is
-                        the title of the blog</a>
-                    <p>this what is the text of the blog this what is the text of
-                        the blog this what is the text of the blogthis what is the
-                        text of the blogthis what is the text of the blog ...</p>
-                </div>
-            </div>
-            <div class="homeBlog_blogs--item">
-                <div class="homeBlog_blogs--item-img">
-                    <a href class="homeBlog_blogs--item-img_img">
-                        <img src="assets/images/blogimg (2).jpg" alt="#">
-                    </a>
-                    <div class="homeBlog_blogs--item-img_tags">
-                        <a href="#">TRAVEL</a>
-                        <a href="#">CAR</a>
-                        <a href="#">AMMAN</a>
-                    </div>
-                </div>
-                <div class="homeBlog_blogs--item-text">
-                    <a href="#" class="homeBlog_blogs--item-text_title">this is
-                        the title of the blog</a>
-                    <p>this what is the text of the blog this what is the text of
-                        the blog this what is the text of the blogthis what is the
-                        text of the blogthis what is the text of the blog ...</p>
-                </div>
-            </div>
-            <div class="homeBlog_blogs--item">
-                <div class="homeBlog_blogs--item-img">
-                    <a href class="homeBlog_blogs--item-img_img">
-                        <img src="assets/images/blogimg (2).jpg" alt="#">
-                    </a>
-                    <div class="homeBlog_blogs--item-img_tags">
-                        <a href="#">TRAVEL</a>
-                        <a href="#">CAR</a>
-                        <a href="#">AMMAN</a>
-                    </div>
-                </div>
-                <div class="homeBlog_blogs--item-text">
-                    <a href="#" class="homeBlog_blogs--item-text_title">this is
-                        the title of the blog</a>
-                    <p>this what is the text of the blog this what is the text of
-                        the blog this what is the text of the blogthis what is the
-                        text of the blogthis what is the text of the blog ...</p>
-                </div>
-            </div>
+    <h2 class="home-title">Categories</h2>
+    <div class="homeBlog_blogs">
+        <?php
+        // Query to fetch 3 random blogs
+        $query = "SELECT id, image, title, tags, content FROM blogs ORDER BY RAND() LIMIT 3";
+        $result = mysqli_query($conn, $query);
 
-        </div>
+        if (mysqli_num_rows($result) > 0) {
+            while ($row = mysqli_fetch_assoc($result)) {
+                // Extract data
+                $id = $row['id']; // Blog ID
+                $image = htmlspecialchars($row['image']); // Image from DB
+                $title = htmlspecialchars($row['title']);
+                $tags = explode(',', $row['tags']); // Assuming tags are comma-separated
+                $content = strip_tags($row['content']); // Remove HTML tags for truncation
+                
+                // Limit content to 200 characters
+                $shortContent = (strlen($content) > 200) ? substr($content, 0, 200) . '...' : $content;
+
+                echo '<div class="homeBlog_blogs--item">
+                        <div class="homeBlog_blogs--item-img">
+                            <a href="single_blog.php?id=' . $id . '" class="homeBlog_blogs--item-img_img" style="text-decoration: none;">
+                                <img src="' . $image . '" alt="Blog Image">
+                            </a>
+                            <div class="homeBlog_blogs--item-img_tags">';
+                            
+                // Display tags dynamically
+                foreach ($tags as $tag) {
+                    echo '<a href="#" style="text-decoration: none;">' . htmlspecialchars(trim($tag)) . '</a>';
+                }
+
+                echo '      </div>
+                        </div>
+                        <div class="homeBlog_blogs--item-text">
+                            <a href="single_blog.php?id=' . $id . '" class="homeBlog_blogs--item-text_title" style="text-decoration: none;">' . $title . '</a>
+                            <a href="single_blog.php?id=' . $id . '" style="text-decoration: none;">
+                                <p>' . htmlspecialchars($shortContent) . '</p> <!-- Truncated Content -->
+                            </a>
+                        </div>
+                    </div>';
+            }
+        } else {
+            echo "<p>No blogs found.</p>";
+        }
+        ?>
     </div>
+</div>
+
+
+
+
+
+
+
 </main>
 <?php include 'footer.php'; ?>
