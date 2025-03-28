@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const activityGrid = document.getElementById("activity_grid");
 
     loadMoreBtn.addEventListener("click", function () {
+        event.preventDefault();
         let xhr = new XMLHttpRequest();
         xhr.open("POST", "load_reviews.php", true);
         xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");

@@ -127,7 +127,7 @@ $limit = 8; // Initial limit
         }
         ?>
     </div>
-    <button class="btn__transparent--l btn__transparent btn" id="loadMore">Load more</button>
+    <a class="btn__transparent--l btn__transparent btn" id="loadMore">Load more</a>
 </div>
 
 
