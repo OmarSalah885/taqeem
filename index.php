@@ -48,6 +48,7 @@
         <div class="carousel-indicators"><span class="indicator active" data-slide="0"></span><span class="indicator"
                 data-slide="1"></span><span class="indicator" data-slide="2"></span></div>
     </div>
+
     <div class="categories">
         <h2 class="home-title">categories </h2>
         <div class="categories_grid">
@@ -55,58 +56,48 @@
                         src=" assets/images/categories/RESTURANTS (1).jpg" alt></a><a class="categories_grid--item_link"
                     href="./listing.html">RESTURANTS</a></div>
             <div class="categories_grid--item"><a href="./listing.php?category_id=2""><img
-                     src=" assets/images/categories/SHOPPING (1).jpg" alt></a><a class="categories_grid--item_link"
+                    src=" assets/images/categories/SHOPPING (1).jpg" alt></a><a class="categories_grid--item_link"
                     href="./listing.html">SHOPPING</a></div>
             <div class="categories_grid--item"><a href="./listing.php?category_id=3""><img
-                     src=" assets/images/categories/ACTIVE LIFE (1).jpg" alt></a><a class="categories_grid--item_link"
+                    src=" assets/images/categories/ACTIVE LIFE (1).jpg" alt></a><a class="categories_grid--item_link"
                     href="./listing.html">ACTIVE
                     LIFE</a>
             </div>
             <div class="categories_grid--item"><a href="./listing.php?category_id=4""><img
-                     src=" assets/images/categories/HOME SERVICES (1).jpg" alt></a><a
+                    src=" assets/images/categories/HOME SERVICES (1).jpg" alt></a><a
                     class="categories_grid--item_link" href="./listing.html">HOME
                     SERVICES</a>
             </div>
             <div class="categories_grid--item"><a href="./listing.php?category_id=5"">
-                  <img src=" assets/images/categories/COFFEE (1).jpg" alt></a><a class="categories_grid--item_link"
+                <img src=" assets/images/categories/COFFEE (1).jpg" alt></a><a class="categories_grid--item_link"
                     href="./listing.html">COFFEE</a>
             </div>
             <div class="categories_grid--item"><a href="./listing.php?category_id=6""><img
-                     src=" assets/images/categories/PETS (1).jpg" alt></a><a class="categories_grid--item_link"
+                    src=" assets/images/categories/PETS (1).jpg" alt></a><a class="categories_grid--item_link"
                     href="./listing.html">PETS</a></div>
             <div class="categories_grid--item"><a href="./listing.php?category_id=7""><img
-                     src=" assets/images/categories/PLANTS SHOP (1).jpg" alt></a><a class="categories_grid--item_link"
+                    src=" assets/images/categories/PLANTS SHOP (1).jpg" alt></a><a class="categories_grid--item_link"
                     href="./listing.html">PLANTS
                     SHOP</a>
             </div>
             <div class="categories_grid--item"><a href="./listing.php?category_id=8""><img
-                     src=" assets/images/categories/ART (1).jpg" alt></a><a class="categories_grid--item_link"
+                    src=" assets/images/categories/ART (1).jpg" alt></a><a class="categories_grid--item_link"
                     href="./listing.html">ART</a></div>
             <div class="categories_grid--item"><a href="./listing.php?category_id=9""><img
-                     src=" assets/images/categories/HOTELS (1).jpg" alt></a><a class="categories_grid--item_link"
+                    src=" assets/images/categories/HOTELS (1).jpg" alt></a><a class="categories_grid--item_link"
                     href="./listing.html">HOTELS</a></div>
             <div class="categories_grid--item"><a href="./listing.php?category_id=10""><img
-                     src=" assets/images/categories/EDUCATION (1).jpg" alt></a><a class="categories_grid--item_link"
+                    src=" assets/images/categories/EDUCATION (1).jpg" alt></a><a class="categories_grid--item_link"
                     href="./listing.html">EDUCATION</a></div>
             <div class="categories_grid--item"><a href="./listing.php?category_id=11""><img
-                     src=" assets/images/categories/HEALTH (1).jpg" alt></a><a class="categories_grid--item_link"
+                    src=" assets/images/categories/HEALTH (1).jpg" alt></a><a class="categories_grid--item_link"
                     href="./listing.html">HEALTH</a></div>
             <div class="categories_grid--item"><a href="./listing.php?category_id=12""><img
-                     src=" assets/images/categories/WORKSPACE (1).jpg" alt></a><a class="categories_grid--item_link"
+                    src=" assets/images/categories/WORKSPACE (1).jpg" alt></a><a class="categories_grid--item_link"
                     href="./listing.html">WORKSPACE</a></div>
         </div>
     </div>
 
-<<<<<<< HEAD
-    <?php
-$limit = 8; // Initial limit
-?>
-    <div class="activity">
-        <h2 class="home-title">Recent Activity</h2>
-        <div class="activity_grid" id="activity_grid">
-            <?php
-       
-=======
     
 <div class="activity">
     <h2 class="home-title">Recent Activity</h2>
@@ -114,7 +105,6 @@ $limit = 8; // Initial limit
         <?php
     
        $limit = 8; // Initial limit
->>>>>>> b346d6f6c1f35dbdba20171b993f3d60f7e36c7a
 
         $query = "SELECT r.id AS review_id, r.review_text, r.rating, 
                 p.name AS place_name, CONCAT(u.first_name, ' ', u.last_name) AS user_name, 
@@ -139,11 +129,7 @@ $limit = 8; // Initial limit
         </div>
         <a class="btn__transparent--l btn__transparent btn" id="loadMore">Load more</a>
     </div>
-<<<<<<< HEAD
-=======
-    <a class="btn__transparent--l btn__transparent btn" id="loadMore">Load more</a>
 </div>
->>>>>>> b346d6f6c1f35dbdba20171b993f3d60f7e36c7a
 
 
 
