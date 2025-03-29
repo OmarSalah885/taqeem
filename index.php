@@ -52,7 +52,7 @@
         <h2 class="home-title">categories </h2>
         <div class="categories_grid">
             <div class="categories_grid--item"><a href="./listing.php?category_id=1"><img
-                     src=" assets/images/categories/RESTURANTS (1).jpg" alt></a><a class="categories_grid--item_link"
+                        src=" assets/images/categories/RESTURANTS (1).jpg" alt></a><a class="categories_grid--item_link"
                     href="./listing.html">RESTURANTS</a></div>
             <div class="categories_grid--item"><a href="./listing.php?category_id=2""><img
                      src=" assets/images/categories/SHOPPING (1).jpg" alt></a><a class="categories_grid--item_link"
@@ -100,10 +100,10 @@
     <?php
 $limit = 8; // Initial limit
 ?>
-<div class="activity">
-    <h2 class="home-title">Recent Activity</h2>
-    <div class="activity_grid" id="activity_grid">
-        <?php
+    <div class="activity">
+        <h2 class="home-title">Recent Activity</h2>
+        <div class="activity_grid" id="activity_grid">
+            <?php
        
 
         $query = "SELECT r.id AS review_id, r.review_text, r.rating, 
@@ -126,9 +126,9 @@ $limit = 8; // Initial limit
             echo "<p>No reviews found.</p>";
         }
         ?>
+        </div>
+        <a class="btn__transparent--l btn__transparent btn" id="loadMore">Load more</a>
     </div>
-    <button class="btn__transparent--l btn__transparent btn" id="loadMore">Load more</button>
-</div>
 
 
 
