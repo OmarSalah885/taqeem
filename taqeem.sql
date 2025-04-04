@@ -2,8 +2,8 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1:3307
--- Generation Time: Mar 30, 2025 at 04:06 PM
+-- Host: 127.0.0.1
+-- Generation Time: Apr 04, 2025 at 01:16 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -85,23 +85,23 @@ INSERT INTO `blog_comments` (`id`, `blog_id`, `user_id`, `comment`, `parent_comm
 (3, 3, 3, 'That sounds amazing! I’ve read about the Monastery hike—how difficult was it? I’ve heard mixed reviews, with some saying it’s exhausting and others saying it’s manageable with breaks. Also, how long did it take you to reach the top?', 1, '2025-03-15 14:11:07'),
 (4, 3, 2, 'It’s definitely a bit of a challenge, but totally doable if you pace yourself. The climb took me about 45 minutes to an hour, but the view from the top made every step worth it. There’s even a small café up there where you can rest and enjoy the scenery. Just bring plenty of water!', 3, '2025-03-15 14:11:07'),
 (5, 3, 4, 'The entrance to Petra through the Siq looks like something out of a fantasy movie! Those towering cliffs and the anticipation of seeing the Treasury must be such an unforgettable experience. I bet it feels like stepping back in time.', NULL, '2025-03-15 14:11:07'),
-(6, 3, 5, 'It really does! Fun fact: the Treasury was featured in \"Indiana Jones and the Last Crusade.\" That scene where they ride up to it made it even more legendary. But in real life, it’s even more massive and intricate than I ever imagined!', 4, '2025-03-15 14:11:07'),
+(6, 3, 5, 'It really does! Fun fact: the Treasury was featured in \"Indiana Jones and the Last Crusade.\" That scene where they ride up to it made it even more legendary. But in real life, it’s even more massive and intricate than I ever imagined!', 5, '2025-03-15 14:11:07'),
 (7, 3, 6, 'I wish they allowed more preservation efforts in some areas. I read that parts of the rock are eroding due to weathering and increased tourism. It’s a delicate balance between keeping it accessible and protecting such a historic site.', NULL, '2025-03-15 14:11:07'),
-(8, 3, 7, 'That’s a great point. From what I saw, they are taking conservation seriously, but with the number of tourists visiting each day, it’s definitely a challenge. I think limiting access to certain fragile areas might be a good idea in the future.', 6, '2025-03-15 14:11:07'),
+(8, 3, 7, 'That’s a great point. From what I saw, they are taking conservation seriously, but with the number of tourists visiting each day, it’s definitely a challenge. I think limiting access to certain fragile areas might be a good idea in the future.', 7, '2025-03-15 14:11:07'),
 (9, 3, 8, 'Is Petra very crowded during peak season? I’d love to visit, but I prefer exploring places when they’re not overly packed with tourists. Are there any specific months or times of the day when it’s less crowded?', NULL, '2025-03-15 14:11:07'),
-(10, 3, 9, 'Yes, it can get quite busy, especially around midday when most tour groups arrive. The best way to avoid crowds is to go early in the morning or later in the afternoon. Also, visiting in the off-season, like late autumn or early spring, helps avoid the extreme heat and peak tourist rush.', 8, '2025-03-15 14:11:07'),
+(10, 3, 9, 'Yes, it can get quite busy, especially around midday when most tour groups arrive. The best way to avoid crowds is to go early in the morning or later in the afternoon. Also, visiting in the off-season, like late autumn or early spring, helps avoid the extreme heat and peak tourist rush.', 9, '2025-03-15 14:11:07'),
 (11, 7, 1, 'Amman sounds like a dream for food lovers! I’ve always wanted to try authentic Jordanian cuisine. What’s the best place for a traditional Jordanian breakfast?', NULL, '2025-03-15 14:13:24'),
-(12, 7, 2, 'If you’re looking for a classic Jordanian breakfast, you have to visit Hashem Restaurant! Their hummus and falafel are legendary, and it’s a favorite among both locals and tourists.', 1, '2025-03-15 14:13:24'),
+(12, 7, 2, 'If you’re looking for a classic Jordanian breakfast, you have to visit Hashem Restaurant! Their hummus and falafel are legendary, and it’s a favorite among both locals and tourists.', 11, '2025-03-15 14:13:24'),
 (13, 7, 3, 'I love street food! Shawarma and falafel are some of my favorites. Are there any specific places in Amman that are known for having the best street food?', NULL, '2025-03-15 14:13:24'),
 (14, 18, 10, 'Aqaba sounds like an amazing destination! I’ve always wanted to go diving in the Red Sea. How difficult is it for a beginner to get started with diving there?', NULL, '2025-03-15 14:17:23'),
-(15, 18, 2, 'It’s actually a great place for beginners! There are plenty of dive shops in Aqaba that offer introductory courses, and the waters are calm and clear, making it a perfect spot to learn.', 1, '2025-03-15 14:17:23'),
+(15, 18, 2, 'It’s actually a great place for beginners! There are plenty of dive shops in Aqaba that offer introductory courses, and the waters are calm and clear, making it a perfect spot to learn.', 14, '2025-03-15 14:17:23'),
 (16, 18, 30, 'The Japanese Gardens dive site looks stunning! Has anyone been there? I’d love to know what the experience is like and if it’s suitable for intermediate divers.', NULL, '2025-03-15 14:17:23'),
-(17, 18, 19, 'Yes! I dove there last year, and it was absolutely breathtaking. The coral formations are vibrant, and there are so many colorful fish. If you’re an intermediate diver, you’ll love it—it’s not too deep, but still full of marine life.', 3, '2025-03-15 14:17:23'),
+(17, 18, 19, 'Yes! I dove there last year, and it was absolutely breathtaking. The coral formations are vibrant, and there are so many colorful fish. If you’re an intermediate diver, you’ll love it—it’s not too deep, but still full of marine life.', 16, '2025-03-15 14:17:23'),
 (18, 18, 24, 'Snorkeling sounds like a great option too! Are there specific locations in Aqaba that are best for snorkeling, or can you just go anywhere along the coast?', NULL, '2025-03-15 14:17:23'),
 (19, 14, 12, 'The Dead Sea has always fascinated me! I’ve heard that the high salt content makes it impossible to sink, but is it safe for people with sensitive skin?', NULL, '2025-03-15 14:20:31'),
-(20, 14, 16, 'Yes, it’s generally safe, but if you have any cuts or sensitive skin, the salt can cause a stinging sensation. It’s best to rinse off with fresh water after floating to avoid irritation.', 1, '2025-03-15 14:20:31'),
+(20, 14, 16, 'Yes, it’s generally safe, but if you have any cuts or sensitive skin, the salt can cause a stinging sensation. It’s best to rinse off with fresh water after floating to avoid irritation.', 19, '2025-03-15 14:20:31'),
 (21, 14, 11, 'I love the idea of a natural spa experience! Has anyone tried the Dead Sea mud treatments? Do they really help with skin conditions?', NULL, '2025-03-15 14:20:31'),
-(22, 14, 26, 'I tried it last summer, and my skin felt so smooth afterward! The minerals in the mud are great for exfoliation, and it helped with some dryness I had. Definitely worth trying!', 3, '2025-03-15 14:20:31');
+(22, 14, 26, 'I tried it last summer, and my skin felt so smooth afterward! The minerals in the mud are great for exfoliation, and it helped with some dryness I had. Definitely worth trying!', 20, '2025-03-15 14:20:31');
 
 -- --------------------------------------------------------
 
