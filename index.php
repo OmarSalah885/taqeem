@@ -175,7 +175,7 @@
 
                 echo '<div class="homeBlog_blogs--item">
                         <div class="homeBlog_blogs--item-img">
-                            <a href="single_blog.php?id=' . $id . '" class="homeBlog_blogs--item-img_img" style="text-decoration: none;">
+                            <a href="single-blog.php?id=' . $id . '" class="homeBlog_blogs--item-img_img" style="text-decoration: none;">
                                 <img src="' . $image . '" alt="Blog Image">
                             </a>
                             <div class="homeBlog_blogs--item-img_tags">';
@@ -188,8 +188,8 @@
                 echo '      </div>
                         </div>
                         <div class="homeBlog_blogs--item-text">
-                            <a href="single_blog.php?id=' . $id . '" class="homeBlog_blogs--item-text_title" style="text-decoration: none;">' . $title . '</a>
-                            <a href="single_blog.php?id=' . $id . '" style="text-decoration: none;">
+                            <a href="single-blog.php?id=' . $id . '" class="homeBlog_blogs--item-text_title" style="text-decoration: none;">' . $title . '</a>
+                            <a href="single-blog.php?id=' . $id . '" style="text-decoration: none;">
                                 <p>' . htmlspecialchars($shortContent) . '</p> <!-- Truncated Content -->
                             </a>
                         </div>
