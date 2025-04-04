@@ -11,13 +11,14 @@
         }
     }
 
-    &_tages {
+    &_tags {
         width: 100%;
         height: fit-content;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 1.6rem;
+
 
         a {
             color: $red-00;
@@ -197,7 +198,7 @@
                             }
 
 
-                            &--replay {
+                            &--reply {
                                 color: $red-500;
                                 font-size: $F-XXS;
                                 text-decoration: none;

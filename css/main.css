@@ -1625,7 +1625,7 @@ body p {
   -o-object-fit: cover;
      object-fit: cover;
 }
-.single-blog_tages {
+.single-blog_tags {
   width: 100%;
   height: -moz-fit-content;
   height: fit-content;
@@ -1634,7 +1634,7 @@ body p {
   justify-content: center;
   gap: 1.6rem;
 }
-.single-blog_tages a {
+.single-blog_tags a {
   color: #FDE8E8;
   background-color: #D01515;
   text-transform: uppercase;
@@ -1645,7 +1645,7 @@ body p {
   margin-bottom: 4.8rem;
   padding: 1rem 1.6rem;
 }
-.single-blog_tages a:hover {
+.single-blog_tags a:hover {
   color: #F38B8B;
   background-color: #740C0C;
 }
@@ -1863,13 +1863,13 @@ body p {
     font-size: 1.328rem;
   }
 }
-.single-blog_comments .comments_container--single .comment_content--replay {
+.single-blog_comments .comments_container--single .comment_content--reply {
   color: #D01515;
   font-size: 1.072rem;
   text-decoration: none;
   transition: all 0.3s;
 }
-.single-blog_comments .comments_container--single .comment_content--replay:hover {
+.single-blog_comments .comments_container--single .comment_content--reply:hover {
   color: #170202;
 }
 .single-blog_comments .comments_container--single .reply-comment {
