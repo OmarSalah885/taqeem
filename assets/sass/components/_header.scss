@@ -467,3 +467,33 @@
     visibility: visible;
     opacity: 1;
 }
+
+
+
+
+.navbar_profile {
+    display: block;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    font-size: $F-XS;
+    gap: .8rem;
+    padding: 0rem .8rem 0rem 0rem;
+    border-radius: 100px 0% 0% 100px;
+    color: $red-900;
+    background-color: $red-00;
+
+    transition: all .3s;
+
+    &:hover {
+        background-color: $red-100;
+        border-radius: 100px 100px;
+    }
+
+    img {
+        width: 3.4rem;
+        height: 3.4rem;
+        object-fit: cover;
+        border-radius: 100%
+    }
+}
