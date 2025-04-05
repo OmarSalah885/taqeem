@@ -68,7 +68,7 @@ include 'db_connect.php';
                 <div class="LogOverlay__content--login">
                     <input type="email" placeholder="EMAIL">
                     <input type="password" placeholder="PASSWORD">
-                    <input type="password" placeholder="PASSWORD">
+                    
                     <p>forgot your password ? <a href="#">RESET
                             PASSWORD.</a></p>
                     <button class="btn__red--l btn__red btn">Sing

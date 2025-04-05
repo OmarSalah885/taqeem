@@ -54,8 +54,8 @@ if (!$blog) {
                     // Fetch comments for the blog
                     $comments_query = "
                         SELECT blog_comments.id, blog_comments.comment, blog_comments.created_at, 
-                               blog_comments.parent_comment_id, 
-                               users.first_name, users.last_name, users.profile_image 
+                            blog_comments.parent_comment_id, 
+                            users.first_name, users.last_name, users.profile_image 
                         FROM blog_comments 
                         JOIN users ON blog_comments.user_id = users.id 
                         WHERE blog_comments.blog_id = ?
