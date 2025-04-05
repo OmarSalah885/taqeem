@@ -22,14 +22,22 @@ include 'db_connect.php';
     <nav>
         <nav class="navbar">
             <div class="navbar_container">
-                <div class="navbar_container--menu-L"><a href="./index.php">home</a><a href="./blogs.php">blog</a><a
-                        href="listing.php">categories</a><a href="./index.php#aboutUs">about us</a></div>
-                <div class="navbar_container--logo"><a href="#"><img src="assets/images/logo.png" alt="logo"></a></div>
-                <div class="navbar_container--menu-R"><a class="btn__red--m btn__red btn" id="search-btn" href="#"><i
-                            class="fa-solid fa-magnifying-glass"></i></a><a class="navbar_container--menu-R_links"
-                        id="login-nav" href="#">log in</a><a class="navbar_container--menu-R_links" id="signup-nav"
-                        href="#">sign up</a><a class="btn__red--m btn__red btn" href="./add-place.php">add
-                        place</a>
+                <div class="navbar_container--menu-L">
+                    <a href="./index.php">home</a><a href="./blogs.php">blog</a>
+                    <a href="listing.php">categories</a>
+                    <a href="./index.php#aboutUs">about us</a>
+                </div>
+                <div class="navbar_container--logo">
+                    <a href="#"><img src="assets/images/logo.png" alt="logo"></a>
+                </div>
+                <div class="navbar_container--menu-R">
+                    <a class="btn__red--m btn__red btn" id="search-btn" href="#"><i
+                            class="fa-solid fa-magnifying-glass"></i></a>
+                    <!-- <a class="navbar_container--menu-R_links" id="login-nav" href="#">log in</a>
+                    <a class="navbar_container--menu-R_links" id="signup-nav" href="#">sign up</a> -->
+                    <a href="#" class="navbar_profile"><img src="assets/images/user.jpg" alt=""><span>abdulrhman
+                            alshafee</span></a>
+                    <a class="btn__red--m btn__red btn" href="./add-place.php">add place</a>
                 </div>
             </div>
         </nav>

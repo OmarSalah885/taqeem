@@ -179,6 +179,7 @@
                         }
                     }
 
+
                     &_link {
                         display: block;
                         width: 3.2rem;
@@ -202,6 +203,11 @@
                     font-size: $F-XS;
                     color: $gray-300;
                     margin-top: 1.6rem;
+
+                    .read-more {
+                        color: $red-500;
+                        text-decoration: none;
+                    }
                 }
             }
 
