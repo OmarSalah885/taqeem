@@ -33,10 +33,10 @@ include 'db_connect.php';
                 <div class="navbar_container--menu-R">
                     <a class="btn__red--m btn__red btn" id="search-btn" href="#"><i
                             class="fa-solid fa-magnifying-glass"></i></a>
-                    <!-- <a class="navbar_container--menu-R_links" id="login-nav" href="#">log in</a>
-                    <a class="navbar_container--menu-R_links" id="signup-nav" href="#">sign up</a> -->
-                    <a href="#" class="navbar_profile"><img src="assets/images/user.jpg" alt=""><span>abdulrhman
-                            alshafee</span></a>
+                     <a class="navbar_container--menu-R_links" id="login-nav" href="#">log in</a>
+                    <a class="navbar_container--menu-R_links" id="signup-nav" href="#">sign up</a> 
+                    <!-- <a href="#" class="navbar_profile"><img src="assets/images/user.jpg" alt=""><span>abdulrhman
+                            alshafee</span></a>-->
                     <a class="btn__red--m btn__red btn" href="./add-place.php">add place</a>
                 </div>
             </div>
@@ -74,14 +74,17 @@ include 'db_connect.php';
                     <button class="btn__red--l btn__red btn">Sing
                         in</button>
                 </div>
-                <div class="LogOverlay__content--signup">
-
-                    <div class="LogOverlay__content--signup_name"><input type="text" placeholder="FIRST NAME"><input
-                            type="text" placeholder="LAST NAME"></div>
-                    <input type="text" placeholder="EMAIL"><input type="text" placeholder="PASSWORD"><button
-                        class="btn__red--l btn__red btn">Sing
-                        up</button>
+                <form action="signup_handle.php" method="POST" class="LogOverlay__content--signup " >
+                <div class="LogOverlay__content--signup_name">
+                            <input type="text" name="first_name" placeholder="FIRST NAME" required>
+                            <input type="text" name="last_name" placeholder="LAST NAME" required>
                 </div>
+                        <input type="email" name="email" placeholder="EMAIL" required>
+                        <input type="password" name="password" placeholder="PASSWORD" required>
+                        <input type="password" name="confirm_password" placeholder="CONFIRM PASSWORD" required>
+                        <button type="submit" class="btn__red--l btn__red btn">Sign up</button>
+                    
+</from>
             </div>
         </div>
         <div class="mobile_overlay" id="mobile_overlay">

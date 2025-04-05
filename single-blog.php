@@ -17,6 +17,28 @@ if (!$blog) {
     include 'footer.php';
     exit;
 }
+
+// Fetch comments for the blog
+$comments_query = "
+    SELECT blog_comments.id, blog_comments.comment, blog_comments.created_at, 
+        blog_comments.parent_comment_id, 
+        users.first_name, users.last_name, users.profile_image 
+    FROM blog_comments 
+    JOIN users ON blog_comments.user_id = users.id 
+    WHERE blog_comments.blog_id = ?
+    ORDER BY blog_comments.parent_comment_id ASC, blog_comments.created_at ASC";
+$stmt = $conn->prepare($comments_query);
+$stmt->bind_param("i", $blog_id);
+$stmt->execute();
+$comments_result = $stmt->get_result();
+$comments = $comments_result->fetch_all(MYSQLI_ASSOC);
+
+// Group comments by parent_comment_id
+$grouped_comments = [];
+foreach ($comments as $comment) {
+    $parent_id = $comment['parent_comment_id'] ?? 0; // 0 for main comments
+    $grouped_comments[$parent_id][] = $comment;
+}
 ?>
 
 <main>
@@ -26,14 +48,10 @@ if (!$blog) {
         </div>
         <div class="single-blog_tags">
             <?php
-            // Ensure the `tags` column exists and contains data
             if (!empty($blog['tags'])) {
-                // Split the tags string into an array
                 $tags = explode(',', $blog['tags']); // Assuming tags are stored as a comma-separated string
-
-                // Loop through each tag and display it
                 foreach ($tags as $tag): ?>
-                    <a href="#" ><?php echo htmlspecialchars($tag); ?></a>
+                    <a href="#"><?php echo htmlspecialchars($tag); ?></a>
                 <?php endforeach;
             } else {
                 echo "<p>No tags available for this blog.</p>";
@@ -48,31 +66,14 @@ if (!$blog) {
         </div>
         <div class="single-blog_comments">
             <div class="comments">
-                <h2 class="comments_counter">Comments</h2>
-                <div class="comments_container">
+                <h2 class="comments_counter">
                     <?php
-                    // Fetch comments for the blog
-                    $comments_query = "
-                        SELECT blog_comments.id, blog_comments.comment, blog_comments.created_at, 
-                            blog_comments.parent_comment_id, 
-                            users.first_name, users.last_name, users.profile_image 
-                        FROM blog_comments 
-                        JOIN users ON blog_comments.user_id = users.id 
-                        WHERE blog_comments.blog_id = ?
-                        ORDER BY blog_comments.parent_comment_id ASC, blog_comments.created_at ASC";
-                    $stmt = $conn->prepare($comments_query);
-                    $stmt->bind_param("i", $blog_id);
-                    $stmt->execute();
-                    $comments_result = $stmt->get_result();
-                    $comments = $comments_result->fetch_all(MYSQLI_ASSOC);
-
-                    // Group comments by parent_comment_id
-                    $grouped_comments = [];
-                    foreach ($comments as $comment) {
-                        $parent_id = $comment['parent_comment_id'] ?? 0; // 0 for main comments
-                        $grouped_comments[$parent_id][] = $comment;
-                    }
+                    // Count the total number of comments
+                    $comment_count = count($comments);
+                    echo $comment_count > 0 ? "$comment_count Comments" : "No comments yet.";
                     ?>
+                </h2>
+                <div class="comments_container">
                     <div class="comments_container">
                         <?php
                         // Recursive function to display comments and replies
@@ -88,14 +89,34 @@ if (!$blog) {
                                                 <h4 class="comment_content--name">
                                                     <?php echo htmlspecialchars($comment['first_name'] . ' ' . $comment['last_name']); ?>
                                                 </h4>
-                                                <p class="comment_content--date"><?php echo htmlspecialchars($comment['created_at']); ?></p>
+                                                <p class="comment_content--date">
+                                                    <?php
+                                                    // Convert the created_at timestamp to a relative time format
+                                                    $comment_date = new DateTime($comment['created_at']);
+                                                    $current_date = new DateTime();
+                                                    $interval = $comment_date->diff($current_date);
+
+                                                    if ($interval->y > 0) {
+                                                        echo $interval->y . ' year' . ($interval->y > 1 ? 's' : '') . ' ago';
+                                                    } elseif ($interval->m > 0) {
+                                                        echo $interval->m . ' month' . ($interval->m > 1 ? 's' : '') . ' ago';
+                                                    } elseif ($interval->d > 0) {
+                                                        echo $interval->d . ' day' . ($interval->d > 1 ? 's' : '') . ' ago';
+                                                    } elseif ($interval->h > 0) {
+                                                        echo $interval->h . ' hour' . ($interval->h > 1 ? 's' : '') . ' ago';
+                                                    } elseif ($interval->i > 0) {
+                                                        echo $interval->i . ' minute' . ($interval->i > 1 ? 's' : '') . ' ago';
+                                                    } else {
+                                                        echo 'Just now';
+                                                    }
+                                                    ?>
+                                                </p>
                                                 <p class="comment_content--text"><?php echo htmlspecialchars($comment['comment']); ?></p>
                                                 <!-- Display the REPLY button for all comments -->
                                                 <a href="#" class="comment_content--reply">REPLY</a>
                                             </div>
                                         </div>
                                         <?php
-                                        
                                         // Recursively display replies for this comment
                                         if (!empty($grouped_comments[$comment['id']])): ?>
                                             <div class="replies">
@@ -119,7 +140,7 @@ if (!$blog) {
             <textarea name="comment" placeholder="Write your comment..."></textarea>
             <input type="hidden" name="blog_id" value="<?php echo $blog_id; ?>">
             <button type="submit" class="btn__red--l btn__red btn">Submit</button>
-        </form>
+                    </form>
     </div>
 </main>
 <?php include 'footer.php'; ?>
