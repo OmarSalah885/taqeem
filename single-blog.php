@@ -41,56 +41,58 @@ foreach ($comments as $comment) {
 }
 ?>
 
-<main>
-    <div class="single-blog">
-        <div class="single-blog_img">
-            <img src="<?php echo htmlspecialchars($blog['image']); ?>" alt>
-        </div>
-        <div class="single-blog_tags">
-            <?php
+
+<main class="single-blog">
+    <div class="single-blog_img">
+        <img src="<?php echo htmlspecialchars($blog['image']); ?>" alt>
+    </div>
+    <div class="single-blog_tags">
+        <?php
             if (!empty($blog['tags'])) {
                 $tags = explode(',', $blog['tags']); // Assuming tags are stored as a comma-separated string
                 foreach ($tags as $tag): ?>
-                    <a href="#"><?php echo htmlspecialchars($tag); ?></a>
-                <?php endforeach;
+        <a href="#"><?php echo htmlspecialchars($tag); ?></a>
+        <?php endforeach;
             } else {
                 echo "<p>No tags available for this blog.</p>";
             }
             ?>
+    </div>
+    <h1 class="single-blog_title"><?php echo htmlspecialchars($blog['title']); ?></h1>
+    <div class="single-blog_content">
+        <div class="single-blog_content--paragraph">
+            <p><?php echo $blog['content']; // Assuming the content is stored as HTML ?></p>
         </div>
-        <h1 class="single-blog_title"><?php echo htmlspecialchars($blog['title']); ?></h1>
-        <div class="single-blog_content">
-            <div class="single-blog_content--paragraph">
-                <p><?php echo $blog['content']; // Assuming the content is stored as HTML ?></p>
-            </div>
-        </div>
-        <div class="single-blog_comments">
-            <div class="comments">
-                <h2 class="comments_counter">
-                    <?php
+    </div>
+    <div class="single-blog_comments">
+        <div class="comments">
+            <h2 class="comments_counter">
+                <?php
                     // Count the total number of comments
                     $comment_count = count($comments);
                     echo $comment_count > 0 ? "$comment_count Comments" : "No comments yet.";
                     ?>
-                </h2>
+            </h2>
+            <div class="comments_container">
                 <div class="comments_container">
-                    <div class="comments_container">
-                        <?php
+                    <?php
                         // Recursive function to display comments and replies
                         function display_comments($grouped_comments, $parent_id = 0) {
                             if (!empty($grouped_comments[$parent_id])) { // Check if there are comments for the current parent_id
                                 foreach ($grouped_comments[$parent_id] as $comment): ?>
-                                    <div class="comments_container--single <?php echo $parent_id == 0 ? 'main-comment' : 'reply-comment'; ?>">
-                                        <div class="comment">
-                                            <div class="comment_img">
-                                                <img src="<?php echo htmlspecialchars($comment['profile_image'] ?: 'assets/images/profiles/pro_null.png'); ?>" alt="User Profile">
-                                            </div>
-                                            <div class="comment_content">
-                                                <h4 class="comment_content--name">
-                                                    <?php echo htmlspecialchars($comment['first_name'] . ' ' . $comment['last_name']); ?>
-                                                </h4>
-                                                <p class="comment_content--date">
-                                                    <?php
+                    <div
+                        class="comments_container--single <?php echo $parent_id == 0 ? 'main-comment' : 'reply-comment'; ?>">
+                        <div class="comment">
+                            <div class="comment_img">
+                                <img src="<?php echo htmlspecialchars($comment['profile_image'] ?: 'assets/images/profiles/pro_null.png'); ?>"
+                                    alt="User Profile">
+                            </div>
+                            <div class="comment_content">
+                                <h4 class="comment_content--name">
+                                    <?php echo htmlspecialchars($comment['first_name'] . ' ' . $comment['last_name']); ?>
+                                </h4>
+                                <p class="comment_content--date">
+                                    <?php
                                                     // Convert the created_at timestamp to a relative time format
                                                     $comment_date = new DateTime($comment['created_at']);
                                                     $current_date = new DateTime();
@@ -110,37 +112,38 @@ foreach ($comments as $comment) {
                                                         echo 'Just now';
                                                     }
                                                     ?>
-                                                </p>
-                                                <p class="comment_content--text"><?php echo htmlspecialchars($comment['comment']); ?></p>
-                                                <!-- Display the REPLY button for all comments -->
-                                                <a href="#" class="comment_content--reply">REPLY</a>
-                                            </div>
-                                        </div>
-                                        <?php
+                                </p>
+                                <p class="comment_content--text">
+                                    <?php echo htmlspecialchars($comment['comment']); ?></p>
+                                <!-- Display the REPLY button for all comments -->
+                                <a href="#" class="comment_content--reply">REPLY</a>
+                            </div>
+                        </div>
+                        <?php
                                         // Recursively display replies for this comment
                                         if (!empty($grouped_comments[$comment['id']])): ?>
-                                            <div class="replies">
-                                                <?php display_comments($grouped_comments, $comment['id']); ?>
-                                            </div>
-                                        <?php endif; ?>
-                                    </div>
-                                <?php endforeach;
+                        <div class="replies">
+                            <?php display_comments($grouped_comments, $comment['id']); ?>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+                    <?php endforeach;
                             }
                         }
 
                         // Display main comments and their replies
                         display_comments($grouped_comments);
                         ?>
-                    </div>
                 </div>
             </div>
         </div>
-        <form class="single-blog_thought" method="POST" action="submit_comment.php">
-            <h2 class="single-blog_thought--title">Leave your thought here</h2>
-            <textarea name="comment" placeholder="Write your comment..."></textarea>
-            <input type="hidden" name="blog_id" value="<?php echo $blog_id; ?>">
-            <button type="submit" class="btn__red--l btn__red btn">Submit</button>
-                    </form>
+    </div>
+    <div class="single-blog_thought" method="POST" action="submit_comment.php">
+        <h2 class="single-blog_thought--title">Leave your thought here</h2>
+        <textarea name="comment" placeholder="Write your comment..."></textarea>
+        <input type="hidden" name="blog_id" value="<?php echo $blog_id; ?>">
+        <button type="submit" class="btn__red--l btn__red btn">Submit</button>
     </div>
 </main>
+
 <?php include 'footer.php'; ?>
