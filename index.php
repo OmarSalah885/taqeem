@@ -1,4 +1,8 @@
-<?php include 'header.php'; ?>
+<?php
+include 'config.php'; // Include session settings
+session_start(); // Start the session
+include 'header.php'; // Include the header
+?>
 
 <main>
 
