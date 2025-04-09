@@ -43,8 +43,13 @@ include 'db_connect.php';
 </body>
 
 <script src="assets/js/load_more.js"></script>
-<script src="assets/js/place.js"></script>
-<script src="assets/js/script.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="assets/js/map.js"></script>
+<script src="assets/js/place.js"></script>
+<script src="assets/js/overlay.js"></script>
+<script src="assets/js/loginSignup.js"></script>
+<script src="assets/js/carousel.js"></script>
+
+
 
 </html>

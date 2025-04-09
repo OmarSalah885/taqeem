@@ -1,68 +1,84 @@
-let map = L.map('map').setView([31.9539, 35.9106], 12); // Amman, Jordan
+// Initialize Leaflet Map
+const map = L.map('map').setView([31.9539, 35.9106], 12); // Amman, Jordan
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
 
-let marker = L.marker([40.7128, -74.0060], { draggable: true }).addTo(map);
+// Marker with drag option
+const marker = L.marker([40.7128, -74.0060], { draggable: true }).addTo(map);
 
-function updateCoordinates(lat, lng) {
-    document.getElementById('coordinates').innerText = lat.toFixed(6) + ", " + lng.toFixed(6);
+// Update coordinates display
+function updateCoordinates({ lat, lng }) {
+    const coordsElement = document.getElementById('coordinates');
+    if (coordsElement) {
+        coordsElement.innerText = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+    }
 }
 
-marker.on('dragend', function (e) {
-    updateCoordinates(e.target.getLatLng().lat, e.target.getLatLng().lng);
+// On marker drag end
+marker.on('dragend', (e) => {
+    updateCoordinates(e.target.getLatLng());
 });
 
-map.on('click', function (e) {
+// On map click, move marker
+map.on('click', (e) => {
     marker.setLatLng(e.latlng);
-    updateCoordinates(e.latlng.lat, e.latlng.lng);
+    updateCoordinates(e.latlng);
 });
 
+// Handle Drag & Drop Upload Areas
+document.querySelectorAll('.drop-area').forEach(setupDropArea);
 
-document.querySelectorAll('.drop-area').forEach(dropArea => {
+function setupDropArea(dropArea) {
     const fileInput = dropArea.querySelector('.file-input');
     const fileList = dropArea.querySelector('.file-list');
 
-    // Prevent default drag behaviors
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        dropArea.addEventListener(eventName, preventDefaults, false);
-    });
+    if (!fileInput || !fileList) return;
 
-    function preventDefaults(e) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
+    const highlight = () => dropArea.classList.add('highlight');
+    const unhighlight = () => dropArea.classList.remove('highlight');
 
-    // Highlight drop area when file is dragged over it
-    ['dragenter', 'dragover'].forEach(eventName => {
-        dropArea.addEventListener(eventName, () => dropArea.classList.add('highlight'), false);
-    });
+    // Prevent default behaviors
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(event =>
+        dropArea.addEventListener(event, preventDefaults, false)
+    );
 
-    ['dragleave', 'drop'].forEach(eventName => {
-        dropArea.addEventListener(eventName, () => dropArea.classList.remove('highlight'), false);
-    });
+    // Highlight when dragging
+    ['dragenter', 'dragover'].forEach(event =>
+        dropArea.addEventListener(event, highlight, false)
+    );
 
-    // Handle dropped files
+    // Unhighlight on leave or drop
+    ['dragleave', 'drop'].forEach(event =>
+        dropArea.addEventListener(event, unhighlight, false)
+    );
+
+    // Handle file drop
     dropArea.addEventListener('drop', (e) => {
-        let files = e.dataTransfer.files;
-        handleFiles(files);
-        console.log(files)
+        const files = e.dataTransfer.files;
+        displayFiles(files, fileList);
     });
 
-    // Handle file input selection
+    // Handle file selection
     fileInput.addEventListener('change', (e) => {
-        let files = e.target.files;
-        handleFiles(files);
+        const files = e.target.files;
+        displayFiles(files, fileList);
     });
+}
 
-    // Function to handle files
-    function handleFiles(files) {
-        fileList.innerHTML = "";
-        [...files].forEach(file => {
-            let listItem = document.createElement('p');
-            listItem.textContent = file.name;
-            fileList.appendChild(listItem);
-        });
-    }
-});
+// Prevent default drag/drop behavior
+function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+}
+
+// Display file list
+function displayFiles(files, fileListElement) {
+    fileListElement.innerHTML = '';
+    [...files].forEach(file => {
+        const p = document.createElement('p');
+        p.textContent = file.name;
+        fileListElement.appendChild(p);
+    });
+}
