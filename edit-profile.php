@@ -1,5 +1,14 @@
-<?php include 'header.php'; ?>
-<?php include 'navbar.php'; ?>
+<?php
+include 'config.php'; // Include session settings
+session_start(); // Start the session
+
+// Redirect if the user is not logged in
+if (!isset($_SESSION['user_id'])) {
+    header('Location: index.php');
+    exit;
+}
+include 'header.php';
+?>
        
         <main class="edit-profile">
             <form class="edit-profile_info">

@@ -1,4 +1,12 @@
 <?php
+include 'config.php'; // Include session settings
+session_start(); // Start the session
+
+// Redirect if the user is not logged in
+if (!isset($_SESSION['user_id'])) {
+    header('Location: index.php');
+    exit;
+}
 include 'header.php';  // Ensure the database connection is established in header.php
 
 // Get category_id, price, search term, and rating from the URL
@@ -128,7 +136,7 @@ $current_page = max(1, min($total_pages, $current_page));  // Ensure the page is
             <option value="" disabled <?php echo empty($price) ? 'selected' : ''; ?>>Price</option>
             <option value="$" <?php echo $price == '1' ? 'selected' : ''; ?>>$</option>
             <option value="$$" <?php echo $price == '2' ? 'selected' : ''; ?>>$$</option>
-            <option value="" <?php echo $price == '3' ? 'selected' : ''; ?>>$$$</option>
+            <option value="$$$" <?php echo $price == '3' ? 'selected' : ''; ?>>$$$</option>
         </select>
         <select name="category_id" class="custom-select" onchange="filterChange()">
             <option value="" disabled <?php echo empty($category_id) ? 'selected' : ''; ?>>Categories</option>

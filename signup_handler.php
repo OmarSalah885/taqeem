@@ -1,8 +1,7 @@
 <?php
-// Include the database connection
-include 'db_connect.php';
+include 'config.php'; // Include session settings
+session_start(); // Start the session
 
-// Check if the form was submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Retrieve and sanitize inputs
     $first_name = trim($_POST['first_name']);
@@ -23,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($password !== $confirm_password) {
         die('Passwords do not match.');
     }
-
+    include 'db_connect.php';
     // Check if the email already exists
     $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
@@ -42,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bind_param("ssss", $first_name, $last_name, $email, $hashed_password);
 
     if ($stmt->execute()) {
-        echo 'Sign-up successful! You can now log in.';
+        // Redirect to the login page after successful signup
         header('Location: index.php?signup=success');
         exit;
     } else {
@@ -52,8 +51,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->close();
     $conn->close();
 } else {
-    // Redirect to the sign-up page if accessed directly
-    header('Location: index.php');
+    // Redirect to the signup page if accessed directly
+    header('Location: signup.php');
     exit;
 }
 ?>
