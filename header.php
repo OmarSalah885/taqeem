@@ -52,15 +52,6 @@ include 'db_connect.php';
                     <a href="#"><img src="assets/images/logo.png" alt="logo"></a>
                 </div>
                 <div class="navbar_container--menu-R">
-<<<<<<< HEAD
-                    <a class="btn__red--m btn__red btn" id="search-btn" href="#"><i
-                            class="fa-solid fa-magnifying-glass"></i></a>
-                    <!-- <a class="navbar_container--menu-R_links" id="login-nav" href="#">log in</a>
-                    <a class="navbar_container--menu-R_links" id="signup-nav" href="#">sign up</a> -->
-                    <a href="#" class="navbar_profile"><img src="assets/images/user.jpg" alt=""><span>abdulrhman
-                            alshafee</span></a>
-                    <a class="btn__red--m btn__red btn" href="./add-place.php">add place</a>
-=======
                     <a class="btn__red--m btn__red btn" id="search-btn" href="#"><i class="fa-solid fa-magnifying-glass"></i></a>
                     <?php if (isset($_SESSION['user_id'])): ?>
                         <!-- Show profile link when the user is logged in -->
@@ -75,7 +66,6 @@ include 'db_connect.php';
                         <a class="navbar_container--menu-R_links" id="signup-nav" href="#">Sign Up</a>
                     <?php endif; ?>
                     <a class="btn__red--m btn__red btn" href="add-place.php">Add Place</a>
->>>>>>> b9f06596bc84da8959fdb1d671f5af88458c6c46
                 </div>
             </div>
         </nav>
@@ -100,18 +90,6 @@ include 'db_connect.php';
                     </div>
                     <a class="LogOverlay__content--links_close" href="#">X</a>
                 </div>
-<<<<<<< HEAD
-                <div class="LogOverlay__content--login">
-                    <input type="email" placeholder="EMAIL">
-                    <input type="password" placeholder="PASSWORD">
-
-                    <p>forgot your password ? <a href="#">RESET
-                            PASSWORD.</a></p>
-                    <button class="btn__red--l btn__red btn">Sing
-                        in</button>
-                </div>
-                <form action="signup_handle.php" method="POST" class="LogOverlay__content--signup ">
-=======
 
                 <!-- Login Form -->
                 <form class="LogOverlay__content--login" action="login_handler.php" method="POST">
@@ -127,7 +105,6 @@ include 'db_connect.php';
 
                 <!-- Signup Form -->
                 <form action="signup_handler.php" method="POST" class="LogOverlay__content--signup">
->>>>>>> b9f06596bc84da8959fdb1d671f5af88458c6c46
                     <div class="LogOverlay__content--signup_name">
                         <input type="text" name="first_name" placeholder="FIRST NAME" required>
                         <input type="text" name="last_name" placeholder="LAST NAME" required>
@@ -136,12 +113,7 @@ include 'db_connect.php';
                     <input type="password" name="password" placeholder="PASSWORD" required>
                     <input type="password" name="confirm_password" placeholder="CONFIRM PASSWORD" required>
                     <button type="submit" class="btn__red--l btn__red btn">Sign up</button>
-<<<<<<< HEAD
-
-                    </from>
-=======
                 </form>
->>>>>>> b9f06596bc84da8959fdb1d671f5af88458c6c46
             </div>
         </div>
 

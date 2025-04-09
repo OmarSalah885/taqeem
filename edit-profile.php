@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-<?php include 'header.php'; ?>
-=======
 <?php
 include 'config.php'; // Include session settings
 session_start(); // Start the session
@@ -36,7 +33,6 @@ include 'header.php';
                         <input type="radio" name="gender" value="female"> Female
                     </label>
                 </label>
->>>>>>> b9f06596bc84da8959fdb1d671f5af88458c6c46
 
 <main class="edit-profile">
     <form class="edit-profile_info">
