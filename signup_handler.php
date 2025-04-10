@@ -12,22 +12,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = trim($_POST['password']);
     $confirm_password = trim($_POST['confirm_password']);
 
+    // Initialize an array to store error messages
+    $errors = [];
+
     // Validate inputs
-    if (empty($first_name) || empty($last_name) || empty($email) || empty($password) || empty($confirm_password)) {
-        $_SESSION['signup_error'] = 'All fields are required.';
-        header('Location: signup.php'); // Redirect back to the signup page
-        exit;
+    if (empty($first_name)) {
+        $errors['first_name'] = 'First name is required.';
     }
 
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $_SESSION['signup_error'] = 'Invalid email format.';
-        header('Location: signup.php'); // Redirect back to the signup page
-        exit;
+    if (empty($last_name)) {
+        $errors['last_name'] = 'Last name is required.';
     }
 
-    if ($password !== $confirm_password) {
-        $_SESSION['signup_error'] = 'Passwords do not match.';
-        header('Location: signup.php'); // Redirect back to the signup page
+    if (empty($email)) {
+        $errors['email'] = 'Email is required.';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors['email'] = 'Invalid email format.';
+    }
+
+    if (empty($password)) {
+        $errors['password'] = 'Password is required.';
+    }
+
+    if (empty($confirm_password)) {
+        $errors['confirm_password'] = 'Confirm password is required.';
+    } elseif ($password !== $confirm_password) {
+        $errors['confirm_password'] = 'Passwords do not match.';
+    }
+
+    // If there are errors, store them in the session and redirect back
+    if (!empty($errors)) {
+        $_SESSION['signup_errors'] = $errors;
+        $_SESSION['signup_data'] = $_POST; // Save the entered data to repopulate the form
+        header('Location: index.php'); // Redirect back to the homepage (where the header is)
         exit;
     }
 
@@ -39,8 +56,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute();
     $stmt->store_result();
     if ($stmt->num_rows > 0) {
-        $_SESSION['signup_error'] = 'This email is already registered.';
-        header('Location: signup.php'); // Redirect back to the signup page
+        $_SESSION['signup_errors']['email'] = 'This email is already registered.';
+        $_SESSION['signup_data'] = $_POST; // Save the entered data to repopulate the form
+        header('Location: index.php'); // Redirect back to the homepage
         exit;
     }
     $stmt->close();
@@ -58,20 +76,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['last_name'] = $last_name;
         $_SESSION['email'] = $email;
         $_SESSION['role'] = 'Guest';
-        unset($_SESSION['signup_error']);
+        unset($_SESSION['signup_errors']);
+        unset($_SESSION['signup_data']);
         header('Location: index.php'); // Redirect to the homepage
         exit;
     } else {
-        $_SESSION['signup_error'] = 'Failed to register. Please try again.';
-        header('Location: signup.php'); // Redirect back to the signup page
+        $_SESSION['signup_errors']['general'] = 'Failed to register. Please try again.';
+        $_SESSION['signup_data'] = $_POST; // Save the entered data to repopulate the form
+        header('Location: index.php'); // Redirect back to the homepage
         exit;
     }
 
     $stmt->close();
     $conn->close();
 } else {
-    // Redirect to the signup page if accessed directly
-    header('Location: signup.php');
+    // Redirect to the homepage if accessed directly
+    header('Location: index.php');
     exit;
 }
 ?>

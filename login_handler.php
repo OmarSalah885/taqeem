@@ -9,10 +9,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
 
+    // Initialize an array to store error messages
+    $errors = [];
+
     // Validate inputs
-    if (empty($email) || empty($password)) {
-        $_SESSION['login_error'] = 'Email and password are required.';
-        header('Location: index.php'); // Redirect back to the homepage
+    if (empty($email)) {
+        $errors['email'] = 'Email is required.';
+    }
+
+    if (empty($password)) {
+        $errors['password'] = 'Password is required.';
+    }
+
+    // If there are errors, store them in the session and redirect back
+    if (!empty($errors)) {
+        $_SESSION['login_errors'] = $errors;
+        $_SESSION['login_data'] = $_POST; // Save the entered data to repopulate the form
+        header('Location: index.php'); // Redirect back to the homepage (where the header is)
         exit;
     }
 
@@ -35,18 +48,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['email'] = $user['email'];
             $_SESSION['role'] = $user['role'];
 
-            unset($_SESSION['login_error']); // Clear any previous login errors
+            unset($_SESSION['login_errors']); // Clear any previous login errors
+            unset($_SESSION['login_data']); // Clear any previous login data
             header('Location: index.php'); // Redirect to the homepage
             exit;
         } else {
             // Password is incorrect
-            $_SESSION['login_error'] = 'Invalid password.';
+            $_SESSION['login_errors']['password'] = 'Invalid password.';
+            $_SESSION['login_data'] = $_POST; // Save the entered data to repopulate the form
             header('Location: index.php'); // Redirect back to the homepage
             exit;
         }
     } else {
         // Email not found
-        $_SESSION['login_error'] = 'No account found with that email.';
+        $_SESSION['login_errors']['email'] = 'No account found with that email.';
+        $_SESSION['login_data'] = $_POST; // Save the entered data to repopulate the form
         header('Location: index.php'); // Redirect back to the homepage
         exit;
     }

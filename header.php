@@ -43,6 +43,7 @@ include 'db_connect.php';
             <div class="navbar_container">
                 <div class="navbar_container--menu-L">
                     <a href="./index.php">home</a>
+
                     <a href="blogs.php">blog</a>
                     <a href="listing.php">categories</a>
                     <a href="./index.php#aboutUs">about us</a>
@@ -92,26 +93,62 @@ include 'db_connect.php';
 
                 <!-- Login Form -->
                 <form class="LogOverlay__content--login" action="login_handler.php" method="POST">
-                    <?php if (isset($_SESSION['login_error'])): ?>
-                        <p class="error"><?php echo htmlspecialchars($_SESSION['login_error']); ?></p>
-                        <?php unset($_SESSION['login_error']); // Clear the error after displaying it ?>
+                    <?php
+                    $login_errors = $_SESSION['login_errors'] ?? [];
+                    $login_data = $_SESSION['login_data'] ?? [];
+                    unset($_SESSION['login_errors'], $_SESSION['login_data']);
+                    ?>
+                    <input type="email" name="email" placeholder="EMAIL" value="<?php echo htmlspecialchars($login_data['email'] ?? ''); ?>" required>
+                    <?php if (isset($login_errors['email'])): ?>
+                        <p class="error"><?php echo $login_errors['email']; ?></p>
                     <?php endif; ?>
-                    <input type="email" name="email" placeholder="EMAIL" required>
+
                     <input type="password" name="password" placeholder="PASSWORD" required>
+                    <?php if (isset($login_errors['password'])): ?>
+                        <p class="error"><?php echo $login_errors['password']; ?></p>
+                    <?php endif; ?>
+
                     <p>Forgot your password? <a href="#">RESET PASSWORD.</a></p>
                     <button type="submit" class="btn__red--l btn__red btn">Sign In</button>
                 </form>
 
                 <!-- Signup Form -->
                 <form action="signup_handler.php" method="POST" class="LogOverlay__content--signup">
+                    <?php
+                    $signup_errors = $_SESSION['signup_errors'] ?? [];
+                    $signup_data = $_SESSION['signup_data'] ?? [];
+                    unset($_SESSION['signup_errors'], $_SESSION['signup_data']);
+                    ?>
                     <div class="LogOverlay__content--signup_name">
-                        <input type="text" name="first_name" placeholder="FIRST NAME" required>
-                        <input type="text" name="last_name" placeholder="LAST NAME" required>
+                        <input type="text" name="first_name" placeholder="FIRST NAME" value="<?php echo htmlspecialchars($signup_data['first_name'] ?? ''); ?>" required>
+                        <?php if (isset($signup_errors['first_name'])): ?>
+                            <p class="error"><?php echo $signup_errors['first_name']; ?></p>
+                        <?php endif; ?>
+
+                        <input type="text" name="last_name" placeholder="LAST NAME" value="<?php echo htmlspecialchars($signup_data['last_name'] ?? ''); ?>" required>
+                        <?php if (isset($signup_errors['last_name'])): ?>
+                            <p class="error"><?php echo $signup_errors['last_name']; ?></p>
+                        <?php endif; ?>
                     </div>
-                    <input type="email" name="email" placeholder="EMAIL" required>
+                    <input type="email" name="email" placeholder="EMAIL" value="<?php echo htmlspecialchars($signup_data['email'] ?? ''); ?>" required>
+                    <?php if (isset($signup_errors['email'])): ?>
+                        <p class="error"><?php echo $signup_errors['email']; ?></p>
+                    <?php endif; ?>
+
                     <input type="password" name="password" placeholder="PASSWORD" required>
+                    <?php if (isset($signup_errors['password'])): ?>
+                        <p class="error"><?php echo $signup_errors['password']; ?></p>
+                    <?php endif; ?>
+
                     <input type="password" name="confirm_password" placeholder="CONFIRM PASSWORD" required>
+                    <?php if (isset($signup_errors['confirm_password'])): ?>
+                        <p class="error"><?php echo $signup_errors['confirm_password']; ?></p>
+                    <?php endif; ?>
+
                     <button type="submit" class="btn__red--l btn__red btn">Sign up</button>
+                    <?php if (isset($signup_errors['general'])): ?>
+                        <p class="error"><?php echo $signup_errors['general']; ?></p>
+                    <?php endif; ?>
                 </form>
             </div>
         </div>
