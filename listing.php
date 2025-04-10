@@ -2,11 +2,7 @@
 include 'config.php'; // Include session settings
 session_start(); // Start the session
 
-// Redirect if the user is not logged in
-if (!isset($_SESSION['user_id'])) {
-    header('Location: index.php');
-    exit;
-}
+
 include 'header.php';  // Ensure the database connection is established in header.php
 
 // Get category_id, price, search term, and rating from the URL

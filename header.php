@@ -43,7 +43,7 @@ include 'db_connect.php';
             <div class="navbar_container">
                 <div class="navbar_container--menu-L">
                     <a href="./index.php">home</a>
-                    <a href="./blogs.php">blog</a>
+                    <a href="blogs.php">blog</a>
                     <a href="listing.php">categories</a>
                     <a href="./index.php#aboutUs">about us</a>
                 </div>
@@ -125,6 +125,7 @@ include 'db_connect.php';
                     <a href="add-place.php">add place</a>
                     <a href="index.php">home</a>
                     <a href="blogs.php">blog</a>
+                    <a href="listing.php">categories</a>
                     <a href="index.php#aboutUs">about us</a>
                 </div>
             </div>

@@ -1,4 +1,6 @@
 <?php
+// filepath: c:\xampp\htdocs\taqeem\signup_handler.php
+
 include 'config.php'; // Include session settings
 session_start(); // Start the session
 
@@ -12,24 +14,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Validate inputs
     if (empty($first_name) || empty($last_name) || empty($email) || empty($password) || empty($confirm_password)) {
-        die('All fields are required.');
+        $_SESSION['signup_error'] = 'All fields are required.';
+        header('Location: signup.php'); // Redirect back to the signup page
+        exit;
     }
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        die('Invalid email format.');
+        $_SESSION['signup_error'] = 'Invalid email format.';
+        header('Location: signup.php'); // Redirect back to the signup page
+        exit;
     }
 
     if ($password !== $confirm_password) {
-        die('Passwords do not match.');
+        $_SESSION['signup_error'] = 'Passwords do not match.';
+        header('Location: signup.php'); // Redirect back to the signup page
+        exit;
     }
-    include 'db_connect.php';
+
+    include 'db_connect.php'; // Include database connection
+
     // Check if the email already exists
     $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $stmt->store_result();
     if ($stmt->num_rows > 0) {
-        die('This email is already registered.');
+        $_SESSION['signup_error'] = 'This email is already registered.';
+        header('Location: signup.php'); // Redirect back to the signup page
+        exit;
     }
     $stmt->close();
 
@@ -41,11 +53,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bind_param("ssss", $first_name, $last_name, $email, $hashed_password);
 
     if ($stmt->execute()) {
-        // Redirect to the login page after successful signup
-        header('Location: index.php?signup=success');
+        $_SESSION['user_id'] = $stmt->insert_id;
+        $_SESSION['first_name'] = $first_name;
+        $_SESSION['last_name'] = $last_name;
+        $_SESSION['email'] = $email;
+        $_SESSION['role'] = 'Guest';
+        unset($_SESSION['signup_error']);
+        header('Location: index.php'); // Redirect to the homepage
         exit;
     } else {
-        echo 'Error: ' . $stmt->error;
+        $_SESSION['signup_error'] = 'Failed to register. Please try again.';
+        header('Location: signup.php'); // Redirect back to the signup page
+        exit;
     }
 
     $stmt->close();
