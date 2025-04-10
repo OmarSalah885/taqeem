@@ -8,6 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Retrieve and sanitize inputs
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
+    $redirect_url = $_POST['redirect_url'] ?? 'index.php'; // Default to index.php if no redirect URL is provided
 
     // Initialize an array to store error messages
     $errors = [];
@@ -25,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!empty($errors)) {
         $_SESSION['login_errors'] = $errors;
         $_SESSION['login_data'] = $_POST; // Save the entered data to repopulate the form
-        header('Location: index.php'); // Redirect back to the homepage (where the header is)
+        header("Location: $redirect_url"); // Redirect back to the same page
         exit;
     }
 
@@ -50,20 +51,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             unset($_SESSION['login_errors']); // Clear any previous login errors
             unset($_SESSION['login_data']); // Clear any previous login data
-            header('Location: index.php'); // Redirect to the homepage
+            header("Location: $redirect_url"); // Redirect back to the same page
             exit;
         } else {
             // Password is incorrect
             $_SESSION['login_errors']['password'] = 'Invalid password.';
             $_SESSION['login_data'] = $_POST; // Save the entered data to repopulate the form
-            header('Location: index.php'); // Redirect back to the homepage
+            header("Location: $redirect_url"); // Redirect back to the same page
             exit;
         }
     } else {
         // Email not found
         $_SESSION['login_errors']['email'] = 'No account found with that email.';
         $_SESSION['login_data'] = $_POST; // Save the entered data to repopulate the form
-        header('Location: index.php'); // Redirect back to the homepage
+        header("Location: $redirect_url"); // Redirect back to the same page
         exit;
     }
 

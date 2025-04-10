@@ -49,14 +49,14 @@ include 'db_connect.php';
                     <a href="./index.php#aboutUs">about us</a>
                 </div>
                 <div class="navbar_container--logo">
-                    <a href="#"><img src="assets/images/logo.png" alt="logo"></a>
+                    <a href="index.php"><img src="assets/images/logo.png" alt="logo"></a>
                 </div>
                 <div class="navbar_container--menu-R">
                     <a class="btn__red--m btn__red btn" id="search-btn" href="#"><i class="fa-solid fa-magnifying-glass"></i></a>
                     <?php if (isset($_SESSION['user_id'])): ?>
                         <!-- Show profile link when the user is logged in -->
                         <a href="#" class="navbar_profile">
-                            <img src="<?php echo htmlspecialchars($_SESSION['profile_image'] ?? 'assets/images/user.jpg'); ?>" alt="User Profile">
+                            <img src="<?php echo htmlspecialchars($_SESSION['profile_image'] ?? 'assets/images/profiles/pro_null.png'); ?>" alt="User Profile">
                             <span><?php echo htmlspecialchars($_SESSION['first_name'] . ' ' . $_SESSION['last_name']); ?></span>
                         </a>
                         <a class="navbar_container--menu-R_links" href="logout.php">Log Out</a>
@@ -71,8 +71,13 @@ include 'db_connect.php';
         </nav>
 
         <nav class="navbar_mobile">
-            <div class="navbar_mobile--logo"><a href="#"><img src="assets/images/logo.png" alt="logo"></a></div>
-            <div class="navbar_mobile--search"><input type="text" placeholder="search"><button><i class="fa-solid fa-magnifying-glass"></i></button></div>
+            <div class="navbar_mobile--logo">
+                <a href="index.php"><img src="assets/images/logo.png" alt="logo"></a>
+            </div>
+            <div class="navbar_mobile--search">
+                <input type="text" placeholder="search">
+                <button><i class="fa-solid fa-magnifying-glass"></i></button>
+            </div>
             <a class="navbar_mobile--menu" id="mobile_emnu-open" href="#"><i class="fa-solid fa-bars"></i></a>
         </nav>
 
@@ -98,6 +103,7 @@ include 'db_connect.php';
                     $login_data = $_SESSION['login_data'] ?? [];
                     unset($_SESSION['login_errors'], $_SESSION['login_data']);
                     ?>
+                    <input type="hidden" name="redirect_url" value="<?php echo htmlspecialchars($_SERVER['REQUEST_URI']); ?>">
                     <input type="email" name="email" placeholder="EMAIL" value="<?php echo htmlspecialchars($login_data['email'] ?? ''); ?>" required>
                     <?php if (isset($login_errors['email'])): ?>
                         <p class="error"><?php echo $login_errors['email']; ?></p>
@@ -157,8 +163,19 @@ include 'db_connect.php';
             <div class="mobile_overlay--content">
                 <a class="mobile_overlay--content-close" id="mobile_emnu-close" href="#">X</a>
                 <div class="mobile_overlay--content_links">
-                    <a id="login-nav_m" href="#">log in</a>
-                    <a id="signup-nav_m" href="#">sign up</a>
+                    <?php if (isset($_SESSION['user_id'])): ?>
+                        <!-- Display user profile when logged in -->
+                        <div class="mobile_user_profile">
+                            <img src="<?php echo htmlspecialchars($_SESSION['profile_image'] ?? 'assets/images/profiles/pro_null.png'); ?>" alt="User Profile">
+                            <span><?php echo htmlspecialchars($_SESSION['first_name'] . ' ' . $_SESSION['last_name']); ?></span>
+                        </div>
+                        <a href="logout.php">Log Out</a>
+                        <a href="profile.php">Profile</a>
+                    <?php else: ?>
+                        <!-- Display login and signup links when not logged in -->
+                        <a id="login-nav_m" href="#">log in</a>
+                        <a id="signup-nav_m" href="#">sign up</a>
+                    <?php endif; ?>
                     <a href="add-place.php">add place</a>
                     <a href="index.php">home</a>
                     <a href="blogs.php">blog</a>
@@ -170,4 +187,5 @@ include 'db_connect.php';
     </nav>
 </body>
 </html>
+
 
