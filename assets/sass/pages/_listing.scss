@@ -54,6 +54,8 @@
                 box-shadow: .4rem .4rem 2rem rgba(0, 0, 0, 0.2);
             }
 
+
+
             &-img {
                 height: 31.6rem;
                 position: relative;
@@ -262,4 +264,26 @@
     text-transform: capitalize;
     background-color: $red-00;
     padding: .8rem;
+}
+
+.edit_place--btn {
+
+    font-size: $F-S;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $red-600;
+    background-color: $red-00;
+    position: absolute;
+    bottom: 1.2rem;
+    left: 1.2rem;
+    text-decoration: none;
+    transition: all .3s;
+    padding: 1.2rem 1.6rem;
+
+    &:hover {
+        color: $red-00;
+        background-color: $red-600;
+        padding: 1.4rem 1.8rem;
+    }
 }

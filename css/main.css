@@ -2285,6 +2285,26 @@ body p {
   }
 }
 
+.edit_place--btn {
+  font-size: 1.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #A21111;
+  background-color: #FDE8E8;
+  position: absolute;
+  bottom: 1.2rem;
+  left: 1.2rem;
+  text-decoration: none;
+  transition: all 0.3s;
+  padding: 1.2rem 1.6rem;
+}
+.edit_place--btn:hover {
+  color: #FDE8E8;
+  background-color: #A21111;
+  padding: 1.4rem 1.8rem;
+}
+
 .place_gallery {
   position: relative;
   overflow: hidden;
