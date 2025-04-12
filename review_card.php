@@ -1,6 +1,6 @@
 <?php
 // Define the maximum length for the review text preview
-$max_length = 150; // Adjust the length as needed
+$max_length = 150;
 
 // Get the full review text
 $full_review = $row['review_text'];
@@ -15,16 +15,17 @@ if (strlen($full_review) > $max_length) {
 
 <div class="activity_grid--item">
     <div class="activity_grid--item_img">
-        <a class="activity_grid--item_img_user" href="#">
+        <!-- Profile Image and Name Link -->
+        <a class="activity_grid--item_img_user" href="profile.php?user_id=<?php echo htmlspecialchars($row['user_id']); ?>">
             <?php
             $profile_image = $row['user_profile_image'] ? $row['user_profile_image'] : 'assets/images/profiles/pro_null.png';
             ?>
-            <img src="<?php echo $profile_image; ?>" alt="">
-            <p><?php echo $row['user_name']; ?></p>
+            <img src="<?php echo htmlspecialchars($profile_image); ?>" alt="User Profile Image">
+            <p><?php echo htmlspecialchars($row['user_name']); ?></p>
         </a>
         
-        <!-- Review image from the review_images table -->
-        <a href="#"><img class="activity_grid--item_img_user-img" src="<?php echo $row['review_image']; ?>" alt=""></a>
+        <!-- Review Image -->
+        <a href="#"><img class="activity_grid--item_img_user-img" src="<?php echo htmlspecialchars($row['review_image']); ?>" alt="Review Image"></a>
         <a class="activity_grid--item_img_like" href="#"><i class="fa-solid fa-heart"></i></a>
     </div>
     
@@ -32,25 +33,29 @@ if (strlen($full_review) > $max_length) {
         <div class="activity_grid--item_content-info">
             <div class="activity_grid--item_content-info_name">
                 <a href="#">
-                    <h3><?php echo $row['place_name']; ?></h3>
+                    <h3><?php echo htmlspecialchars($row['place_name']); ?></h3>
                 </a>
                 <div class="activity_stars">
                     <?php
-                    for ($i = 0; $i < $row['rating']; $i++) {
+                    $rating = $row['rating'];
+                    for ($i = 0; $i < $rating; $i++) {
                         echo '<i class="fa-solid fa-star"></i>';
+                    }
+                    for ($i = $rating; $i < 5; $i++) {
+                        echo '<i class="fa-regular fa-star"></i>';
                     }
                     ?>
                 </div>
             </div>
             <a class="activity_grid--item_content-info_link" href="#">
-                <i class="<?php echo $row['icon_class']; ?>"></i>
+                <i class="<?php echo htmlspecialchars($row['icon_class']); ?>"></i>
             </a>
         </div>
         
         <p>
-            <?php echo $short_review; ?>
-            <?php if (strlen($full_review) > $max_length) : ?>
-                <a href="review_details.php?id=<?php echo $row['review_id']; ?>" class="read-more">Read more</a>
+            <?php echo htmlspecialchars($short_review); ?>
+            <?php if (strlen($full_review) > $max_length): ?>
+                <a href="review_details.php?id=<?php echo htmlspecialchars($row['review_id']); ?>" class="read-more">Read more</a>
             <?php endif; ?>
         </p>
     </div>

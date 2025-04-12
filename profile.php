@@ -58,6 +58,7 @@ if (!$user) {
                 $places_query = $conn->prepare("
                     SELECT 
                         p.id, p.name, p.price, p.tags, p.city, p.featured_image, 
+                        c.id AS category_id, 
                         c.icon AS category_icon, 
                         COALESCE(AVG(r.rating), 0) AS avg_rating
                     FROM places p
@@ -86,7 +87,7 @@ if (!$user) {
                         <a href="place.php?id=<?php echo $place['id']; ?>" class="listing_grid--item-img_img">
                             <img src="<?php echo htmlspecialchars($place['featured_image'] ?? 'assets/images/listing.jpg'); ?>" alt="Place Image">
                         </a>
-                        <a href="#" class="listing_grid--item-img_category">
+                        <a href="listing.php?category_id=<?php echo urlencode($place['category_id']); ?>" class="listing_grid--item-img_category">
                             <i class="<?php echo htmlspecialchars($place['category_icon'] ?? 'fa-solid fa-question'); ?>"></i>
                         </a>
                         <?php if ($is_owner): ?>
@@ -128,7 +129,7 @@ if (!$user) {
             </div>
 
             <?php if ($total_places > 2): ?>
-            <a href="my_places.php?user_id=<?php echo $profile_user_id; ?>" class="btn__red--l btn__red btn">see all</a>
+            <a href="my_places.php?user_id=<?php echo $profile_user_id; ?>&page=1" class="btn__red--l btn__red btn">see all</a>
             <?php endif; ?>
         </div>
         <div class="profile_main_myReviews">
@@ -138,12 +139,23 @@ if (!$user) {
                 // Fetch the newest 2 reviews and count total reviews
                 $reviews_query = $conn->prepare("
                     SELECT 
-                        r.id AS review_id, r.rating, r.review_text, r.created_at, 
-                        p.id AS place_id, p.name AS place_name, p.featured_image AS place_image, 
-                        c.icon AS category_icon
+                        r.id AS review_id, 
+                        r.review_text, 
+                        r.rating, 
+                        r.created_at, 
+                        p.id AS place_id, 
+                        p.name AS place_name, 
+                        p.featured_image AS place_image, 
+                        c.id AS category_id, 
+                        c.icon AS category_icon,
+                        u.id AS user_id, 
+                        u.first_name, 
+                        u.last_name, 
+                        u.profile_image
                     FROM reviews r
                     INNER JOIN places p ON r.place_id = p.id
                     LEFT JOIN categories c ON p.category_id = c.id
+                    INNER JOIN users u ON r.user_id = u.id
                     WHERE r.user_id = ?
                     ORDER BY r.created_at DESC
                     LIMIT 2
@@ -163,9 +175,9 @@ if (!$user) {
                 ?>
                 <div class="activity_grid--item">
                     <div class="activity_grid--item_img">
-                        <a class="activity_grid--item_img_user" href="profile.php?user_id=<?php echo $profile_user_id; ?>">
-                            <img src="<?php echo htmlspecialchars($user['profile_image'] ?? 'assets/images/profiles/pro_null.png'); ?>" alt="User Image">
-                            <p><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></p>
+                        <a class="activity_grid--item_img_user" href="profile.php?user_id=<?php echo $review['user_id']; ?>">
+                            <img src="<?php echo htmlspecialchars($review['profile_image'] ?? 'assets/images/profiles/pro_null.png'); ?>" alt="User Image">
+                            <p><?php echo htmlspecialchars($review['first_name'] . ' ' . $review['last_name']); ?></p>
                         </a>
                         <a href="place.php?id=<?php echo $review['place_id']; ?>">
                             <img class="activity_grid--item_img_user-img" src="<?php echo htmlspecialchars($review['place_image'] ?? 'assets/images/listing.jpg'); ?>" alt="Place Image">
@@ -189,20 +201,26 @@ if (!$user) {
                                     <?php endfor; ?>
                                 </div>
                             </div>
-                            <a class="activity_grid--item_content-info_link" href="#">
+                            <a class="activity_grid--item_content-info_link" href="listing.php?category_id=<?php echo urlencode($review['category_id']); ?>">
                                 <i class="<?php echo htmlspecialchars($review['category_icon'] ?? 'fa-solid fa-question'); ?>"></i>
                             </a>
                         </div>
-                        <p><?php echo htmlspecialchars(substr($review['review_text'], 0, 150)) . '...'; ?></p>
+                        <p>
+                            <?php echo htmlspecialchars(substr($review['review_text'], 0, 150)); ?>
+                            <?php if (strlen($review['review_text']) > 150): ?>
+                                <a href="review_details.php?id=<?php echo $review['review_id']; ?>" class="read-more">Read more</a>
+                            <?php endif; ?>
+                        </p>
                     </div>
                 </div>
                 <?php endwhile; ?>
             </div>
 
             <?php if ($total_reviews > 2): ?>
-            <a href="my_reviews.php?user_id=<?php echo $profile_user_id; ?>" class="btn__red--l btn__red btn">see all</a>
+            <a href="my_reviews.php?user_id=<?php echo $profile_user_id; ?>&page=1" class="btn__red--l btn__red btn">see all</a>
             <?php endif; ?>
         </div>
+
         <div class="profile_main_likeReviews">
             <h2 class="profile_title">LIKED REVIEWS</h2>
             <div class="profile_container">
@@ -210,13 +228,24 @@ if (!$user) {
                 // Fetch the newest 2 liked reviews and count total liked reviews
                 $liked_reviews_query = $conn->prepare("
                     SELECT 
-                        rl.review_id, r.rating, r.review_text, r.created_at, 
-                        p.id AS place_id, p.name AS place_name, p.featured_image AS place_image, 
-                        c.icon AS category_icon
+                        rl.review_id, 
+                        r.rating, 
+                        r.review_text, 
+                        r.created_at, 
+                        p.id AS place_id, 
+                        p.name AS place_name, 
+                        p.featured_image AS place_image, 
+                        c.id AS category_id, 
+                        c.icon AS category_icon,
+                        u.id AS user_id, 
+                        u.first_name, 
+                        u.last_name, 
+                        u.profile_image
                     FROM review_likes rl
                     INNER JOIN reviews r ON rl.review_id = r.id
                     INNER JOIN places p ON r.place_id = p.id
                     LEFT JOIN categories c ON p.category_id = c.id
+                    INNER JOIN users u ON r.user_id = u.id
                     WHERE rl.user_id = ?
                     ORDER BY rl.created_at DESC
                     LIMIT 2
@@ -236,9 +265,9 @@ if (!$user) {
                 ?>
                 <div class="activity_grid--item">
                     <div class="activity_grid--item_img">
-                        <a class="activity_grid--item_img_user" href="profile.php?user_id=<?php echo $profile_user_id; ?>">
-                            <img src="<?php echo htmlspecialchars($user['profile_image'] ?? 'assets/images/profiles/pro_null.png'); ?>" alt="User Image">
-                            <p><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></p>
+                        <a class="activity_grid--item_img_user" href="profile.php?user_id=<?php echo $liked_review['user_id']; ?>">
+                            <img src="<?php echo htmlspecialchars($liked_review['profile_image'] ?? 'assets/images/profiles/pro_null.png'); ?>" alt="User Image">
+                            <p><?php echo htmlspecialchars($liked_review['first_name'] . ' ' . $liked_review['last_name']); ?></p>
                         </a>
                         <a href="place.php?id=<?php echo $liked_review['place_id']; ?>">
                             <img class="activity_grid--item_img_user-img" src="<?php echo htmlspecialchars($liked_review['place_image'] ?? 'assets/images/listing.jpg'); ?>" alt="Place Image">
@@ -262,18 +291,23 @@ if (!$user) {
                                     <?php endfor; ?>
                                 </div>
                             </div>
-                            <a class="activity_grid--item_content-info_link" href="#">
+                            <a class="activity_grid--item_content-info_link" href="listing.php?category_id=<?php echo urlencode($liked_review['category_id']); ?>">
                                 <i class="<?php echo htmlspecialchars($liked_review['category_icon'] ?? 'fa-solid fa-question'); ?>"></i>
                             </a>
                         </div>
-                        <p><?php echo htmlspecialchars(substr($liked_review['review_text'], 0, 150)) . '...'; ?></p>
+                        <p>
+                            <?php echo htmlspecialchars(substr($liked_review['review_text'], 0, 150)); ?>
+                            <?php if (strlen($liked_review['review_text']) > 150): ?>
+                                <a href="review_details.php?id=<?php echo $liked_review['review_id']; ?>" class="read-more">Read more</a>
+                            <?php endif; ?>
+                        </p>
                     </div>
                 </div>
                 <?php endwhile; ?>
             </div>
 
             <?php if ($total_liked_reviews > 2): ?>
-            <a href="liked_reviews.php?user_id=<?php echo $profile_user_id; ?>" class="btn__red--l btn__red btn">see all</a>
+            <a href="liked_rev.php?user_id=<?php echo $profile_user_id; ?>&page=1" class="btn__red--l btn__red btn">see all</a>
             <?php endif; ?>
         </div>
         <div class="profile_main_collection">
@@ -284,6 +318,7 @@ if (!$user) {
                 $saved_places_query = $conn->prepare("
                     SELECT 
                         sp.place_id, p.name, p.price, p.tags, p.city, p.featured_image, 
+                        c.id AS category_id, 
                         c.icon AS category_icon, 
                         COALESCE(AVG(r.rating), 0) AS avg_rating
                     FROM saved_places sp
@@ -313,7 +348,7 @@ if (!$user) {
                         <a href="place.php?id=<?php echo $saved_place['place_id']; ?>" class="listing_grid--item-img_img">
                             <img src="<?php echo htmlspecialchars($saved_place['featured_image'] ?? 'assets/images/listing.jpg'); ?>" alt="Place Image">
                         </a>
-                        <a href="#" class="listing_grid--item-img_category">
+                        <a href="listing.php?category_id=<?php echo urlencode($saved_place['category_id']); ?>" class="listing_grid--item-img_category">
                             <i class="<?php echo htmlspecialchars($saved_place['category_icon'] ?? 'fa-solid fa-question'); ?>"></i>
                         </a>
                         <a href="#" class="listing_grid--item-img_save"><i class="fa-solid fa-bookmark"></i></a>
@@ -353,7 +388,7 @@ if (!$user) {
             </div>
 
             <?php if ($total_saved_places > 2): ?>
-            <a href="saved_places.php?user_id=<?php echo $profile_user_id; ?>" class="btn__red--l btn__red btn">see all</a>
+            <a href="my_collections.php?user_id=<?php echo $profile_user_id; ?>&page=1" class="btn__red--l btn__red btn">see all</a>
             <?php endif; ?>
         </div>
         <div class="profile_main_info">

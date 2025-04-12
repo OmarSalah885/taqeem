@@ -123,9 +123,7 @@ $current_page = max(1, min($total_pages, $current_page));  // Ensure the page is
                 </h2>
             </div>
         </div>
-
-       
-       <!-- Filters (Price, Categories, Stars) -->
+<!-- Filters (Price, Categories, Stars) -->
 <div class="listing_filter">
     <div class="listing_filter-L">
         <select name="price" class="custom-select" onchange="filterChange()">
@@ -164,10 +162,7 @@ $current_page = max(1, min($total_pages, $current_page));  // Ensure the page is
     <option value="2" <?php echo $sort == '2' ? 'selected' : ''; ?>>Newest</option>
     <option value="3" <?php echo $sort == '3' ? 'selected' : ''; ?>>Price</option>
 </select>
-
 </div>
-
-
         <!-- Display Places -->
         <div class="listing_grid">
             <?php if (!empty($places)): ?>
