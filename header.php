@@ -55,7 +55,7 @@ include 'db_connect.php';
     <a class="btn__red--m btn__red btn" id="search-btn" href="#"><i class="fa-solid fa-magnifying-glass"></i></a>
     <?php if (isset($_SESSION['user_id'])): ?>
         <!-- Show profile link when the user is logged in -->
-        <a href="#" class="navbar_profile">
+        <a href="profile.php?user_id=<?php echo htmlspecialchars($_SESSION['user_id']); ?>" class="navbar_profile">
             <img src="<?php echo htmlspecialchars($_SESSION['profile_image']); ?>" alt="User Profile">
             <span><?php echo htmlspecialchars($_SESSION['first_name'] . ' ' . $_SESSION['last_name']); ?></span>
         </a>
