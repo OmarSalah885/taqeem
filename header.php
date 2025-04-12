@@ -52,21 +52,22 @@ include 'db_connect.php';
                     <a href="index.php"><img src="assets/images/logo.png" alt="logo"></a>
                 </div>
                 <div class="navbar_container--menu-R">
-                    <a class="btn__red--m btn__red btn" id="search-btn" href="#"><i class="fa-solid fa-magnifying-glass"></i></a>
-                    <?php if (isset($_SESSION['user_id'])): ?>
-                        <!-- Show profile link when the user is logged in -->
-                        <a href="#" class="navbar_profile">
-                            <img src="<?php echo htmlspecialchars($_SESSION['profile_image'] ?? 'assets/images/profiles/pro_null.png'); ?>" alt="User Profile">
-                            <span><?php echo htmlspecialchars($_SESSION['first_name'] . ' ' . $_SESSION['last_name']); ?></span>
-                        </a>
-                        <a class="navbar_container--menu-R_links" href="logout.php">Log Out</a>
-                    <?php else: ?>
-                        <!-- Show login and signup links when the user is not logged in -->
-                        <a class="navbar_container--menu-R_links" id="login-nav" href="#">Log In</a>
-                        <a class="navbar_container--menu-R_links" id="signup-nav" href="#">Sign Up</a>
-                    <?php endif; ?>
-                    <a class="btn__red--m btn__red btn" href="add-place.php">Add Place</a>
-                </div>
+    <a class="btn__red--m btn__red btn" id="search-btn" href="#"><i class="fa-solid fa-magnifying-glass"></i></a>
+    <?php if (isset($_SESSION['user_id'])): ?>
+        <!-- Show profile link when the user is logged in -->
+        <a href="#" class="navbar_profile">
+            <img src="<?php echo htmlspecialchars($_SESSION['profile_image']); ?>" alt="User Profile">
+            <span><?php echo htmlspecialchars($_SESSION['first_name'] . ' ' . $_SESSION['last_name']); ?></span>
+        </a>
+        <a class="navbar_container--menu-R_links" href="logout.php">Log Out</a>
+    <?php else: ?>
+        <!-- Show login and signup links when the user is not logged in -->
+        <a class="navbar_container--menu-R_links" id="login-nav" href="#">Log In</a>
+        <a class="navbar_container--menu-R_links" id="signup-nav" href="#">Sign Up</a>
+    <?php endif; ?>
+    <a class="btn__red--m btn__red btn" href="add-place.php">Add Place</a>
+</div>
+
             </div>
         </nav>
 
