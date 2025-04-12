@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!empty($errors)) {
         $_SESSION['login_errors'] = $errors;
         $_SESSION['login_data'] = $_POST; // Save the entered data to repopulate the form
-        header("Location: $redirect_url"); // Redirect back to the same page
+        header("Location: $redirect_url");
         exit;
     }
 
@@ -40,39 +40,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user = $result->fetch_assoc();
 
     if ($user) {
-        // Verify the password
+        // Check the password using password_verify for hashed passwords
         if (password_verify($password, $user['password'])) {
-            // Password is correct, set session variables
+            // Password is correct
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['first_name'] = $user['first_name'];
             $_SESSION['last_name'] = $user['last_name'];
             $_SESSION['email'] = $user['email'];
             $_SESSION['role'] = $user['role'];
 
-            unset($_SESSION['login_errors']); // Clear any previous login errors
-            unset($_SESSION['login_data']); // Clear any previous login data
-            header("Location: $redirect_url"); // Redirect back to the same page
+            unset($_SESSION['login_errors']);
+            unset($_SESSION['login_data']);
+            header("Location: $redirect_url");
             exit;
         } else {
             // Password is incorrect
             $_SESSION['login_errors']['password'] = 'Invalid password.';
-            $_SESSION['login_data'] = $_POST; // Save the entered data to repopulate the form
-            header("Location: $redirect_url"); // Redirect back to the same page
+            $_SESSION['login_data'] = $_POST;
+            header("Location: $redirect_url");
             exit;
         }
     } else {
         // Email not found
         $_SESSION['login_errors']['email'] = 'No account found with that email.';
-        $_SESSION['login_data'] = $_POST; // Save the entered data to repopulate the form
-        header("Location: $redirect_url"); // Redirect back to the same page
+        $_SESSION['login_data'] = $_POST;
+        header("Location: $redirect_url");
         exit;
     }
 
     $stmt->close();
     $conn->close();
 } else {
-    // Redirect to the homepage if accessed directly
     header('Location: index.php');
     exit;
 }
-?>

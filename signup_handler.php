@@ -43,8 +43,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // If there are errors, store them in the session and redirect back
     if (!empty($errors)) {
         $_SESSION['signup_errors'] = $errors;
-        $_SESSION['signup_data'] = $_POST; // Save the entered data to repopulate the form
-        header('Location: index.php'); // Redirect back to the homepage (where the header is)
+        $_SESSION['signup_data'] = $_POST;
+        header('Location: index.php');
         exit;
     }
 
@@ -57,13 +57,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->store_result();
     if ($stmt->num_rows > 0) {
         $_SESSION['signup_errors']['email'] = 'This email is already registered.';
-        $_SESSION['signup_data'] = $_POST; // Save the entered data to repopulate the form
-        header('Location: index.php'); // Redirect back to the homepage
+        $_SESSION['signup_data'] = $_POST;
+        $stmt->close();
+        header('Location: index.php');
         exit;
     }
     $stmt->close();
 
-    // Hash the password
+    // Hash the password securely
     $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
     // Insert the user into the database
@@ -78,20 +79,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['role'] = 'Guest';
         unset($_SESSION['signup_errors']);
         unset($_SESSION['signup_data']);
-        header('Location: index.php'); // Redirect to the homepage
+        header('Location: index.php');
         exit;
     } else {
         $_SESSION['signup_errors']['general'] = 'Failed to register. Please try again.';
-        $_SESSION['signup_data'] = $_POST; // Save the entered data to repopulate the form
-        header('Location: index.php'); // Redirect back to the homepage
+        $_SESSION['signup_errors']['mysql'] = $stmt->error;
+        $_SESSION['signup_data'] = $_POST;
+        header('Location: index.php');
         exit;
     }
 
     $stmt->close();
     $conn->close();
 } else {
-    // Redirect to the homepage if accessed directly
     header('Location: index.php');
     exit;
 }
-?>

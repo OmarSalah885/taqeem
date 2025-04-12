@@ -1,11 +1,11 @@
 <?php
 $servername = "localhost";
 $username = "root";
-$password = "";
+$db_password = "";
 $database = "taqeem";
 
-$conn = new mysqli($servername, $username, $password, $database,3307);
-$conn->set_charset("utf8mb4");
+$conn = new mysqli($servername, $username, $db_password, $database);
+
 
 // Check connection
 if ($conn->connect_error) {
