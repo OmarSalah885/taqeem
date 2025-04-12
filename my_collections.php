@@ -93,16 +93,25 @@ $collections_result = $collections_query->get_result();
                     <?php echo htmlspecialchars($collection['city']); ?>
                 </a>
                 <div class="listing_grid--item-content_stars">
-                    <div class="listing_grid--item-content_stars-stars">
-                        <?php
-                        $avg_rating = round($collection['avg_rating']); // Round the average rating
-                        for ($i = 0; $i < $avg_rating; $i++): ?>
-                            <i class="fa-solid fa-star"></i>
-                        <?php endfor; ?>
-                        <?php for ($i = $avg_rating; $i < 5; $i++): ?>
-                            <i class="fa-regular fa-star"></i>
-                        <?php endfor; ?>
-                    </div>
+                <?php
+                                // Fetch average rating from reviews for a specific place
+                                $sql = "SELECT AVG(rating) AS avg_rating FROM reviews WHERE place_id = ?";
+                                $stmt = $conn->prepare($sql);
+                                $stmt->bind_param("i", $place['id']);
+                                $stmt->execute();
+                                $result = $stmt->get_result();
+                                $rating = $result->fetch_assoc()['avg_rating'] ?? 0;
+                                $stmt->close();
+                                $percentage = ($rating / 5) * 100; // Convert rating to percentage
+                                ?>
+
+                                <div class="listing_grid--item-content_stars-stars" style="background: linear-gradient(90deg, #A21111 var(--rating, <?php echo $percentage; ?>%), #D0D0D0 var(--rating,<?php echo $percentage-100; ?>%)); display: inline-block; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                                    <i class="fa-solid fa-star star-rating"></i>
+                                    <i class="fa-solid fa-star star-rating"></i>
+                                    <i class="fa-solid fa-star star-rating"></i>
+                                    <i class="fa-solid fa-star star-rating"></i>
+                                    <i class="fa-solid fa-star star-rating"></i>
+                                </div>
                     <h4 class="listing_grid--item-content_stars-price"><?php echo htmlspecialchars($collection['price']); ?></h4>
                 </div>
             </div>

@@ -16,12 +16,12 @@ if (strlen($full_review) > $max_length) {
 <div class="activity_grid--item">
     <div class="activity_grid--item_img">
         <!-- Profile Image and Name Link -->
-        <a class="activity_grid--item_img_user" href="profile.php?user_id=<?php echo htmlspecialchars($row['user_id']); ?>">
+        <a class="activity_grid--item_img_user" href="profile.php?user_id=<?php echo htmlspecialchars($row['user_id'] ?? ''); ?>">
             <?php
-            $profile_image = $row['user_profile_image'] ? $row['user_profile_image'] : 'assets/images/profiles/pro_null.png';
+            $profile_image = $row['user_profile_image'] ?? 'assets/images/profiles/pro_null.png';
             ?>
             <img src="<?php echo htmlspecialchars($profile_image); ?>" alt="User Profile Image">
-            <p><?php echo htmlspecialchars($row['user_name']); ?></p>
+            <p><?php echo htmlspecialchars($row['user_name'] ?? 'Unknown User'); ?></p>
         </a>
         
         <!-- Review Image -->
@@ -48,7 +48,7 @@ if (strlen($full_review) > $max_length) {
                 </div>
             </div>
             <a class="activity_grid--item_content-info_link" href="#">
-                <i class="<?php echo htmlspecialchars($row['icon_class']); ?>"></i>
+                <i class="<?php echo htmlspecialchars($row['icon_class'] ?? 'fa-solid fa-question'); ?>"></i>
             </a>
         </div>
         
