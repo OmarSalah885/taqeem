@@ -388,7 +388,9 @@ if (isset($_SESSION['user_id'])) {
                         <a href="listing.php?category_id=<?php echo urlencode($saved_place['category_id']); ?>" class="listing_grid--item-img_category">
                             <i class="<?php echo htmlspecialchars($saved_place['category_icon'] ?? 'fa-solid fa-question'); ?>"></i>
                         </a>
-                        <a href="#" class="listing_grid--item-img_save"><i class="fa-solid fa-bookmark"></i></a>
+                        <a href="#" class="listing_grid--item-img_save" onclick="toggleSave(event, <?php echo $saved_place['place_id']; ?>)">
+                            <i class="fa-solid fa-bookmark"></i>
+                        </a>
                     </div>
                     <div class="listing_grid--item-content">
                         <div class="listing_grid--item-content_tages">
@@ -411,7 +413,7 @@ if (isset($_SESSION['user_id'])) {
                                 // Fetch average rating from reviews for a specific place
                                 $sql = "SELECT AVG(rating) AS avg_rating FROM reviews WHERE place_id = ?";
                                 $stmt = $conn->prepare($sql);
-                                $stmt->bind_param("i", $place['id']);
+                                $stmt->bind_param("i", $saved_place['place_id']);
                                 $stmt->execute();
                                 $result = $stmt->get_result();
                                 $rating = $result->fetch_assoc()['avg_rating'] ?? 0;

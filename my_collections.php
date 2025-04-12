@@ -74,7 +74,10 @@ $collections_result = $collections_query->get_result();
                 <a href="listing.php?category_id=<?php echo urlencode($collection['category_id']); ?>" class="listing_grid--item-img_category">
                     <i class="<?php echo htmlspecialchars($collection['category_icon'] ?? 'fa-solid fa-question'); ?>"></i>
                 </a>
-                <a href="#" class="listing_grid--item-img_save"><i class="fa-solid fa-bookmark"></i></a>
+                <!-- Save Icon -->
+                <a href="#" class="listing_grid--item-img_save" onclick="toggleSave(event, <?php echo $collection['place_id']; ?>)">
+                    <i class="fa-solid fa-bookmark"></i>
+                </a>
             </div>
             <div class="listing_grid--item-content">
                 <div class="listing_grid--item-content_tages">
@@ -94,25 +97,25 @@ $collections_result = $collections_query->get_result();
                 </a>
                 <div class="listing_grid--item-content_stars">
                 <?php
-                                // Fetch average rating from reviews for a specific place
-                                $sql = "SELECT AVG(rating) AS avg_rating FROM reviews WHERE place_id = ?";
-                                $stmt = $conn->prepare($sql);
-                                $stmt->bind_param("i", $place['id']);
-                                $stmt->execute();
-                                $result = $stmt->get_result();
-                                $rating = $result->fetch_assoc()['avg_rating'] ?? 0;
-                                $stmt->close();
-                                $percentage = ($rating / 5) * 100; // Convert rating to percentage
-                                ?>
+                    // Fetch average rating from reviews for a specific place
+                    $sql = "SELECT AVG(rating) AS avg_rating FROM reviews WHERE place_id = ?";
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bind_param("i", $collection['place_id']);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+                    $rating = $result->fetch_assoc()['avg_rating'] ?? 0;
+                    $stmt->close();
+                    $percentage = ($rating / 5) * 100; // Convert rating to percentage
+                ?>
 
-                                <div class="listing_grid--item-content_stars-stars" style="background: linear-gradient(90deg, #A21111 var(--rating, <?php echo $percentage; ?>%), #D0D0D0 var(--rating,<?php echo $percentage-100; ?>%)); display: inline-block; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-                                    <i class="fa-solid fa-star star-rating"></i>
-                                    <i class="fa-solid fa-star star-rating"></i>
-                                    <i class="fa-solid fa-star star-rating"></i>
-                                    <i class="fa-solid fa-star star-rating"></i>
-                                    <i class="fa-solid fa-star star-rating"></i>
-                                </div>
-                    <h4 class="listing_grid--item-content_stars-price"><?php echo htmlspecialchars($collection['price']); ?></h4>
+                <div class="listing_grid--item-content_stars-stars" style="background: linear-gradient(90deg, #A21111 var(--rating, <?php echo $percentage; ?>%), #D0D0D0 var(--rating,<?php echo $percentage-100; ?>%)); display: inline-block; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                    <i class="fa-solid fa-star star-rating"></i>
+                    <i class="fa-solid fa-star star-rating"></i>
+                    <i class="fa-solid fa-star star-rating"></i>
+                    <i class="fa-solid fa-star star-rating"></i>
+                    <i class="fa-solid fa-star star-rating"></i>
+                </div>
+                <h4 class="listing_grid--item-content_stars-price"><?php echo htmlspecialchars($collection['price']); ?></h4>
                 </div>
             </div>
         </div>

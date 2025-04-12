@@ -94,6 +94,21 @@ $total_pages = ceil($total_items / $items_per_page);
 $current_page = max(1, min($total_pages, $current_page));  // Ensure the page is within bounds
 ?>
 
+<?php
+// Fetch saved places for the logged-in user
+$saved_places = [];
+if (isset($_SESSION['user_id'])) {
+    $user_id = $_SESSION['user_id'];
+    $saved_places_query = $conn->prepare("SELECT place_id FROM saved_places WHERE user_id = ?");
+    $saved_places_query->bind_param("i", $user_id);
+    $saved_places_query->execute();
+    $saved_places_result = $saved_places_query->get_result();
+    while ($saved_place = $saved_places_result->fetch_assoc()) {
+        $saved_places[] = $saved_place['place_id'];
+    }
+}
+?>
+
 <main>
     <div class="listing">
         <div class="pageinfo">
@@ -186,7 +201,10 @@ $current_page = max(1, min($total_pages, $current_page));  // Ensure the page is
                             <a href="listing.php?category_id=<?php echo $place['category_id']; ?>" class="listing_grid--item-img_category">
                                 <i class="<?php echo htmlspecialchars($category_icon); ?>"></i>
                             </a>
-                            <a href="#" class="listing_grid--item-img_save"><i class="fa-solid fa-bookmark"></i></a>
+                            <!-- Save Icon -->
+                            <a href="#" class="listing_grid--item-img_save" onclick="toggleSave(event, <?php echo $place['id']; ?>)">
+                                <i class="<?php echo in_array($place['id'], $saved_places) ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark'; ?>"></i>
+                            </a>
                         </div>
                         <div class="listing_grid--item-content">
                             <div class="listing_grid--item-content_tages">

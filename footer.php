@@ -46,5 +46,6 @@ include 'db_connect.php';
 <script src="assets/js/script.js"></script>
 <script src="assets/js/map.js"></script>
 <script src="assets/js/review_interactions.js"></script>
+<script src="assets/js/save_interactions.js"></script>
 
 </html>
