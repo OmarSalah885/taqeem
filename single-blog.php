@@ -143,7 +143,7 @@ foreach ($comments as $comment) {
                 function display_comments($grouped_comments, $parent_id = 0) {
                     if (!empty($grouped_comments[$parent_id])) {
                         foreach ($grouped_comments[$parent_id] as $comment): ?>
-                            <div class="comments_container--single <?php echo $parent_id == 0 ? 'main-comment' : 'reply-comment'; ?>">
+                            <div class="comments_container--single <?php echo $parent_id == 0 ? 'main-comment' : 'reply-comment'; ?>" data-comment-id="<?php echo $comment['id']; ?>">
                                 <div class="comment">
                                     <div class="comment_img">
                                         <img src="<?php echo htmlspecialchars($comment['profile_image'] ?: 'assets/images/profiles/pro_null.png'); ?>" alt="User Profile">
@@ -196,7 +196,8 @@ foreach ($comments as $comment) {
     <form class="single-blog_thought" method="POST" action="submit_comment.php">
         <h2 class="single-blog_thought--title">Leave your thought here</h2>
         <textarea name="comment" placeholder="Write your comment..." required></textarea>
-        <input type="hidden" name="blog_id" value="1">
+        <input type="hidden" name="blog_id" value="<?php echo $blog_id; ?>">
+        <input type="hidden" name="parent_comment_id" id="parent_comment_id" value="">
         <button type="submit" class="btn__red--l btn__red btn">Submit</button>
     </form>
 </main>
