@@ -25,7 +25,17 @@ if (!$user) {
     exit;
 }
 ?>
-
+<?php
+$is_liked = false;
+if (isset($_SESSION['user_id'])) {
+    $user_id = $_SESSION['user_id'];
+    $check_like_query = $conn->prepare("SELECT id FROM review_likes WHERE user_id = ? AND review_id = ?");
+    $check_like_query->bind_param("ii", $user_id, $review['review_id']);
+    $check_like_query->execute();
+    $check_like_result = $check_like_query->get_result();
+    $is_liked = $check_like_result->num_rows > 0;
+}
+?>
 <main class="profile">
     <div class="profile_sidebar">
         <!-- User Image -->
@@ -184,15 +194,34 @@ if (!$user) {
                 ?>
                 <div class="activity_grid--item">
                     <div class="activity_grid--item_img">
+                        <!-- Profile Image and Name -->
                         <a class="activity_grid--item_img_user" href="profile.php?user_id=<?php echo $review['user_id']; ?>">
                             <img src="<?php echo htmlspecialchars($review['profile_image'] ?? 'assets/images/profiles/pro_null.png'); ?>" alt="User Image">
                             <p><?php echo htmlspecialchars($review['first_name'] . ' ' . $review['last_name']); ?></p>
                         </a>
+
+                        <!-- Review Image -->
                         <a href="place.php?id=<?php echo $review['place_id']; ?>">
                             <img class="activity_grid--item_img_user-img" src="<?php echo htmlspecialchars($review['place_image'] ?? 'assets/images/listing.jpg'); ?>" alt="Place Image">
                         </a>
-                        <a class="activity_grid--item_img_like" href="#"><i class="fa-solid fa-heart"></i></a>
+
+                        <!-- Like Icon -->
+                        <?php
+                        $is_liked = false;
+                        if (isset($_SESSION['user_id'])) {
+                            $user_id = $_SESSION['user_id'];
+                            $check_like_query = $conn->prepare("SELECT id FROM review_likes WHERE user_id = ? AND review_id = ?");
+                            $check_like_query->bind_param("ii", $user_id, $review['review_id']);
+                            $check_like_query->execute();
+                            $check_like_result = $check_like_query->get_result();
+                            $is_liked = $check_like_result->num_rows > 0;
+                        }
+                        ?>
+                        <a class="activity_grid--item_img_like" href="#" onclick="toggleLike(event, <?php echo $review['review_id']; ?>)">
+                            <i class="<?php echo $is_liked ? 'fa-solid fa-heart' : 'fa-regular fa-heart'; ?>"></i>
+                        </a>
                     </div>
+
                     <div class="activity_grid--item_content">
                         <div class="activity_grid--item_content-info">
                             <div class="activity_grid--item_content-info_name">
@@ -210,9 +239,6 @@ if (!$user) {
                                     <?php endfor; ?>
                                 </div>
                             </div>
-                            <a class="activity_grid--item_content-info_link" href="listing.php?category_id=<?php echo urlencode($review['category_id']); ?>">
-                                <i class="<?php echo htmlspecialchars($review['category_icon'] ?? 'fa-solid fa-question'); ?>"></i>
-                            </a>
                         </div>
                         <p>
                             <?php echo htmlspecialchars(substr($review['review_text'], 0, 150)); ?>
@@ -234,7 +260,7 @@ if (!$user) {
             <h2 class="profile_title">LIKED REVIEWS</h2>
             <div class="profile_container">
                 <?php
-                // Fetch the newest 2 liked reviews and count total liked reviews
+                // Fetch the newest 2 liked reviews
                 $liked_reviews_query = $conn->prepare("
                     SELECT 
                         rl.review_id, 
@@ -281,7 +307,10 @@ if (!$user) {
                         <a href="place.php?id=<?php echo $liked_review['place_id']; ?>">
                             <img class="activity_grid--item_img_user-img" src="<?php echo htmlspecialchars($liked_review['place_image'] ?? 'assets/images/listing.jpg'); ?>" alt="Place Image">
                         </a>
-                        <a class="activity_grid--item_img_like" href="#"><i class="fa-solid fa-heart"></i></a>
+                        <!-- Like Icon -->
+                        <a class="activity_grid--item_img_like" href="#" onclick="toggleLike(event, <?php echo $liked_review['review_id']; ?>)">
+                            <i class="fa-solid fa-heart"></i>
+                        </a>
                     </div>
                     <div class="activity_grid--item_content">
                         <div class="activity_grid--item_content-info">
@@ -300,9 +329,6 @@ if (!$user) {
                                     <?php endfor; ?>
                                 </div>
                             </div>
-                            <a class="activity_grid--item_content-info_link" href="listing.php?category_id=<?php echo urlencode($liked_review['category_id']); ?>">
-                                <i class="<?php echo htmlspecialchars($liked_review['category_icon'] ?? 'fa-solid fa-question'); ?>"></i>
-                            </a>
                         </div>
                         <p>
                             <?php echo htmlspecialchars(substr($liked_review['review_text'], 0, 150)); ?>
@@ -313,12 +339,14 @@ if (!$user) {
                     </div>
                 </div>
                 <?php endwhile; ?>
-            </div>
 
-            <?php if ($total_liked_reviews > 2): ?>
-            <a href="liked_rev.php?user_id=<?php echo $profile_user_id; ?>&page=1" class="btn__red--l btn__red btn">see all</a>
-            <?php endif; ?>
+                <!-- See All Button -->
+                <?php if ($total_liked_reviews > 2): ?>
+                    <a href="liked_rev.php?user_id=<?php echo $profile_user_id; ?>&page=1" class="btn__red--l btn__red btn">see all</a>
+                <?php endif; ?>
+            </div>
         </div>
+
         <div class="profile_main_collection">
             <h2 class="profile_title">MY COLLECTIONS</h2>
             <div class="profile_container">

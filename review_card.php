@@ -11,6 +11,17 @@ if (strlen($full_review) > $max_length) {
 } else {
     $short_review = $full_review;
 }
+
+// Check if the review is liked by the logged-in user
+$is_liked = false;
+if (isset($_SESSION['user_id'])) {
+    $user_id = $_SESSION['user_id'];
+    $check_like_query = $conn->prepare("SELECT id FROM review_likes WHERE user_id = ? AND review_id = ?");
+    $check_like_query->bind_param("ii", $user_id, $row['review_id']);
+    $check_like_query->execute();
+    $check_like_result = $check_like_query->get_result();
+    $is_liked = $check_like_result->num_rows > 0;
+}
 ?>
 
 <div class="activity_grid--item">
@@ -26,7 +37,9 @@ if (strlen($full_review) > $max_length) {
         
         <!-- Review Image -->
         <a href="#"><img class="activity_grid--item_img_user-img" src="<?php echo htmlspecialchars($row['review_image']); ?>" alt="Review Image"></a>
-        <a class="activity_grid--item_img_like" href="#"><i class="fa-solid fa-heart"></i></a>
+        <a class="activity_grid--item_img_like" href="#" onclick="toggleLike(event, <?php echo $row['review_id']; ?>)">
+            <i class="<?php echo $is_liked ? 'fa-solid fa-heart' : 'fa-regular fa-heart'; ?>"></i>
+        </a>
     </div>
     
     <div class="activity_grid--item_content">
