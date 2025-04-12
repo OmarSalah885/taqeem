@@ -60,7 +60,7 @@ include 'db_connect.php';
     <?php if (isset($_SESSION['user_id'])): ?>
         <!-- Show profile link when the user is logged in -->
         <a href="profile.php?user_id=<?php echo htmlspecialchars($_SESSION['user_id']); ?>" class="navbar_profile">
-            <img src="<?php echo htmlspecialchars($_SESSION['profile_image']); ?>" alt="User Profile">
+            <img src="<?php echo htmlspecialchars($_SESSION['profile_image'] ?? 'assets/images/profiles/pro_null.png'); ?>" alt="User Profile">
             <span><?php echo htmlspecialchars($_SESSION['first_name'] . ' ' . $_SESSION['last_name']); ?></span>
         </a>
         <a class="navbar_container--menu-R_links" href="logout.php">Log Out</a>
