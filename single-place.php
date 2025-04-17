@@ -313,7 +313,7 @@ include 'header.php';
                 <div class="stars_p">
                     <p>5 STARS</p>
                     <div class="stars_p--5">
-                        <div class="stars_p--color"></div>
+                        <div class="stars_p--color" style="width: 15%;"></div>
                     </div>
                 </div>
                 <div class="stars_p">
