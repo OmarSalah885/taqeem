@@ -81,82 +81,93 @@ if (isset($_SESSION['user_id'])) {
             <h2><?php echo $is_owner ? 'MY REVIEWS' : htmlspecialchars($user_name) . "'s REVIEWS"; ?></h2>
         </div>
     </div>
-    <div class="listing_grid">
-        <?php while ($review = $reviews_result->fetch_assoc()): ?>
-        <div class="activity_grid--item">
-            <div class="activity_grid--item_img">
-                <a class="activity_grid--item_img_user" href="profile.php?user_id=<?php echo $review['user_id']; ?>">
-                    <img src="<?php echo htmlspecialchars($review['profile_image'] ?? 'assets/images/profiles/pro_null.png'); ?>" alt="User Image">
-                    <p><?php echo htmlspecialchars($review['first_name'] . ' ' . $review['last_name']); ?></p>
-                </a>
-                <a href="place.php?id=<?php echo $review['place_id']; ?>">
-                    <img class="activity_grid--item_img_user-img" src="<?php echo htmlspecialchars($review['place_image'] ?? 'assets/images/listing.jpg'); ?>" alt="Place Image">
-                </a>
-                <!-- Like Icon -->
-                <?php $is_liked = in_array($review['review_id'], $is_liked_reviews); ?>
-                <a class="activity_grid--item_img_like" href="#" onclick="toggleLike(event, <?php echo $review['review_id']; ?>)">
-                    <i class="<?php echo $is_liked ? 'fa-solid fa-heart' : 'fa-regular fa-heart'; ?>"></i>
-                </a>
-            </div>
-            <div class="activity_grid--item_content">
-                <div class="activity_grid--item_content-info">
-                    <div class="activity_grid--item_content-info_name">
-                        <a href="place.php?id=<?php echo $review['place_id']; ?>">
-                            <h3><?php echo htmlspecialchars($review['place_name']); ?></h3>
-                        </a>
-                        <div class="activity_stars">
-                            <?php
+
+    <div class="places_likes_content">
+        <div class="listing_grid">
+            <?php while ($review = $reviews_result->fetch_assoc()): ?>
+            <div class="activity_grid--item">
+                <div class="activity_grid--item_img">
+                    <a class="activity_grid--item_img_user"
+                        href="profile.php?user_id=<?php echo $review['user_id']; ?>">
+                        <img src="<?php echo htmlspecialchars($review['profile_image'] ?? 'assets/images/profiles/pro_null.png'); ?>"
+                            alt="User Image">
+                        <p><?php echo htmlspecialchars($review['first_name'] . ' ' . $review['last_name']); ?></p>
+                    </a>
+                    <a href="place.php?id=<?php echo $review['place_id']; ?>">
+                        <img class="activity_grid--item_img_user-img"
+                            src="<?php echo htmlspecialchars($review['place_image'] ?? 'assets/images/listing.jpg'); ?>"
+                            alt="Place Image">
+                    </a>
+                    <!-- Like Icon -->
+                    <?php $is_liked = in_array($review['review_id'], $is_liked_reviews); ?>
+                    <a class="activity_grid--item_img_like" href="#"
+                        onclick="toggleLike(event, <?php echo $review['review_id']; ?>)">
+                        <i class="<?php echo $is_liked ? 'fa-solid fa-heart' : 'fa-regular fa-heart'; ?>"></i>
+                    </a>
+                </div>
+                <div class="activity_grid--item_content">
+                    <div class="activity_grid--item_content-info">
+                        <div class="activity_grid--item_content-info_name">
+                            <a href="place.php?id=<?php echo $review['place_id']; ?>">
+                                <h3><?php echo htmlspecialchars($review['place_name']); ?></h3>
+                            </a>
+                            <div class="activity_stars">
+                                <?php
                             $rating = (int)$review['rating'];
                             for ($i = 0; $i < $rating; $i++): ?>
                                 <i class="fa-solid fa-star"></i>
-                            <?php endfor; ?>
-                            <?php for ($i = $rating; $i < 5; $i++): ?>
+                                <?php endfor; ?>
+                                <?php for ($i = $rating; $i < 5; $i++): ?>
                                 <i class="fa-regular fa-star"></i>
-                            <?php endfor; ?>
+                                <?php endfor; ?>
+                            </div>
                         </div>
+                        <a class="activity_grid--item_content-info_link"
+                            href="listing.php?category_id=<?php echo urlencode($review['category_id']); ?>">
+                            <i
+                                class="<?php echo htmlspecialchars($review['category_icon'] ?? 'fa-solid fa-question'); ?>"></i>
+                        </a>
                     </div>
-                    <a class="activity_grid--item_content-info_link" href="listing.php?category_id=<?php echo urlencode($review['category_id']); ?>">
-                        <i class="<?php echo htmlspecialchars($review['category_icon'] ?? 'fa-solid fa-question'); ?>"></i>
-                    </a>
+                    <p>
+                        <?php echo htmlspecialchars(substr($review['review_text'], 0, 150)); ?>
+                        <?php if (strlen($review['review_text']) > 150): ?>
+                        <a href="review_details.php?id=<?php echo $review['review_id']; ?>" class="read-more">Read
+                            more</a>
+                        <?php endif; ?>
+                    </p>
                 </div>
-                <p>
-                    <?php echo htmlspecialchars(substr($review['review_text'], 0, 150)); ?>
-                    <?php if (strlen($review['review_text']) > 150): ?>
-                        <a href="review_details.php?id=<?php echo $review['review_id']; ?>" class="read-more">Read more</a>
-                    <?php endif; ?>
-                </p>
             </div>
+            <?php endwhile; ?>
         </div>
-        <?php endwhile; ?>
-    </div>
 
-    <!-- Pagination -->
-    <div class="listing_indicator">
-        <ul class="listing_indicator">
-            <?php if ($page > 1): ?>
-            <li class="indicator_item">
-                <a href="my_reviews.php?user_id=<?php echo $user_id; ?>&page=<?php echo $page - 1; ?>">
-                    <i class="fa-solid fa-chevron-left"></i>
-                </a>
-            </li>
-            <?php endif; ?>
+        <!-- Pagination -->
+        <div class="listing_indicator">
+            <ul class="listing_indicator">
+                <?php if ($page > 1): ?>
+                <li class="indicator_item">
+                    <a href="my_reviews.php?user_id=<?php echo $user_id; ?>&page=<?php echo $page - 1; ?>">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </a>
+                </li>
+                <?php endif; ?>
 
-            <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-            <li class="indicator_item <?php echo ($i === $page) ? 'active' : ''; ?>">
-                <a href="my_reviews.php?user_id=<?php echo $user_id; ?>&page=<?php echo $i; ?>">
-                    <?php echo $i; ?>
-                </a>
-            </li>
-            <?php endfor; ?>
+                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                <li class="indicator_item <?php echo ($i === $page) ? 'active' : ''; ?>">
+                    <a href="my_reviews.php?user_id=<?php echo $user_id; ?>&page=<?php echo $i; ?>">
+                        <?php echo $i; ?>
+                    </a>
+                </li>
+                <?php endfor; ?>
 
-            <?php if ($page < $total_pages): ?>
-            <li class="indicator_item">
-                <a href="my_reviews.php?user_id=<?php echo $user_id; ?>&page=<?php echo $page + 1; ?>">
-                    <i class="fa-solid fa-chevron-right"></i>
-                </a>
-            </li>
-            <?php endif; ?>
-        </ul>
+                <?php if ($page < $total_pages): ?>
+                <li class="indicator_item">
+                    <a href="my_reviews.php?user_id=<?php echo $user_id; ?>&page=<?php echo $page + 1; ?>">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                </li>
+                <?php endif; ?>
+            </ul>
+        </div>
     </div>
 </main>
 

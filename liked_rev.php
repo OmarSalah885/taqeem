@@ -58,20 +58,28 @@ $liked_reviews_result = $liked_reviews_query->get_result();
             <h2>LIKED REVIEWS</h2>
         </div>
     </div>
-    <div class="listing_grid">
-        <?php while ($liked_review = $liked_reviews_result->fetch_assoc()): ?>
+
+    <div class="places_likes_content">
+        <div class="listing_grid">
+            <?php while ($liked_review = $liked_reviews_result->fetch_assoc()): ?>
             <!-- Review Card -->
             <div class="activity_grid--item">
                 <div class="activity_grid--item_img">
-                    <a class="activity_grid--item_img_user" href="profile.php?user_id=<?php echo $liked_review['user_id']; ?>">
-                        <img src="<?php echo htmlspecialchars($liked_review['profile_image'] ?? 'assets/images/profiles/pro_null.png'); ?>" alt="User Image">
-                        <p><?php echo htmlspecialchars($liked_review['first_name'] . ' ' . $liked_review['last_name']); ?></p>
+                    <a class="activity_grid--item_img_user"
+                        href="profile.php?user_id=<?php echo $liked_review['user_id']; ?>">
+                        <img src="<?php echo htmlspecialchars($liked_review['profile_image'] ?? 'assets/images/profiles/pro_null.png'); ?>"
+                            alt="User Image">
+                        <p><?php echo htmlspecialchars($liked_review['first_name'] . ' ' . $liked_review['last_name']); ?>
+                        </p>
                     </a>
                     <a href="place.php?id=<?php echo $liked_review['place_id']; ?>">
-                        <img class="activity_grid--item_img_user-img" src="<?php echo htmlspecialchars($liked_review['place_image'] ?? 'assets/images/listing.jpg'); ?>" alt="Place Image">
+                        <img class="activity_grid--item_img_user-img"
+                            src="<?php echo htmlspecialchars($liked_review['place_image'] ?? 'assets/images/listing.jpg'); ?>"
+                            alt="Place Image">
                     </a>
                     <!-- Like Icon -->
-                    <a class="activity_grid--item_img_like" href="#" onclick="toggleLike(event, <?php echo $liked_review['review_id']; ?>)">
+                    <a class="activity_grid--item_img_like" href="#"
+                        onclick="toggleLike(event, <?php echo $liked_review['review_id']; ?>)">
                         <i class="fa-solid fa-heart"></i>
                     </a>
                 </div>
@@ -85,55 +93,59 @@ $liked_reviews_result = $liked_reviews_query->get_result();
                                 <?php
                                 $rating = (int)$liked_review['rating'];
                                 for ($i = 0; $i < $rating; $i++): ?>
-                                    <i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i>
                                 <?php endfor; ?>
                                 <?php for ($i = $rating; $i < 5; $i++): ?>
-                                    <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
                                 <?php endfor; ?>
                             </div>
                         </div>
-                        <a class="activity_grid--item_content-info_link" href="listing.php?category_id=<?php echo urlencode($liked_review['category_id']); ?>">
-                            <i class="<?php echo htmlspecialchars($liked_review['category_icon'] ?? 'fa-solid fa-question'); ?>"></i>
+                        <a class="activity_grid--item_content-info_link"
+                            href="listing.php?category_id=<?php echo urlencode($liked_review['category_id']); ?>">
+                            <i
+                                class="<?php echo htmlspecialchars($liked_review['category_icon'] ?? 'fa-solid fa-question'); ?>"></i>
                         </a>
                     </div>
                     <p>
                         <?php echo htmlspecialchars(substr($liked_review['review_text'], 0, 150)); ?>
                         <?php if (strlen($liked_review['review_text']) > 150): ?>
-                            <a href="review_details.php?id=<?php echo $liked_review['review_id']; ?>" class="read-more">Read more</a>
+                        <a href="review_details.php?id=<?php echo $liked_review['review_id']; ?>" class="read-more">Read
+                            more</a>
                         <?php endif; ?>
                     </p>
                 </div>
             </div>
-        <?php endwhile; ?>
-    </div>
+            <?php endwhile; ?>
+        </div>
 
-    <!-- Pagination -->
-    <div class="listing_indicator">
-        <ul class="listing_indicator">
-            <?php if ($page > 1): ?>
-            <li class="indicator_item">
-                <a href="liked_rev.php?user_id=<?php echo $user_id; ?>&page=<?php echo $page - 1; ?>">
-                    <i class="fa-solid fa-chevron-left"></i>
-                </a>
-            </li>
-            <?php endif; ?>
+        <!-- Pagination -->
+        <div class="listing_indicator">
+            <ul class="listing_indicator">
+                <?php if ($page > 1): ?>
+                <li class="indicator_item">
+                    <a href="liked_rev.php?user_id=<?php echo $user_id; ?>&page=<?php echo $page - 1; ?>">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </a>
+                </li>
+                <?php endif; ?>
 
-            <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-            <li class="indicator_item <?php echo ($i === $page) ? 'active' : ''; ?>">
-                <a href="liked_rev.php?user_id=<?php echo $user_id; ?>&page=<?php echo $i; ?>">
-                    <?php echo $i; ?>
-                </a>
-            </li>
-            <?php endfor; ?>
+                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                <li class="indicator_item <?php echo ($i === $page) ? 'active' : ''; ?>">
+                    <a href="liked_rev.php?user_id=<?php echo $user_id; ?>&page=<?php echo $i; ?>">
+                        <?php echo $i; ?>
+                    </a>
+                </li>
+                <?php endfor; ?>
 
-            <?php if ($page < $total_pages): ?>
-            <li class="indicator_item">
-                <a href="liked_rev.php?user_id=<?php echo $user_id; ?>&page=<?php echo $page + 1; ?>">
-                    <i class="fa-solid fa-chevron-right"></i>
-                </a>
-            </li>
-            <?php endif; ?>
-        </ul>
+                <?php if ($page < $total_pages): ?>
+                <li class="indicator_item">
+                    <a href="liked_rev.php?user_id=<?php echo $user_id; ?>&page=<?php echo $page + 1; ?>">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                </li>
+                <?php endif; ?>
+            </ul>
+        </div>
     </div>
 </main>
 

@@ -64,39 +64,45 @@ $collections_result = $collections_query->get_result();
             <h2><?php echo $is_owner ? 'MY COLLECTIONS' : htmlspecialchars($user_name) . "'s COLLECTIONS"; ?></h2>
         </div>
     </div>
-    <div class="listing_grid">
-        <?php while ($collection = $collections_result->fetch_assoc()): ?>
-        <div class="listing_grid--item">
-            <div class="listing_grid--item-img">
-                <a href="place.php?id=<?php echo $collection['place_id']; ?>" class="listing_grid--item-img_img">
-                    <img src="<?php echo htmlspecialchars($collection['featured_image'] ?? 'assets/images/listing.jpg'); ?>" alt="Place Image">
-                </a>
-                <a href="listing.php?category_id=<?php echo urlencode($collection['category_id']); ?>" class="listing_grid--item-img_category">
-                    <i class="<?php echo htmlspecialchars($collection['category_icon'] ?? 'fa-solid fa-question'); ?>"></i>
-                </a>
-                <!-- Save Icon -->
-                <a href="#" class="listing_grid--item-img_save" onclick="toggleSave(event, <?php echo $collection['place_id']; ?>)">
-                    <i class="fa-solid fa-bookmark"></i>
-                </a>
-            </div>
-            <div class="listing_grid--item-content">
-                <div class="listing_grid--item-content_tages">
-                    <?php
+    <div class="places_likes_content">
+        <div class="listing_grid">
+            <?php while ($collection = $collections_result->fetch_assoc()): ?>
+            <div class="listing_grid--item">
+                <div class="listing_grid--item-img">
+                    <a href="place.php?id=<?php echo $collection['place_id']; ?>" class="listing_grid--item-img_img">
+                        <img src="<?php echo htmlspecialchars($collection['featured_image'] ?? 'assets/images/listing.jpg'); ?>"
+                            alt="Place Image">
+                    </a>
+                    <a href="listing.php?category_id=<?php echo urlencode($collection['category_id']); ?>"
+                        class="listing_grid--item-img_category">
+                        <i
+                            class="<?php echo htmlspecialchars($collection['category_icon'] ?? 'fa-solid fa-question'); ?>"></i>
+                    </a>
+                    <!-- Save Icon -->
+                    <a href="#" class="listing_grid--item-img_save"
+                        onclick="toggleSave(event, <?php echo $collection['place_id']; ?>)">
+                        <i class="fa-solid fa-bookmark"></i>
+                    </a>
+                </div>
+                <div class="listing_grid--item-content">
+                    <div class="listing_grid--item-content_tages">
+                        <?php
                     $tags = explode(',', $collection['tags']);
                     foreach ($tags as $tag):
                     ?>
-                    <a href="#"><?php echo htmlspecialchars($tag); ?></a>
-                    <?php endforeach; ?>
-                </div>
-                <a class="listing_grid--item-content_name" href="place.php?id=<?php echo $collection['place_id']; ?>">
-                    <?php echo htmlspecialchars($collection['name']); ?>
-                </a>
-                <a href="#" class="listing_grid--item-content_location">
-                    <i class="fa-solid fa-location-dot"></i>
-                    <?php echo htmlspecialchars($collection['city']); ?>
-                </a>
-                <div class="listing_grid--item-content_stars">
-                <?php
+                        <a href="#"><?php echo htmlspecialchars($tag); ?></a>
+                        <?php endforeach; ?>
+                    </div>
+                    <a class="listing_grid--item-content_name"
+                        href="place.php?id=<?php echo $collection['place_id']; ?>">
+                        <?php echo htmlspecialchars($collection['name']); ?>
+                    </a>
+                    <a href="#" class="listing_grid--item-content_location">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <?php echo htmlspecialchars($collection['city']); ?>
+                    </a>
+                    <div class="listing_grid--item-content_stars">
+                        <?php
                     // Fetch average rating from reviews for a specific place
                     $sql = "SELECT AVG(rating) AS avg_rating FROM reviews WHERE place_id = ?";
                     $stmt = $conn->prepare($sql);
@@ -108,47 +114,50 @@ $collections_result = $collections_query->get_result();
                     $percentage = ($rating / 5) * 100; // Convert rating to percentage
                 ?>
 
-                <div class="listing_grid--item-content_stars-stars" style="background: linear-gradient(90deg, #A21111 var(--rating, <?php echo $percentage; ?>%), #D0D0D0 var(--rating,<?php echo $percentage-100; ?>%)); display: inline-block; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-                    <i class="fa-solid fa-star star-rating"></i>
-                    <i class="fa-solid fa-star star-rating"></i>
-                    <i class="fa-solid fa-star star-rating"></i>
-                    <i class="fa-solid fa-star star-rating"></i>
-                    <i class="fa-solid fa-star star-rating"></i>
-                </div>
-                <h4 class="listing_grid--item-content_stars-price"><?php echo htmlspecialchars($collection['price']); ?></h4>
+                        <div class="listing_grid--item-content_stars-stars"
+                            style="background: linear-gradient(90deg, #A21111 var(--rating, <?php echo $percentage; ?>%), #D0D0D0 var(--rating,<?php echo $percentage-100; ?>%)); display: inline-block; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                            <i class="fa-solid fa-star star-rating"></i>
+                            <i class="fa-solid fa-star star-rating"></i>
+                            <i class="fa-solid fa-star star-rating"></i>
+                            <i class="fa-solid fa-star star-rating"></i>
+                            <i class="fa-solid fa-star star-rating"></i>
+                        </div>
+                        <h4 class="listing_grid--item-content_stars-price">
+                            <?php echo htmlspecialchars($collection['price']); ?></h4>
+                    </div>
                 </div>
             </div>
+            <?php endwhile; ?>
         </div>
-        <?php endwhile; ?>
-    </div>
 
-    <!-- Pagination -->
-    <div class="listing_indicator">
-        <ul class="listing_indicator">
-            <?php if ($page > 1): ?>
-            <li class="indicator_item">
-                <a href="my_collections.php?user_id=<?php echo $user_id; ?>&page=<?php echo $page - 1; ?>">
-                    <i class="fa-solid fa-chevron-left"></i>
-                </a>
-            </li>
-            <?php endif; ?>
+        <!-- Pagination -->
+        <div class="listing_indicator">
+            <ul class="listing_indicator">
+                <?php if ($page > 1): ?>
+                <li class="indicator_item">
+                    <a href="my_collections.php?user_id=<?php echo $user_id; ?>&page=<?php echo $page - 1; ?>">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </a>
+                </li>
+                <?php endif; ?>
 
-            <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-            <li class="indicator_item <?php echo ($i === $page) ? 'active' : ''; ?>">
-                <a href="my_collections.php?user_id=<?php echo $user_id; ?>&page=<?php echo $i; ?>">
-                    <?php echo $i; ?>
-                </a>
-            </li>
-            <?php endfor; ?>
+                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                <li class="indicator_item <?php echo ($i === $page) ? 'active' : ''; ?>">
+                    <a href="my_collections.php?user_id=<?php echo $user_id; ?>&page=<?php echo $i; ?>">
+                        <?php echo $i; ?>
+                    </a>
+                </li>
+                <?php endfor; ?>
 
-            <?php if ($page < $total_pages): ?>
-            <li class="indicator_item">
-                <a href="my_collections.php?user_id=<?php echo $user_id; ?>&page=<?php echo $page + 1; ?>">
-                    <i class="fa-solid fa-chevron-right"></i>
-                </a>
-            </li>
-            <?php endif; ?>
-        </ul>
+                <?php if ($page < $total_pages): ?>
+                <li class="indicator_item">
+                    <a href="my_collections.php?user_id=<?php echo $user_id; ?>&page=<?php echo $page + 1; ?>">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                </li>
+                <?php endif; ?>
+            </ul>
+        </div>
     </div>
 </main>
 

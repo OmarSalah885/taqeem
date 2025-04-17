@@ -287,3 +287,16 @@
         padding: 1.4rem 1.8rem;
     }
 }
+
+.places_likes_content {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    justify-content: center;
+    width: 100%;
+
+    .listing_indicator {
+        width: 100%;
+
+    }
+}

@@ -2305,6 +2305,17 @@ body p {
   padding: 1.4rem 1.8rem;
 }
 
+.places_likes_content {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: center;
+  width: 100%;
+}
+.places_likes_content .listing_indicator {
+  width: 100%;
+}
+
 .place_gallery {
   position: relative;
   overflow: hidden;
@@ -2351,6 +2362,13 @@ body p {
 }
 .place_gallery .gallery-btn.right-btn {
   right: 10px;
+}
+.place_gallery .btn {
+  position: absolute;
+  top: 90%;
+  left: 50%;
+  translate: -50% -50%;
+  z-index: 200000;
 }
 .place_info {
   width: 100%;
@@ -3133,6 +3151,71 @@ body p {
   height: 100%;
   -o-object-fit: cover;
      object-fit: cover;
+}
+.place .reviews_container .review .review_btns {
+  font-size: 1.6rem;
+  display: flex;
+  align-items: center;
+  gap: 2.4rem;
+}
+.place .reviews_container .review .review_btns--like {
+  background-color: #D01515;
+  color: #FDE8E8;
+  font-size: 2.4rem;
+  width: 3.6rem;
+  height: 3.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.place .reviews_container .review .review_btns--like:hover {
+  background-color: #A21111;
+}
+.place .reviews_container .review .review_btns--link {
+  color: #D01515;
+}
+.place .reviews_container .review .review_btns--link:hover {
+  color: #740C0C;
+}
+.place .reviews_container .review .review_btns a {
+  transition: all 0.3s;
+  text-decoration: none;
+}
+.place .reviews_container .review textarea {
+  padding: 2.4rem;
+  font-family: inherit;
+  font-size: 1.6rem;
+  outline: 0.1rem #D0D0D0 solid;
+  border-radius: none;
+  border: none;
+  transition: all 0.3s;
+  height: 24rem;
+}
+.place .reviews_container .review textarea:focus {
+  outline: none;
+  outline: 0.1rem #7C7A7A solid;
+}
+.place .reviews_container .review .review_placeComment {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  background-color: #FDE8E8;
+  padding: 2.4rem;
+}
+.place .reviews_container .review .review_placeComment h4 {
+  font-size: 1.6rem;
+}
+.place .reviews_container .review .review_placeComment p {
+  font-size: 1.328rem;
+}
+.place .reviews_container .review .review_placeComment a {
+  text-decoration: none;
+  font-size: 1.328rem;
+  color: #D01515;
+  transition: all 0.3s;
+}
+.place .reviews_container .review .review_placeComment a:hover {
+  color: #740C0C;
 }
 .place .addReview {
   width: 100%;

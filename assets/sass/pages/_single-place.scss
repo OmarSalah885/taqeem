@@ -51,6 +51,14 @@
                 right: 10px;
             }
         }
+
+        .btn {
+            position: absolute;
+            top: 90%;
+            left: 50%;
+            translate: -50% -50%;
+            z-index: 200000;
+        }
     }
 
     &_info {
@@ -663,6 +671,85 @@
                             width: 100%;
                             height: 100%;
                             object-fit: cover;
+                        }
+                    }
+                }
+
+                .review_btns {
+                    font-size: $F-S;
+                    display: flex;
+                    align-items: center;
+                    gap: 2.4rem;
+
+                    &--like {
+                        background-color: $red-500;
+                        color: $red-00;
+                        font-size: $F-L;
+                        width: 3.6rem;
+                        height: 3.6rem;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+
+
+                        &:hover {
+                            background-color: $red-600;
+                        }
+                    }
+
+                    &--link {
+                        color: $red-500;
+
+                        &:hover {
+                            color: $red-700;
+                        }
+                    }
+
+                    a {
+                        transition: all .3s;
+                        text-decoration: none;
+                    }
+                }
+
+                textarea {
+                    padding: 2.4rem;
+                    font-family: inherit;
+                    font-size: $F-S;
+                    outline: .1rem $gray-100 solid;
+                    border-radius: none;
+                    border: none;
+                    transition: all .3s;
+                    height: 24rem;
+
+                    &:focus {
+                        outline: none;
+                        outline: .1rem $gray-300 solid;
+                    }
+                }
+
+                .review_placeComment {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 1.2rem;
+                    background-color: $red-00;
+                    padding: 2.4rem;
+
+                    h4 {
+                        font-size: $F-S;
+                    }
+
+                    p {
+                        font-size: $F-XS;
+                    }
+
+                    a {
+                        text-decoration: none;
+                        font-size: $F-XS;
+                        color: $red-500;
+                        transition: all .3s;
+
+                        &:hover {
+                            color: $red-700;
                         }
                     }
                 }
