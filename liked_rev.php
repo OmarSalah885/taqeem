@@ -78,9 +78,20 @@ $liked_reviews_result = $liked_reviews_query->get_result();
                             alt="Place Image">
                     </a>
                     <!-- Like Icon -->
+                    <?php
+                    // Check if the logged-in user has already liked this review
+                    if ($user_id === $_SESSION['user_id']) { // Check if the logged-in user is viewing their own liked reviews
+                        $liked_query = $conn->prepare("SELECT * FROM review_likes WHERE user_id = ? AND review_id = ?");
+                        $liked_query->bind_param("ii", $_SESSION['user_id'], $liked_review['review_id']);
+                        $liked_query->execute();
+                        $is_liked = $liked_query->get_result()->num_rows > 0;
+                    } else {
+                        $is_liked = false; // Always unliked for other users' liked reviews
+                    }
+                    ?>
                     <a class="activity_grid--item_img_like" href="#"
                         onclick="toggleLike(event, <?php echo $liked_review['review_id']; ?>)">
-                        <i class="fa-solid fa-heart"></i>
+                        <i class="<?php echo $is_liked ? 'fa-solid fa-heart' : 'fa-regular fa-heart'; ?>"></i>
                     </a>
                 </div>
                 <div class="activity_grid--item_content">

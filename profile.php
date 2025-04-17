@@ -60,38 +60,41 @@ if (isset($_SESSION['user_id'])) {
         <?php endif; ?>
     </div>
     <div class="profile_main">
+        <!-- MY PLACES Section -->
+        <?php
+        // Fetch the newest 2 places and count total places
+        $places_query = $conn->prepare("
+            SELECT 
+                p.id, p.name, p.price, p.tags, p.city, p.featured_image, 
+                c.id AS category_id, 
+                c.icon AS category_icon, 
+                COALESCE(AVG(r.rating), 0) AS avg_rating
+            FROM places p
+            LEFT JOIN reviews r ON p.id = r.place_id
+            LEFT JOIN categories c ON p.category_id = c.id
+            WHERE p.user_id = ?
+            GROUP BY p.id
+            ORDER BY p.created_at DESC
+            LIMIT 2
+        ");
+        $places_query->bind_param("i", $profile_user_id);
+        $places_query->execute();
+        $places_result = $places_query->get_result();
+
+        // Count total places for the "See All" button
+        $total_places_query = $conn->prepare("SELECT COUNT(*) AS total_places FROM places WHERE user_id = ?");
+        $total_places_query->bind_param("i", $profile_user_id);
+        $total_places_query->execute();
+        $total_places_result = $total_places_query->get_result();
+        $total_places = $total_places_result->fetch_assoc()['total_places'] ?? 0; // Ensure $total_places is initialized
+
+        // Check if there are any places
+        if ($total_places > 0):
+        ?>
         <div class="profile_main_collection">
             <h2 class="profile_title">MY PLACES</h2>
             <div class="profile_container">
-                <?php
-                // Fetch the newest 2 places and count total places
-                $places_query = $conn->prepare("
-                    SELECT 
-                        p.id, p.name, p.price, p.tags, p.city, p.featured_image, 
-                        c.id AS category_id, 
-                        c.icon AS category_icon, 
-                        COALESCE(AVG(r.rating), 0) AS avg_rating
-                    FROM places p
-                    LEFT JOIN reviews r ON p.id = r.place_id
-                    LEFT JOIN categories c ON p.category_id = c.id
-                    WHERE p.user_id = ?
-                    GROUP BY p.id
-                    ORDER BY p.created_at DESC
-                    LIMIT 2
-                ");
-                $places_query->bind_param("i", $profile_user_id);
-                $places_query->execute();
-                $places_result = $places_query->get_result();
-
-                // Count total places for the "See All" button
-                $total_places_query = $conn->prepare("SELECT COUNT(*) AS total_places FROM places WHERE user_id = ?");
-                $total_places_query->bind_param("i", $profile_user_id);
-                $total_places_query->execute();
-                $total_places_result = $total_places_query->get_result();
-                $total_places = $total_places_result->fetch_assoc()['total_places'];
-
-                while ($place = $places_result->fetch_assoc()):
-                ?>
+                <?php while ($place = $places_result->fetch_assoc()): ?>
                 <div class="listing_grid--item">
                     <div class="listing_grid--item-img">
                         <a href="place.php?id=<?php echo $place['id']; ?>" class="listing_grid--item-img_img">
@@ -99,6 +102,17 @@ if (isset($_SESSION['user_id'])) {
                         </a>
                         <a href="listing.php?category_id=<?php echo urlencode($place['category_id']); ?>" class="listing_grid--item-img_category">
                             <i class="<?php echo htmlspecialchars($place['category_icon'] ?? 'fa-solid fa-question'); ?>"></i>
+                        </a>
+                        <!-- Save Icon -->
+                        <?php
+                        // Check if the logged-in user has already saved this place
+                        $saved_query = $conn->prepare("SELECT * FROM saved_places WHERE user_id = ? AND place_id = ?");
+                        $saved_query->bind_param("ii", $logged_in_user_id, $place['id']);
+                        $saved_query->execute();
+                        $is_saved = $saved_query->get_result()->num_rows > 0;
+                        ?>
+                        <a href="#" class="listing_grid--item-img_save" onclick="toggleSave(event, <?php echo $place['id']; ?>)">
+                            <i class="<?php echo $is_saved ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark'; ?>"></i>
                         </a>
                         <?php if ($is_owner): ?>
                         <a href="edit_place.php?place_id=<?php echo $place['id']; ?>" class="edit_place--btn">EDIT PLACE</a>
@@ -121,36 +135,35 @@ if (isset($_SESSION['user_id'])) {
                             <?php echo htmlspecialchars($place['city']); ?>
                         </a>
                         <div class="listing_grid--item-content_stars">
-                        <?php
-                                // Fetch average rating from reviews for a specific place
-                                $sql = "SELECT AVG(rating) AS avg_rating FROM reviews WHERE place_id = ?";
-                                $stmt = $conn->prepare($sql);
-                                $stmt->bind_param("i", $place['id']);
-                                $stmt->execute();
-                                $result = $stmt->get_result();
-                                $rating = $result->fetch_assoc()['avg_rating'] ?? 0;
-                                $stmt->close();
-                                $percentage = ($rating / 5) * 100; // Convert rating to percentage
-                                ?>
-
-                                <div class="listing_grid--item-content_stars-stars" style="background: linear-gradient(90deg, #A21111 var(--rating, <?php echo $percentage; ?>%), #D0D0D0 var(--rating,<?php echo $percentage-100; ?>%)); display: inline-block; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-                                    <i class="fa-solid fa-star star-rating"></i>
-                                    <i class="fa-solid fa-star star-rating"></i>
-                                    <i class="fa-solid fa-star star-rating"></i>
-                                    <i class="fa-solid fa-star star-rating"></i>
-                                    <i class="fa-solid fa-star star-rating"></i>
-                                </div>
+                            <?php
+                            // Fetch average rating from reviews for a specific place
+                            $sql = "SELECT AVG(rating) AS avg_rating FROM reviews WHERE place_id = ?";
+                            $stmt = $conn->prepare($sql);
+                            $stmt->bind_param("i", $place['id']);
+                            $stmt->execute();
+                            $result = $stmt->get_result();
+                            $rating = $result->fetch_assoc()['avg_rating'] ?? 0;
+                            $stmt->close();
+                            $percentage = ($rating / 5) * 100; // Convert rating to percentage
+                            ?>
+                            <div class="listing_grid--item-content_stars-stars" style="background: linear-gradient(90deg, #A21111 var(--rating, <?php echo $percentage; ?>%), #D0D0D0 var(--rating,<?php echo $percentage-100; ?>%)); display: inline-block; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                                <i class="fa-solid fa-star star-rating"></i>
+                                <i class="fa-solid fa-star star-rating"></i>
+                                <i class="fa-solid fa-star star-rating"></i>
+                                <i class="fa-solid fa-star star-rating"></i>
+                                <i class="fa-solid fa-star star-rating"></i>
+                            </div>
                             <h4 class="listing_grid--item-content_stars-price"><?php echo htmlspecialchars($place['price']); ?></h4>
                         </div>
                     </div>
                 </div>
                 <?php endwhile; ?>
             </div>
-
             <?php if ($total_places > 2): ?>
             <a href="my_places.php?user_id=<?php echo $profile_user_id; ?>&page=1" class="btn__red--l btn__red btn">see all</a>
             <?php endif; ?>
         </div>
+        <?php endif; ?>
         <div class="profile_main_myReviews">
             <h2 class="profile_title">MY REVIEWS</h2>
             <div class="profile_container">
@@ -308,8 +321,19 @@ if (isset($_SESSION['user_id'])) {
                             <img class="activity_grid--item_img_user-img" src="<?php echo htmlspecialchars($liked_review['place_image'] ?? 'assets/images/listing.jpg'); ?>" alt="Place Image">
                         </a>
                         <!-- Like Icon -->
+                        <?php
+                        // Check if the logged-in user has already liked this review
+                        if ($is_owner) {
+                            $liked_query = $conn->prepare("SELECT * FROM review_likes WHERE user_id = ? AND review_id = ?");
+                            $liked_query->bind_param("ii", $logged_in_user_id, $liked_review['review_id']);
+                            $liked_query->execute();
+                            $is_liked = $liked_query->get_result()->num_rows > 0;
+                        } else {
+                            $is_liked = false; // Always unliked for other users' profiles
+                        }
+                        ?>
                         <a class="activity_grid--item_img_like" href="#" onclick="toggleLike(event, <?php echo $liked_review['review_id']; ?>)">
-                            <i class="fa-solid fa-heart"></i>
+                            <i class="<?php echo $is_liked ? 'fa-solid fa-heart' : 'fa-regular fa-heart'; ?>"></i>
                         </a>
                     </div>
                     <div class="activity_grid--item_content">
@@ -388,8 +412,20 @@ if (isset($_SESSION['user_id'])) {
                         <a href="listing.php?category_id=<?php echo urlencode($saved_place['category_id']); ?>" class="listing_grid--item-img_category">
                             <i class="<?php echo htmlspecialchars($saved_place['category_icon'] ?? 'fa-solid fa-question'); ?>"></i>
                         </a>
+                        <!-- Save Icon -->
+                        <?php
+                        // Check if the logged-in user has already saved this place
+                        if ($is_owner) {
+                            $saved_query = $conn->prepare("SELECT * FROM saved_places WHERE user_id = ? AND place_id = ?");
+                            $saved_query->bind_param("ii", $logged_in_user_id, $saved_place['place_id']);
+                            $saved_query->execute();
+                            $is_saved = $saved_query->get_result()->num_rows > 0;
+                        } else {
+                            $is_saved = false; // Always unchecked for other users' profiles
+                        }
+                        ?>
                         <a href="#" class="listing_grid--item-img_save" onclick="toggleSave(event, <?php echo $saved_place['place_id']; ?>)">
-                            <i class="fa-solid fa-bookmark"></i>
+                            <i class="<?php echo $is_saved ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark'; ?>"></i>
                         </a>
                     </div>
                     <div class="listing_grid--item-content">

@@ -99,9 +99,15 @@ if (isset($_SESSION['user_id'])) {
                             alt="Place Image">
                     </a>
                     <!-- Like Icon -->
-                    <?php $is_liked = in_array($review['review_id'], $is_liked_reviews); ?>
-                    <a class="activity_grid--item_img_like" href="#"
-                        onclick="toggleLike(event, <?php echo $review['review_id']; ?>)">
+                    <?php
+                    // Check if the logged-in user has already liked this review
+                    if ($is_owner) {
+                        $is_liked = in_array($review['review_id'], $is_liked_reviews);
+                    } else {
+                        $is_liked = false; // Always unliked for other users' reviews
+                    }
+                    ?>
+                    <a class="activity_grid--item_img_like" href="#" onclick="toggleLike(event, <?php echo $review['review_id']; ?>)">
                         <i class="<?php echo $is_liked ? 'fa-solid fa-heart' : 'fa-regular fa-heart'; ?>"></i>
                     </a>
                 </div>

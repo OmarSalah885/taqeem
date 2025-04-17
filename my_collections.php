@@ -79,9 +79,20 @@ $collections_result = $collections_query->get_result();
                             class="<?php echo htmlspecialchars($collection['category_icon'] ?? 'fa-solid fa-question'); ?>"></i>
                     </a>
                     <!-- Save Icon -->
+                    <?php
+                    // Check if the logged-in user has already saved this place
+                    if ($is_owner) {
+                        $saved_query = $conn->prepare("SELECT * FROM saved_places WHERE user_id = ? AND place_id = ?");
+                        $saved_query->bind_param("ii", $user_id, $collection['place_id']);
+                        $saved_query->execute();
+                        $is_saved = $saved_query->get_result()->num_rows > 0;
+                    } else {
+                        $is_saved = false; // Always unchecked for other users' collections
+                    }
+                    ?>
                     <a href="#" class="listing_grid--item-img_save"
                         onclick="toggleSave(event, <?php echo $collection['place_id']; ?>)">
-                        <i class="fa-solid fa-bookmark"></i>
+                        <i class="<?php echo $is_saved ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark'; ?>"></i>
                     </a>
                 </div>
                 <div class="listing_grid--item-content">

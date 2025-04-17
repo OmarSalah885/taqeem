@@ -12,7 +12,7 @@ if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 
     // Last activity was more than 30 minutes ago
     session_unset(); // Unset session variables
     session_destroy(); // Destroy the session
-    header('Location: login.php?timeout=true'); // Redirect to login page
+    header('Location: index.php?timeout=true'); // Redirect to login page
     exit;
 }
 $_SESSION['LAST_ACTIVITY'] = time(); // Update last activity time
