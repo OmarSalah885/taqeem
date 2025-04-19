@@ -1,8 +1,8 @@
 <?php
 include 'config.php'; // Include database connection
+include 'db_connect.php';
 session_start();      // Start the session
 
-include 'header.php';
 
 // Get the profile user ID from the query string
 $profile_user_id = isset($_GET['user_id']) ? (int)$_GET['user_id'] : 0;
@@ -24,41 +24,83 @@ if (!$user) {
     echo "<p>User not found.</p>";
     exit;
 }
-?>
-<?php
-$is_liked = false;
-if (isset($_SESSION['user_id'])) {
-    $user_id = $_SESSION['user_id'];
-    $check_like_query = $conn->prepare("SELECT id FROM review_likes WHERE user_id = ? AND review_id = ?");
-    $check_like_query->bind_param("ii", $user_id, $review['review_id']);
-    $check_like_query->execute();
-    $check_like_result = $check_like_query->get_result();
-    $is_liked = $check_like_result->num_rows > 0;
+
+// Handle image upload if it's the owner's profile
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_image']) && $is_owner) {
+    $image = $_FILES['profile_image'];
+    $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+    $maxSize = 2 * 1024 * 1024; // 2MB
+
+    if ($image['error'] === UPLOAD_ERR_OK) {
+        $fileType = mime_content_type($image['tmp_name']);
+        $fileSize = $image['size'];
+
+        if (in_array($fileType, $allowedTypes) && $fileSize <= $maxSize) {
+            $tmpName = $image['tmp_name'];
+            $ext = pathinfo($image['name'], PATHINFO_EXTENSION);
+            $imageName = uniqid() . '.' . $ext;
+            $targetDir = 'assets/images/profiles/';
+            $targetFile = $targetDir . $imageName;
+
+            if (move_uploaded_file($tmpName, $targetFile)) {
+                // Delete old image if it's not the default and exists
+                $oldImage = $user['profile_image'] ?? '';
+                if (!empty($oldImage) && $oldImage !== 'assets/images/profiles/pro_null.png' && file_exists($oldImage)) {
+                    unlink($oldImage);
+                }
+
+                // Update DB and $user array
+                $stmt = $conn->prepare("UPDATE users SET profile_image = ? WHERE id = ?");
+                $stmt->bind_param("si", $targetFile, $logged_in_user_id);
+                $stmt->execute();
+                $user['profile_image'] = $targetFile;
+
+                // Refresh the page to reload updated image with ?v=timestamp
+                header("Location: " . $_SERVER['REQUEST_URI']);
+                exit();
+            }
+        } else {
+            echo "<script>alert('Invalid file type or size too big. Only JPG, JPEG, PNG under 2MB are allowed.');</script>";
+        }
+    }
 }
+include 'header.php';
 ?>
+
+
 <main class="profile">
-    <div class="profile_sidebar">
-        <!-- User Image -->
-        <div class="profile_sidebar--img">
-            <img src="<?php echo htmlspecialchars($user['profile_image'] ?? 'assets/images/profiles/pro_null.png'); ?>" alt="User Profile">
-        </div>
-
-        <!-- User Info -->
-        <div class="profile_sidebar--info">
-            <h3 class="name"><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></h3>
-            <a href="mailto:<?php echo htmlspecialchars($user['email']); ?>"><?php echo htmlspecialchars($user['email']); ?></a>
-            <h2 class="location"><?php echo htmlspecialchars($user['location'] ?? 'Unknown Location'); ?></h2>
-        </div>
-
-        <!-- Edit Buttons (Only for Profile Owner) -->
-        <?php if ($is_owner): ?>
-        <div class="profile_sidebar--edit">
-            <a class="profile_sidebar--edit-btn" href="edit-profile.php"><i class="fa-solid fa-pen"></i>Edit profile</a>
-            <a class="profile_sidebar--edit-btn" href="add-photo.php"><i class="fa-solid fa-user"></i>Add photo</a>
-        </div>
-        <a href="logout.php" class="btn__transparent--l btn__transparent btn">LOGOUT</a>
-        <?php endif; ?>
+<div class="profile_sidebar">
+    <!-- User Image -->
+    <div class="profile_sidebar--img" style="cursor: pointer;" onclick="document.getElementById('profileInput').click();">
+        <img src="<?php echo htmlspecialchars($user['profile_image'] ?? 'assets/images/profiles/pro_null.png'); ?>" alt="User Profile">
     </div>
+
+    <!-- Hidden Upload Form -->
+    <?php if ($is_owner): ?>
+    <form id="uploadForm" method="POST" enctype="multipart/form-data" style="display: none;">
+        <input type="file" name="profile_image" id="profileInput" accept="image/jpeg,image/jpg,image/png" onchange="document.getElementById('uploadForm').submit();">
+    </form>
+    <?php endif; ?>
+
+    <!-- User Info -->
+    <div class="profile_sidebar--info">
+        <h3 class="name"><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></h3>
+        <a href="mailto:<?php echo htmlspecialchars($user['email']); ?>"><?php echo htmlspecialchars($user['email']); ?></a>
+        <h2 class="location"><?php echo htmlspecialchars($user['location'] ?? 'Unknown Location'); ?></h2>
+    </div>
+
+    <!-- Edit Buttons (Only for Profile Owner) -->
+    <?php if ($is_owner): ?>
+    <div class="profile_sidebar--edit">
+        <a class="profile_sidebar--edit-btn" href="edit-profile.php"><i class="fa-solid fa-pen"></i>Edit profile</a>
+        <label for="profileInput" class="profile_sidebar--edit-btn" style="cursor:pointer;">
+            <i class="fa-solid fa-user"></i>Add photo
+        </label>
+    </div>
+    <a href="logout.php" class="btn__transparent--l btn__transparent btn">LOGOUT</a>
+    <?php endif; ?>
+</div>
+
     <div class="profile_main">
         <!-- MY PLACES Section -->
         <?php
@@ -501,4 +543,5 @@ if (isset($_SESSION['user_id'])) {
         </div>
     </div>
 </main>
+
 <?php include 'footer.php'; ?>
