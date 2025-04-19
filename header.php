@@ -20,7 +20,27 @@ $_SESSION['LAST_ACTIVITY'] = time(); // Update last activity time
 include 'db_connect.php';
 
 
+if (!isset($_SESSION['profile_image']) || !isset($_SESSION['first_name']) || !isset($_SESSION['last_name'])) {
+    if (isset($_SESSION['user_id'])) {
+        $user_id = $_SESSION['user_id'];
+
+        $stmt = $conn->prepare("SELECT profile_image, first_name, last_name FROM users WHERE id = ?");
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result && $headerUser = $result->fetch_assoc()) {
+            $_SESSION['profile_image'] = $headerUser['profile_image'];
+            $_SESSION['first_name'] = $headerUser['first_name'];
+            $_SESSION['last_name'] = $headerUser['last_name'];
+        }
+
+        $stmt->close();
+    }
+}
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -60,8 +80,8 @@ include 'db_connect.php';
     <?php if (isset($_SESSION['user_id'])): ?>
         <!-- Show profile link when the user is logged in -->
         <a href="profile.php?user_id=<?php echo htmlspecialchars($_SESSION['user_id']); ?>" class="navbar_profile">
-        <img src="<?php echo htmlspecialchars($user['profile_image'] ?? 'assets/images/profiles/pro_null.png'); ?>?v=<?php echo time(); ?>" alt="User Profile">
-            <span><?php echo htmlspecialchars($_SESSION['first_name'] . ' ' . $_SESSION['last_name']); ?></span>
+        <img src="<?php echo htmlspecialchars($_SESSION['profile_image'] ?? 'assets/images/profiles/pro_null.png') . '?v=' . time(); ?>" alt="User Profile">
+        <span><?php echo htmlspecialchars($_SESSION['first_name'] . ' ' . $_SESSION['last_name']); ?></span>
         </a>
         <a class="navbar_container--menu-R_links" href="logout.php">Log Out</a>
     <?php else: ?>
