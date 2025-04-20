@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 20, 2025 at 05:40 PM
+-- Generation Time: Apr 20, 2025 at 07:52 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -2119,12 +2119,12 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `first_name`, `last_name`, `email`, `password`, `profile_image`, `gender`, `about_me`, `location`, `role`, `created_at`, `visibility`) VALUES
-(1, 'Ali', 'Al-Haddad', 'ali.ghaddad@example.com', '$2y$10$ccRtfDH.R08bAdaX8vHCMeHkKEW.RF2wBHy/X9fh9P8mjPYMZiK52', 'assets/images/profiles/6805134cec41e.jpg', 'Male', 'Hi, I’m Ali! I love discovering great local spots, whether it’s a cozy café, a hidden bookstore, or a restaurant with the best food in town. I enjoy sharing honest reviews to help others find amazing experiences. When I’m not trying new places, I’m usually working on tech-related topics or exploring programming.', 'Amman, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
+(1, 'Ali', 'feras', 'ali.ghaddad@example.com', '$2y$10$ccRtfDH.R08bAdaX8vHCMeHkKEW.RF2wBHy/X9fh9P8mjPYMZiK52', 'assets/images/profiles/6805134cec41e.jpg', 'Male', 'Hi, I’m Ali! I love discovering great local spots, whether it’s a cozy café, a hidden bookstore, or a restaurant with the best food in town. I enjoy sharing honest reviews to help others find amazing experiences. When I’m not trying new places, I’m usually working on tech-related topics or exploring programming.', 'Amman, Jordan middle town', 'Guest', '2025-03-15 09:24:35', 'private'),
 (2, 'Fatima', 'Al-Abed', 'fatima.alabed@example.com', '$2y$10$OeBoqwucgy370kpRojZSDOzKumpQkfA6bc85O0yWolJQg6p3wvuHm', 'assets/images/profiles/w(1).jpg', 'Female', 'Hi, I’m Fatima! Always on the lookout for new books to read and cool writing spots. I love sharing my thoughts and experiences with others, especially in literary spaces. When I’m not reading, I’m writing or learning more about the world of words!', 'Irbid, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
 (3, 'Hassan', 'Ali', 'hassan.ali@example.com', '$2y$10$JkN6S6zL9iT2Hfzfxw58IOJsIxWeHtbBWS9IHA11gRvPIZF2QbiYC', 'assets/images/profiles/m(2).jpg', 'Male', 'Hassan here! Passionate about tech, especially programming. Whether it’s a hidden tech hub or a cozy café where I can work on my next project, I love sharing my experiences with others. Excited to hear any recommendations you may have!', 'Zarqa, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
 (4, 'Reem', 'Al-Shami', 'reem.ashami@example.com', '$2y$10$16sUDN80Rz2QBzD3pySA3eZQUu7O8DnQJ7WmMdLZgdNsFeGRxkTuG', 'assets/images/profiles/w(2).jpg', 'Female', 'Hey! I’m Reem, and I’m all about traveling and learning about new cultures. There’s nothing better than exploring new places, trying new foods, and sharing my experiences. Always on the hunt for the next great destination!', 'Amman, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
 (5, 'Yousef', 'Najjar', 'yousef.najjar@example.com', '$2y$10$SNVjT2gGZSlZXd5VsdDoluXG/z/V1R8kYW6GgE7CWl3XaNIoHjSfq', NULL, 'Male', 'Hi, I’m Yousef! Passionate about technology and music, I love discovering places that allow me to enjoy both. Whether it’s a café with great Wi-Fi or a cozy bar with live music, I’m always looking for something new and exciting.', NULL, 'Guest', '2025-03-15 09:24:35', 'public'),
-(6, 'Sara', 'Al-Hussein', 'sara.hussein@example.com', '$2y$10$Oinp00wa9UneO.ud6MmqxONNUynRsvosO8PMKAEurXYQVrod2jkA6', 'assets/images/profiles/6803ab3479167.jpg', 'Female', 'I’m Sara! I’m a fan of writing and reading, and I enjoy sharing my thoughts with others. Whether it’s at a quiet bookstore or a bustling café, I love finding places that inspire creativity and help me unwind!', 'Aqaba, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
+(6, 'sara', 'Al-Hussein', 'sara.hussein@example.com', '$2y$10$LrYSWyze3E/4USJkcxssUOPSabTFTGXvLWSJBFJeCIu1q1H7LU9MC', 'assets/images/profiles/68052c835e4c5.jpg', 'Female', 'I’m Sara! I’m a fan of writing and reading, and I enjoy sharing my thoughts with others. Whether it’s at a quiet bookstore or a bustling café, I love finding places that inspire creativity and help me unwind!', 'Aqaba, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
 (7, 'Mahmoud', 'Al-Khateeb', 'mahmoud.khateeb@example.com', '$2y$10$9Ijuo07.AxqGUS8pDpxXZ.w/lGwRKhvbDZcMe8M3aUAdOZ4VvVk.m', NULL, 'Male', 'Mahmoud here! Passionate about programming and data analysis. I’m always discovering new spots to work, relax, and explore. On the lookout for hidden gems that spark creativity and offer a peaceful atmosphere.', 'Amman, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
 (8, 'Layla', 'Al-Sabbah', 'layla.alsabbah@example.com', '$2y$10$M8JN.cvcL47NcR4fiq4WpuVOBicKM2zAvcMosEdzadBEX3hzKz0ma', 'assets/images/profiles/w(3).jpg', 'Female', 'Hi, I’m Layla! As a civil engineering student, I seek quiet spots where I can focus. When I’m not studying, I love exploring new places and discovering unique spots in the city.', 'Karak, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
 (9, 'Imad', 'Issa', 'imad.issa@example.com', '$2y$10$fH8Sw3rRwqe7pL9yi.WmROZvp/GPphyntNlx3kkA5qyzA9fyBAsuS', 'assets/images/profiles/m(3).jpg', 'Male', 'Imad here! I work in digital marketing and love exploring new places with a strong online presence. Whether it’s a café with great Wi-Fi or a tech hub, I’m always excited to discover new spots that help me grow in my career.', 'Irbid, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
@@ -2334,6 +2334,18 @@ ALTER TABLE `place_gallery`
 --
 ALTER TABLE `reviews`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=386;
+
+--
+-- AUTO_INCREMENT for table `review_comments`
+--
+ALTER TABLE `review_comments`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `review_images`
+--
+ALTER TABLE `review_images`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=234;
 
 --
 -- AUTO_INCREMENT for table `review_likes`

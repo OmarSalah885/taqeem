@@ -86,6 +86,10 @@ $update = $conn->prepare("UPDATE users SET first_name = ?, last_name = ?, about_
 $update->bind_param("sssssssi", $first_name, $last_name, $about_me, $gender, $visibility, $location, $new_image_path, $user_id);
 
 if ($update->execute()) {
+    // Update session variables for the name
+    $_SESSION['first_name'] = $first_name;
+    $_SESSION['last_name'] = $last_name;
+
     $update->close();
     $_SESSION['success'] = "Profile updated successfully!";
     header("Location: edit-profile.php"); // Refresh the page to reflect changes

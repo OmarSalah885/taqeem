@@ -63,11 +63,19 @@ $stmt->close();
     </form>
 
     <form action="change_password.php" method="POST" class="edit-profile_password">
-        <h2 class="edit-profile_title">SET YOUR PASSWORD</h2>
+    <?php if (isset($_SESSION['error'])): ?>
+    <div class="error-message"><?= $_SESSION['error']; unset($_SESSION['error']); ?></div>
+<?php endif; ?>
+
+<?php if (isset($_SESSION['success'])): ?>
+    <div class="success-message"><?= $_SESSION['success']; unset($_SESSION['success']); ?></div>
+<?php endif; ?>
+
+        <h2 class="edit-profile_title">UPDATE YOUR PASSWORD</h2>
         <input type="password" name="current_password" placeholder="CURRENT PASSWORD" class="edit-profile_input" required>
         <input type="password" name="new_password" placeholder="NEW PASSWORD" class="edit-profile_input" required>
         <input type="password" name="confirm_password" placeholder="VERIFY NEW PASSWORD" class="edit-profile_input" required>
-        <button class="btn__red--l btn__red btn" type="submit">CREATE PASSWORD</button>
+        <button class="btn__red--l btn__red btn" type="submit">CHANGES PASSWORD</button>
     </form>
 </main>
 
