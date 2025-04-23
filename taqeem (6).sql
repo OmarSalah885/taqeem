@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 20, 2025 at 07:52 PM
+-- Generation Time: Apr 23, 2025 at 06:08 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -108,7 +108,8 @@ INSERT INTO `blog_comments` (`id`, `blog_id`, `user_id`, `comment`, `parent_comm
 (27, 4, 4, 'no one  care', 26, '2025-04-12 19:51:51'),
 (28, 4, 4, 'i like it so much it was the perfict trip for me', 0, '2025-04-12 19:52:24'),
 (29, 4, 1, 'who do u think u are every one care', 27, '2025-04-12 19:53:21'),
-(30, 4, 1, 'fuck u', 28, '2025-04-12 20:40:02');
+(30, 4, 1, 'fuck u', 28, '2025-04-12 20:40:02'),
+(31, 0, 1, 'thx u so much', NULL, '2025-04-22 17:35:53');
 
 -- --------------------------------------------------------
 
@@ -437,7 +438,7 @@ CREATE TABLE `places` (
   `name` varchar(255) NOT NULL,
   `price` enum('$','$$','$$$') NOT NULL,
   `tags` varchar(255) DEFAULT NULL,
-  `highlights` text DEFAULT NULL,
+  `description` text DEFAULT NULL,
   `country` varchar(100) DEFAULT NULL,
   `city` varchar(100) DEFAULT NULL,
   `google_map_location` varchar(255) DEFAULT NULL,
@@ -456,7 +457,7 @@ CREATE TABLE `places` (
 -- Dumping data for table `places`
 --
 
-INSERT INTO `places` (`id`, `user_id`, `category_id`, `name`, `price`, `tags`, `highlights`, `country`, `city`, `google_map_location`, `email`, `phone_1`, `phone_2`, `website`, `facebook_url`, `instagram_url`, `twitter_url`, `featured_image`, `created_at`) VALUES
+INSERT INTO `places` (`id`, `user_id`, `category_id`, `name`, `price`, `tags`, `description`, `country`, `city`, `google_map_location`, `email`, `phone_1`, `phone_2`, `website`, `facebook_url`, `instagram_url`, `twitter_url`, `featured_image`, `created_at`) VALUES
 (1, 1, 1, 'Zarb House', '$$$', 'Jordanian, BBQ, Traditional', 'A must-visit for lovers of authentic Jordanian zarb, slow-cooked underground.', 'Jordan', 'Amman', 'https://goo.gl/maps/example1', 'contact@zarbhouse.com', '0791234567', '0797676767', 'https://zarbhouse.com', NULL, NULL, 'https://x.com/home', 'assets/images/places/restaurants/RM(1).jpg', '2025-03-15 14:37:28'),
 (2, 2, 1, 'Habibah Sweets', '$', 'Desserts, Sweets, Kunafa', 'Famous for its mouthwatering kunafa, a true taste of Amman.', 'Jordan', 'Amman', 'https://goo.gl/maps/example2', 'info@habibahsweets.com', '0792345678', NULL, NULL, 'https://facebook.com/habibah', NULL, 'https://x.com/home', 'assets/images/places/restaurants/RM(2).jpg', '2025-03-15 14:37:28'),
 (3, 3, 1, 'Shawarma Reem', '$', 'Shawarma, Fast Food, Street Food', 'One of the best shawarma spots in Amman, known for its rich flavors.', 'Jordan', 'Amman', 'https://goo.gl/maps/example3', NULL, '0793456789', NULL, NULL, NULL, NULL, NULL, 'assets/images/places/restaurants/RM(3).jpg', '2025-03-15 14:37:28'),
@@ -578,7 +579,7 @@ INSERT INTO `places` (`id`, `user_id`, `category_id`, `name`, `price`, `tags`, `
 (119, 3, 12, 'The Office', '$$$', 'Workspace, Premium Offices, Events', 'The Office offers premium office spaces with advanced facilities, ideal for businesses looking for a professional and creative environment.', 'Jordan', 'Amman', 'https://goo.gl/maps/example85', 'contact@theoffice.jo', '0796565656', NULL, 'https://theoffice.jo', 'https://facebook.com/theoffice.jo', 'https://instagram.com/theoffice.jo', NULL, 'assets/images/places/workspace/work(2).jpg', '2025-03-15 14:47:35'),
 (120, 7, 12, 'Flexi Spaces', '$$', 'Workspace, Shared Offices, Flexible Plans', 'Flexi Spaces offers shared offices with flexible plans, giving companies the ability to scale their workspace according to needs.', 'Jordan', 'Amman', 'https://goo.gl/maps/example86', 'info@flexispaces.jo', '0796666666', NULL, 'https://flexispaces.jo', NULL, NULL, NULL, 'assets/images/places/workspace/work(3).jpg', '2025-03-15 14:47:35'),
 (121, 9, 12, 'Startup Space', '$$', 'Workspace, Co-Working, Networking', 'Startup Space is designed for startups and small businesses, providing co-working areas, networking opportunities, and business support services.', 'Jordan', 'Amman', 'https://goo.gl/maps/example87', 'info@startupspace.jo', '0796767676', NULL, 'https://startupspace.jo', NULL, NULL, 'https://x.com/home', 'assets/images/places/workspace/work(4).jpg', '2025-03-15 14:47:35');
-INSERT INTO `places` (`id`, `user_id`, `category_id`, `name`, `price`, `tags`, `highlights`, `country`, `city`, `google_map_location`, `email`, `phone_1`, `phone_2`, `website`, `facebook_url`, `instagram_url`, `twitter_url`, `featured_image`, `created_at`) VALUES
+INSERT INTO `places` (`id`, `user_id`, `category_id`, `name`, `price`, `tags`, `description`, `country`, `city`, `google_map_location`, `email`, `phone_1`, `phone_2`, `website`, `facebook_url`, `instagram_url`, `twitter_url`, `featured_image`, `created_at`) VALUES
 (122, 11, 12, 'Co-Work Jordan', '$$', 'Workspace, Shared Offices, Startups', 'Co-Work Jordan offers shared office spaces for entrepreneurs, freelancers, and small teams, fostering collaboration and business growth.', 'Jordan', 'Amman', 'https://goo.gl/maps/example88', 'info@coworkjordan.com', '0796868686', NULL, 'https://coworkjordan.com', NULL, NULL, NULL, 'assets/images/places/workspace/work(5).jpg', '2025-03-15 14:47:35'),
 (123, 13, 12, 'The Foundry', '$$$', 'Workspace, Premium Offices, Networking', 'The Foundry is a co-working space offering private offices, shared desks, and events for business professionals and entrepreneurs.', 'Jordan', 'Amman', 'https://goo.gl/maps/example89', 'contact@thefoundry.jo', '0796969696', '0797676767', 'https://thefoundry.jo', 'https://facebook.com/thefoundry.jo', 'https://instagram.com/thefoundry.jo', 'https://x.com/home', 'assets/images/places/workspace/work(6).jpg', '2025-03-15 14:47:35'),
 (124, 15, 12, 'Hub 25', '$$', 'Workspace, Shared Offices, Creative', 'Hub 25 offers flexible co-working spaces for creatives, startups, and freelancers, with high-speed internet, meeting rooms, and community events.', 'Jordan', 'Amman', 'https://goo.gl/maps/example90', 'info@hub25.jo', '0797070707', NULL, 'https://hub25.jo', NULL, NULL, NULL, 'assets/images/places/workspace/work(7).jpg', '2025-03-15 14:47:35'),
@@ -1722,7 +1723,13 @@ INSERT INTO `reviews` (`id`, `place_id`, `user_id`, `rating`, `review_text`, `cr
 (382, 129, 3, 5, 'The best coworking space I’ve been to. The internet is fast, the coffee is great, and the staff is always friendly. Would highly recommend.', '2025-03-20 18:21:21'),
 (383, 130, 4, 5, 'Fantastic workspace! I love how the layout promotes productivity, and the internet is lightning fast. Definitely one of the best coworking spaces in town.', '2025-03-20 18:21:21'),
 (384, 130, 5, 4, 'A really good space to work in. The staff is helpful, and the atmosphere is professional. Would love to see more networking events.', '2025-03-20 18:21:21'),
-(385, 130, 6, 5, 'This coworking space is perfect! It has everything I need to work efficiently, and the people here are friendly and welcoming.', '2025-03-20 18:21:21');
+(385, 130, 6, 5, 'This coworking space is perfect! It has everything I need to work efficiently, and the people here are friendly and welcoming.', '2025-03-20 18:21:21'),
+(387, 58, 2, 3, 'i like so much', '2025-04-22 11:41:22'),
+(388, 58, 2, 4, 'i like so much but not all things i wanted exsist', '2025-04-22 11:44:03'),
+(389, 58, 2, 2, 'my man', '2025-04-22 11:47:52'),
+(390, 1, 2, 5, 'i like so much', '2025-04-22 12:27:50'),
+(396, 24, 1, 3, 'sjapiubfpaibdshc', '2025-04-23 15:52:14'),
+(397, 24, 1, 3, 'sjapiubfpaibdshc', '2025-04-23 15:53:13');
 
 -- --------------------------------------------------------
 
@@ -1737,6 +1744,13 @@ CREATE TABLE `review_comments` (
   `comment` text NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `review_comments`
+--
+
+INSERT INTO `review_comments` (`id`, `review_id`, `user_id`, `comment`, `created_at`) VALUES
+(5, 2, 1, 'sao goood', '2025-04-23 15:27:00');
 
 -- --------------------------------------------------------
 
@@ -1796,7 +1810,10 @@ INSERT INTO `review_images` (`id`, `review_id`, `image_url`, `uploaded_at`) VALU
 (230, 156, 'assets/images/places/pets/pets(12).jpg', '2025-03-22 08:57:32'),
 (231, 172, 'assets/images/places/plants/plants(1).jpg', '2025-03-22 08:57:32'),
 (232, 178, 'assets/images/places/plants/plants(5).jpg', '2025-03-22 08:57:32'),
-(233, 182, 'assets/images/places/plants/plants(10).jpg', '2025-03-22 08:57:32');
+(233, 182, 'assets/images/places/plants/plants(10).jpg', '2025-03-22 08:57:32'),
+(234, 390, 'assets/images/review_images/68078b460bfdc_download (1).jpg', '2025-04-22 12:27:50'),
+(245, 396, 'assets/images/review_images/68090cae992c0_fizkes201102042.jpg', '2025-04-23 15:52:14'),
+(246, 397, 'assets/images/review_images/68090ce9888cf_2b_en_articleslide_sm2-350x264.jpg', '2025-04-23 15:53:13');
 
 -- --------------------------------------------------------
 
@@ -1965,7 +1982,9 @@ INSERT INTO `review_likes` (`id`, `user_id`, `review_id`, `created_at`) VALUES
 (193, 1, 153, '2025-04-17 06:06:58'),
 (194, 1, 114, '2025-04-17 06:07:02'),
 (204, 1, 380, '2025-04-17 09:48:01'),
-(207, 10, 12, '2025-04-19 15:00:34');
+(207, 10, 12, '2025-04-19 15:00:34'),
+(219, 1, 11, '2025-04-22 16:48:43'),
+(222, 1, 4, '2025-04-22 16:56:09');
 
 -- --------------------------------------------------------
 
@@ -2291,7 +2310,7 @@ ALTER TABLE `blogs`
 -- AUTO_INCREMENT for table `blog_comments`
 --
 ALTER TABLE `blog_comments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `categories`
@@ -2333,25 +2352,25 @@ ALTER TABLE `place_gallery`
 -- AUTO_INCREMENT for table `reviews`
 --
 ALTER TABLE `reviews`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=386;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=399;
 
 --
 -- AUTO_INCREMENT for table `review_comments`
 --
 ALTER TABLE `review_comments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `review_images`
 --
 ALTER TABLE `review_images`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=234;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=248;
 
 --
 -- AUTO_INCREMENT for table `review_likes`
 --
 ALTER TABLE `review_likes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=208;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=225;
 
 --
 -- AUTO_INCREMENT for table `saved_places`
