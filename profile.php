@@ -279,7 +279,7 @@ include 'header.php';
                                 </a>
 
                                 <!-- Review Image -->
-                                <a href="place.php?id=<?php echo $review['place_id']; ?>">
+                                <a href="singe_place.php?place_id=<?php echo $review['place_id']; ?>">
                                     <img class="activity_grid--item_img_user-img" src="<?php echo htmlspecialchars($review['place_image'] ?? 'assets/images/listing.jpg'); ?>" alt="Place Image">
                                 </a>
 

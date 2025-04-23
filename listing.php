@@ -195,7 +195,7 @@ if (isset($_SESSION['user_id'])) {
 
                     <div class="listing_grid--item">
                         <div class="listing_grid--item-img">
-                            <a href="single-place.php?id=<?php echo $place['id']; ?>" class="listing_grid--item-img_img">
+                            <a href="single-place.php?place_id=<?php echo $place['id']; ?>" class="listing_grid--item-img_img">
                                 <img src="<?php echo $place['featured_image']; ?>" alt="<?php echo $place['name']; ?>">
                             </a>
                             <a href="listing.php?category_id=<?php echo $place['category_id']; ?>" class="listing_grid--item-img_category">
@@ -216,7 +216,7 @@ if (isset($_SESSION['user_id'])) {
                                 </a>
                                 <?php endforeach; ?>
                             </div>
-                            <a class="listing_grid--item-content_name" href="single-place.php?id=<?php echo $place['id']; ?>">
+                            <a class="listing_grid--item-content_name" href="single-place.php?place_id=<?php echo $place['id']; ?>">
                                 <?php echo $place['name']; ?>
                             </a>
                             <a href="#" class="listing_grid--item-content_location">

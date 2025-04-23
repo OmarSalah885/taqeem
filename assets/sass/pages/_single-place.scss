@@ -127,8 +127,8 @@
 
             .extra_price {
                 color: $gray-500;
-                font-size: $F-M;
-                font-size: 600;
+                font-size: $F-M ;
+                font-weight: 600;
             }
 
             .extra_category {
@@ -774,13 +774,11 @@
 
                 i {
                     color: $gray-100;
-                    /* Default gray */
                     transition: color 0.3s;
 
                     &.hover,
                     &.active {
                         color: $red-600;
-                        /* Highlight color */
                     }
                 }
             }
@@ -790,7 +788,6 @@
                 font-family: inherit;
                 font-size: $F-S;
                 outline: .1rem $gray-100 solid;
-                border-radius: none;
                 border: none;
                 transition: all .3s;
                 height: 24rem;
@@ -800,6 +797,51 @@
                     outline: .1rem $gray-300 solid;
                 }
             }
+            .image-preview {
+                display: flex;
+                gap: 1.6rem;
+                flex-wrap: wrap;
+            
+                .image-thumb {
+                    position: relative;
+                    width: 10rem;
+                    height: 10rem;
+                    border-radius: 0.6rem;
+                    overflow: hidden;
+            
+                    img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                        border-radius: 0.6rem;
+                    }
+            
+                    .remove-image {
+                        position: absolute;
+                        top: -0.6rem;
+                        right: -0.6rem;
+                        background-color: $red-600;
+                        color: white;
+                        font-size: 1.4rem;
+                        border-radius: 50%;
+                        width: 2rem;
+                        height: 2rem;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        cursor: pointer;
+                        transition: background-color 0.2s;
+            
+                        &:hover {
+                            background-color: $red-500;
+                        }
+                    }
+                }
+            }
+            
+
+            
+            
         }
     }
 }
