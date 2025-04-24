@@ -127,7 +127,7 @@
 
             .extra_price {
                 color: $gray-500;
-                font-size: $F-M ;
+                font-size: $F-M;
                 font-weight: 600;
             }
 
@@ -280,6 +280,7 @@
 
                 img {
                     height: 100%;
+                    width: 100%;
                     object-fit: cover;
                 }
             }
@@ -288,6 +289,7 @@
                 display: flex;
                 flex-direction: column;
                 gap: 3.2rem;
+                max-width: 70%;
 
                 &-name {
                     display: flex;
@@ -626,7 +628,7 @@
                     width: 100%;
                     display: flex;
                     align-items: center;
-                    justify-content: space-between;
+                    gap: 0.6%;
                     flex-wrap: wrap;
 
                     @include respond(x-large) {
@@ -792,56 +794,56 @@
                 transition: all .3s;
                 height: 24rem;
 
+
                 &:focus {
                     outline: none;
                     outline: .1rem $gray-300 solid;
                 }
             }
+
             .image-preview {
                 display: flex;
-                gap: 1.6rem;
+                gap: 1.2rem;
                 flex-wrap: wrap;
-            
+
                 .image-thumb {
                     position: relative;
-                    width: 10rem;
-                    height: 10rem;
-                    border-radius: 0.6rem;
-                    overflow: hidden;
-            
+                    width: 16rem;
+                    height: 16rem;
+
                     img {
                         width: 100%;
                         height: 100%;
                         object-fit: cover;
-                        border-radius: 0.6rem;
                     }
-            
+
                     .remove-image {
                         position: absolute;
                         top: -0.6rem;
                         right: -0.6rem;
                         background-color: $red-600;
-                        color: white;
-                        font-size: 1.4rem;
+                        color: $red-00;
                         border-radius: 50%;
-                        width: 2rem;
-                        height: 2rem;
+                        width: 2.6rem;
+                        height: 2.6rem;
                         display: flex;
                         align-items: center;
                         justify-content: center;
                         cursor: pointer;
                         transition: background-color 0.2s;
-            
+                        font-size: $F-M;
+                        padding-bottom: 0.4rem;
+
                         &:hover {
                             background-color: $red-500;
                         }
                     }
                 }
             }
-            
 
-            
-            
+
+
+
         }
     }
 }
@@ -862,4 +864,36 @@
 .faq-item.active .faq-answer {
     max-height: 200px;
     padding: 15px;
+}
+
+
+.edit-review-form {
+    textarea {
+        padding:
+            2.4rem;
+        font-family: inherit;
+        font-size: 1.6rem;
+        outline:
+            0.1rem #D0D0D0 solid;
+        border-radius: none;
+        border:
+            none;
+        transition:
+            all 0.3s;
+
+        height: 24rem;
+        width: 100%;
+        margin-bottom: 1.4rem;
+    }
+
+    .addReview_stars {
+        margin-bottom: 1.4rem;
+        font-size: $F-M;
+    }
+}
+
+.comment__actions {
+    display: flex;
+    gap: 1.2rem;
+    flex-wrap: wrap;
 }

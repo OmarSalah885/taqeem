@@ -75,10 +75,10 @@ if (isset($_SESSION['user_id'])) {
             ?>
         </div>
         <button class="gallery-btn right-btn">›</button>
-            <?php if ($is_owner): 
+        <?php if ($is_owner): 
                 echo '<a href="#" class="btn__red--l btn__red btn">EDIT PLACE</a>';
              endif; ?>
-        
+
     </div>
     <div class="place_info">
         <div class="place_info-cont">
@@ -99,7 +99,7 @@ if (isset($_SESSION['user_id'])) {
             </div>
             <h1 class="place_info--name"><?php echo htmlspecialchars($place['name']); ?></h1>
             <div class="place_info--extra">
-                    <?php
+                <?php
                     // Fetch average rating for the place
                     $rating_query = $conn->prepare("SELECT AVG(rating) AS avg_rating FROM reviews WHERE place_id = ?");
                     $rating_query->bind_param("i", $place_id); // Use dynamic place_id
@@ -109,14 +109,15 @@ if (isset($_SESSION['user_id'])) {
                     $rating_query->close();
 
                     $percentage = ($rating / 5) * 100;
-                    ?> 
-                    <div class="extra_stars" style="background: linear-gradient(90deg, #A21111 var(--rating, <?php echo $percentage; ?>%), #D0D0D0 var(--rating,<?php echo $percentage-100; ?>%)); display: inline-block; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-                                    <i class="fa-solid fa-star star-rating"></i>
-                                    <i class="fa-solid fa-star star-rating"></i>
-                                    <i class="fa-solid fa-star star-rating"></i>
-                                    <i class="fa-solid fa-star star-rating"></i>
-                                    <i class="fa-solid fa-star star-rating"></i>
-                    </div>
+                    ?>
+                <div class="extra_stars"
+                    style="background: linear-gradient(90deg, #A21111 var(--rating, <?php echo $percentage; ?>%), #D0D0D0 var(--rating,<?php echo $percentage-100; ?>%)); display: inline-block; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                    <i class="fa-solid fa-star star-rating"></i>
+                    <i class="fa-solid fa-star star-rating"></i>
+                    <i class="fa-solid fa-star star-rating"></i>
+                    <i class="fa-solid fa-star star-rating"></i>
+                    <i class="fa-solid fa-star star-rating"></i>
+                </div>
                 <h3 class="extra_price"><?php echo htmlspecialchars($place['price']); ?></h3>
                 <a href="#" class="extra_category">
                     <?php
@@ -324,12 +325,12 @@ if (isset($_SESSION['user_id'])) {
         </div>
     </div>
     <div class="reviews" id="reviews">
-    <h2 class="place-title">REVIEWS</h2>
+        <h2 class="place-title">REVIEWS</h2>
 
-    <!-- Overall Rating Section -->
-    <div class="reviews_overall">
-        <div class="reviews_overall--L">
-            <?php
+        <!-- Overall Rating Section -->
+        <div class="reviews_overall">
+            <div class="reviews_overall--L">
+                <?php
             $rating_query = $conn->prepare("
                 SELECT AVG(rating) AS avg_rating, COUNT(*) AS total_reviews 
                 FROM reviews 
@@ -345,23 +346,23 @@ if (isset($_SESSION['user_id'])) {
             $percentage = ($overall_rating / 5) * 100;
             ?>
 
-            <h2>Overall rating</h2>
-            <div class="overall_stars" style="
+                <h2>Overall rating</h2>
+                <div class="overall_stars" style="
                 background: linear-gradient(90deg, #A21111 <?= $percentage ?>%, #D0D0D0 <?= $percentage ?>%);
                 display: inline-block;
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;">
-                <?php for ($i = 0; $i < 5; $i++): ?>
+                    <?php for ($i = 0; $i < 5; $i++): ?>
                     <i class="fa-solid fa-star star-rating"></i>
-                <?php endfor; ?>
+                    <?php endfor; ?>
+                </div>
+                <p><?= number_format($overall_rating, 1) ?> out of 5</p>
+                <p><?= $total_reviews ?> reviews</p>
             </div>
-            <p><?= number_format($overall_rating, 1) ?> out of 5</p>
-            <p><?= $total_reviews ?> reviews</p>
-        </div>
 
-        <!-- Ratings Breakdown -->
-        <div class="reviews_overall--R">
-            <?php
+            <!-- Ratings Breakdown -->
+            <div class="reviews_overall--R">
+                <?php
             $ratings_counts = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0];
             $ratings_query = $conn->prepare("
                 SELECT rating, COUNT(*) AS count 
@@ -387,15 +388,15 @@ if (isset($_SESSION['user_id'])) {
                         <div class="stars_p--color" style="width: <?= $percent ?>%;"></div>
                     </div>
                 </div>
-            <?php endforeach; ?>
+                <?php endforeach; ?>
+            </div>
         </div>
-    </div>
 
-    
 
-    <!-- Individual Reviews -->
-    <div class="reviews_container">
-        <?php
+
+        <!-- Individual Reviews -->
+        <div class="reviews_container">
+            <?php
         $reviews_query = $conn->prepare("
             SELECT r.id AS review_id, r.user_id, r.rating, r.review_text, r.created_at,
                    CONCAT(u.first_name, ' ', u.last_name) AS user_name, u.profile_image
@@ -416,37 +417,38 @@ if (isset($_SESSION['user_id'])) {
                 $created_at = date("M j, Y", strtotime($review['created_at']));
                 $profile_image = $review['profile_image'] ?: 'assets/images/profiles/pro_null.png';
         ?>
-        <div class="review" id="review-<?= $review_id ?>">
-            <div class="review_profile">
-                <a href="profile.php?user_id=<?= urlencode($review['user_id']) ?>" class="review_profile--img">
-                    <img src="<?= htmlspecialchars($profile_image) ?>" alt="User Profile">
-                </a>
-                <div class="review_profile--info">
-                    <a href="profile.php?user_id=<?= urlencode($review['user_id']) ?>" class="review_profile--info-name">
-                        <?= htmlspecialchars($review['user_name']) ?>
+            <div class="review" id="review-<?= $review_id ?>">
+                <div class="review_profile">
+                    <a href="profile.php?user_id=<?= urlencode($review['user_id']) ?>" class="review_profile--img">
+                        <img src="<?= htmlspecialchars($profile_image) ?>" alt="User Profile">
                     </a>
-                    <div class="review_profile--info-stars">
-                        <div class="review_stars" style="
+                    <div class="review_profile--info">
+                        <a href="profile.php?user_id=<?= urlencode($review['user_id']) ?>"
+                            class="review_profile--info-name">
+                            <?= htmlspecialchars($review['user_name']) ?>
+                        </a>
+                        <div class="review_profile--info-stars">
+                            <div class="review_stars" style="
                             background: linear-gradient(90deg, #A21111 <?= $percentage ?>%, #D0D0D0 <?= $percentage ?>%);
                             display: inline-block;
                             -webkit-background-clip: text;
                             -webkit-text-fill-color: transparent;">
-                            <?php for ($i = 0; $i < 5; $i++): ?>
+                                <?php for ($i = 0; $i < 5; $i++): ?>
                                 <i class="fa-solid fa-star star-rating"></i>
-                            <?php endfor; ?>
+                                <?php endfor; ?>
+                            </div>
+                            <p class="review-date"><?= $created_at ?></p>
                         </div>
-                        <p class="review-date"><?= $created_at ?></p>
                     </div>
                 </div>
-            </div>
 
-            <div class="review_text">
-                <p><?= htmlspecialchars($review['review_text']) ?></p>
-            </div>
+                <div class="review_text">
+                    <p><?= htmlspecialchars($review['review_text']) ?></p>
+                </div>
 
-            <!-- Review Gallery -->
-            <div class="review_gallery">
-                <?php
+                <!-- Review Gallery -->
+                <div class="review_gallery">
+                    <?php
                 $gallery_query = $conn->prepare("SELECT image_url FROM review_images WHERE review_id = ?");
                 $gallery_query->bind_param("i", $review_id);
                 $gallery_query->execute();
@@ -457,49 +459,60 @@ if (isset($_SESSION['user_id'])) {
                     <a href="<?= htmlspecialchars($image['image_url']) ?>" class="review_gallery-img" target="_blank">
                         <img src="<?= htmlspecialchars($image['image_url']) ?>" alt="Review Image">
                     </a>
-                <?php endwhile;
+                    <?php endwhile;
                 $gallery_query->close();
                 ?>
-            </div>
+                </div>
 
-            <!-- Review Buttons -->
-            <div class="review_btns">
-                <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $review['user_id']): ?>
+                <!-- Review Buttons -->
+                <div class="review_btns">
+                    <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $review['user_id']): ?>
                     <a class="review_btns--link" href="#" onclick="showEditForm(<?= $review_id ?>)">edit my review</a>
-                    <a class="review_btns--link" href="javascript:void(0);" onclick="deleteReview(<?= $review_id ?>)">delete my review</a>
-                    <form id="editForm-<?= $review_id ?>" method="POST" action="edit_review.php" style="display: none;">
+                    <a class="review_btns--link" href="javascript:void(0);"
+                        onclick="deleteReview(<?= $review_id ?>)">delete my review</a>
+                    <?php elseif ($is_owner): ?>
+                    <a class="btn__transparent--s btn__transparent btn" href="#"
+                        onclick="showCommentForm(<?= $review_id ?>)">comment on review</a>
+                    <?php endif; ?>
+
+                    <?php if ($is_owner): ?>
+                    <form id="commentForm-<?= $review_id ?>" method="POST" action="submit_owner_comment.php"
+                        style="display: none;">
                         <input type="hidden" name="review_id" value="<?= $review_id ?>">
-                        <input type="hidden" name="place_id" value="<?= $place_id ?>">
-                        <input type="number" name="rating" min="1" max="5" value="<?= $rating ?>" required>
-                        <textarea name="review_text" required><?= htmlspecialchars($review['review_text']) ?></textarea>
-                        <button type="submit" name="edit_review">Save Changes</button>
+                        <textarea name="comment" placeholder="add comment on review" required></textarea>
+                        <button type="submit" class="btn__transparent--s btn__transparent btn">submit comment</button>
                     </form>
-                <?php elseif ($is_owner): ?>
-                    <a class="btn__transparent--s btn__transparent btn" href="#" onclick="showCommentForm(<?= $review_id ?>)">comment on review</a>
-                <?php endif; ?>
+                    <?php endif; ?>
 
-                <?php if ($is_owner): ?>
-                <form id="commentForm-<?= $review_id ?>" method="POST" action="submit_owner_comment.php" style="display: none;">
-                    <input type="hidden" name="review_id" value="<?= $review_id ?>">
-                    <textarea name="comment" placeholder="add comment on review" required></textarea>
-                    <button type="submit" class="btn__transparent--s btn__transparent btn">submit comment</button>
-                </form>
-                <?php endif; ?>
-
-                <!-- Like Icon -->
-                <?php
+                    <!-- Like Icon -->
+                    <?php
                 $is_liked = false;
                 if (isset($_SESSION['user_id'])) {
                     $is_liked = in_array($review_id, $is_liked_reviews);
                 }
                 ?>
-                <a class="review_btns--like" href="#" onclick="toggleLike(event, <?= $review_id ?>)">
-                    <i class="<?= $is_liked ? 'fa-solid fa-heart' : 'fa-regular fa-heart' ?>"></i>
-                </a>
-            </div>
-
-            <!-- Display Comments -->
-            <?php
+                    <a class="review_btns--like" href="#" onclick="toggleLike(event, <?= $review_id ?>)">
+                        <i class="<?= $is_liked ? 'fa-solid fa-heart' : 'fa-regular fa-heart' ?>"></i>
+                    </a>
+                </div>
+                <form id="editForm-<?= $review_id ?>" method="POST" action="edit_review.php" style="display: none;"
+                    class="edit-review-form">
+                    <input type="hidden" name="review_id" value="<?= $review_id ?>">
+                    <input type="hidden" name="place_id" value="<?= $place_id ?>">
+                    <input type="number" name="rating" min="1" max="5" value="<?= $rating ?>" required>
+                    <div class="addReview_stars">
+                        <input type="hidden" name="rating" id="rating" value="0">
+                        <i class="fa-solid fa-star" data-value="1"></i>
+                        <i class="fa-solid fa-star" data-value="2"></i>
+                        <i class="fa-solid fa-star" data-value="3"></i>
+                        <i class="fa-solid fa-star" data-value="4"></i>
+                        <i class="fa-solid fa-star" data-value="5"></i>
+                    </div>
+                    <textarea name="review_text" required><?= htmlspecialchars($review['review_text']) ?></textarea>
+                    <button type="submit" name="edit_review" class="btn__red--s btn__red btn">Save Changes</button>
+                </form>
+                <!-- Display Comments -->
+                <?php
 $comments_query = $conn->prepare("SELECT id, comment, created_at FROM review_comments WHERE review_id = ?");
 $comments_query->bind_param("i", $review_id);
 $comments_query->execute();
@@ -516,135 +529,142 @@ if ($comments_result->num_rows > 0):
         // Editable comment with contenteditable attribute
         echo "<p id='comment-text-{$comment_id}' class='comment-text' contenteditable='false'>{$comment_text}</p>";
         echo "</div>"; // Close the owner-comment div
+
         // Check if the logged-in user is the owner of the comment
         if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $user_id) {
+            echo "<div class='comment__actions'>";
             echo "<button onclick='editComment({$comment_id})' class='btn__transparent--s btn__transparent btn'>Edit Comment</button>";
             echo "<button onclick='deleteComment({$comment_id})' class='btn__transparent--s btn__transparent btn'>Delete Comment</button>";
+            echo "</div>";
         }
     endwhile;
     echo '</div>';
 endif;
+
 $comments_query->close();
 ?>
 
 
 
-        </div>
-        <?php endwhile;
+            </div>
+            <?php endwhile;
         else:
             echo '<p>No reviews available for this place.</p>';
         endif;
         $reviews_query->close();
         ?>
+        </div>
     </div>
-</div>
 
 
     <div class="addReview">
         <h2 class="place-title">WRITE A REVIEW</h2>
         <?php if (isset($_SESSION['user_id'])): ?>
-            <form method="POST" action="add_review.php" id="reviewForm" enctype="multipart/form-data">
-                <div class="addReview_container">
-                    <div class="addReview_stars">
-                        <input type="hidden" name="rating" id="rating" value="0">
-                        <i class="fa-solid fa-star" data-value="1"></i>
-                        <i class="fa-solid fa-star" data-value="2"></i>
-                        <i class="fa-solid fa-star" data-value="3"></i>
-                        <i class="fa-solid fa-star" data-value="4"></i>
-                        <i class="fa-solid fa-star" data-value="5"></i>
-                    </div>
-                    <input type="hidden" name="place_id" value="<?php echo $place_id; ?>">
-                    <input type="hidden" name="review_id" id="review_id" value=""> <!-- For editing -->
-                    <a class="btn__transparent--s btn__transparent btn" href="#" onclick="document.getElementById('imageInput').click(); return false;">add photos</a>
-                    <input type="file" name="images[]" id="imageInput" multiple style="display: none;" accept="image/*">
-                    <div id="imagePreview" class="image-preview"></div> <!-- Preview section -->
-                    <textarea name="review_text" id="review_text" placeholder="Your review" required></textarea>
-                    <button type="submit" name="submit_review" class="btn__red--l btn__red btn" id="submitButton">ADD REVIEW</button>
+        <form method="POST" action="add_review.php" id="reviewForm" enctype="multipart/form-data">
+            <div class="addReview_container">
+                <div class="addReview_stars">
+                    <input type="hidden" name="rating" id="rating" value="0">
+                    <i class="fa-solid fa-star" data-value="1"></i>
+                    <i class="fa-solid fa-star" data-value="2"></i>
+                    <i class="fa-solid fa-star" data-value="3"></i>
+                    <i class="fa-solid fa-star" data-value="4"></i>
+                    <i class="fa-solid fa-star" data-value="5"></i>
                 </div>
-            </form>
+                <input type="hidden" name="place_id" value="<?php echo $place_id; ?>">
+                <input type="hidden" name="review_id" id="review_id" value=""> <!-- For editing -->
+                <a class="btn__transparent--s btn__transparent btn" href="#"
+                    onclick="document.getElementById('imageInput').click(); return false;">add photos</a>
+                <input type="file" name="images[]" id="imageInput" multiple style="display: none;" accept="image/*">
+                <div id="imagePreview" class="image-preview"></div> <!-- Preview section -->
+                <textarea name="review_text" id="review_text" placeholder="Your review" required></textarea>
+                <button type="submit" name="submit_review" class="btn__red--l btn__red btn" id="submitButton">ADD
+                    REVIEW</button>
+            </div>
+        </form>
         <?php else: ?>
-            <p>You must be logged in to write a review.</p>
+        <p>You must be logged in to write a review.</p>
         <?php endif; ?>
     </div>
 </main>
 <?php include 'footer.php'; ?>
 <script>
-    document.querySelectorAll('.addReview_stars i').forEach(star => {
-        star.addEventListener('click', function () {
-            const rating = this.getAttribute('data-value');
-            document.getElementById('rating').value = rating;
+document.querySelectorAll('.addReview_stars i').forEach(star => {
+    star.addEventListener('click', function() {
+        const rating = this.getAttribute('data-value');
+        document.getElementById('rating').value = rating;
 
-            // Highlight the selected stars
-            document.querySelectorAll('.addReview_stars i').forEach(s => {
-                s.style.color = s.getAttribute('data-value') <= rating ? '#A21111' : '#D0D0D0';
-            });
+        // Highlight the selected stars
+        document.querySelectorAll('.addReview_stars i').forEach(s => {
+            s.style.color = s.getAttribute('data-value') <= rating ? '#A21111' : '#D0D0D0';
         });
     });
+});
 
-    function showEditForm(reviewId) {
-        document.getElementById(`editForm-${reviewId}`).style.display = 'block';
+function showEditForm(reviewId) {
+    document.getElementById(`editForm-${reviewId}`).style.display = 'block';
+
+}
+
+function showCommentForm(reviewId) {
+    document.getElementById(`commentForm-${reviewId}`).style.display = 'block';
+}
+
+const imageInput = document.getElementById('imageInput');
+const imagePreview = document.getElementById('imagePreview');
+let selectedImages = [];
+
+imageInput.addEventListener('change', function(e) {
+    const files = Array.from(e.target.files);
+
+    // Combine already selected images with new ones
+    const totalImages = selectedImages.length + files.length;
+    if (totalImages > 4) {
+        alert("You can upload a maximum of 4 images.");
+        return;
     }
 
-    function showCommentForm(reviewId) {
-        document.getElementById(`commentForm-${reviewId}`).style.display = 'block';
-    }
+    files.forEach(file => {
+        if (selectedImages.length >= 4) return;
 
-    const imageInput = document.getElementById('imageInput');
-    const imagePreview = document.getElementById('imagePreview');
-    let selectedImages = [];
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const imageUrl = event.target.result;
 
-    imageInput.addEventListener('change', function (e) {
-        const files = Array.from(e.target.files);
+            // Create preview container
+            const previewContainer = document.createElement('div');
+            previewContainer.classList.add('image-thumb');
 
-        // Combine already selected images with new ones
-        const totalImages = selectedImages.length + files.length;
-        if (totalImages > 4) {
-            alert("You can upload a maximum of 4 images.");
-            return;
-        }
+            // Image
+            const img = document.createElement('img');
+            img.src = imageUrl;
 
-        files.forEach(file => {
-            if (selectedImages.length >= 4) return;
-
-            const reader = new FileReader();
-            reader.onload = function (event) {
-                const imageUrl = event.target.result;
-
-                // Create preview container
-                const previewContainer = document.createElement('div');
-                previewContainer.classList.add('image-thumb');
-
-                // Image
-                const img = document.createElement('img');
-                img.src = imageUrl;
-
-                // Remove button
-                const removeBtn = document.createElement('span');
-                removeBtn.classList.add('remove-image');
-                removeBtn.innerHTML = '&times;';
-                removeBtn.onclick = function () {
-                    imagePreview.removeChild(previewContainer);
-                    selectedImages = selectedImages.filter(i => i !== file);
-                    updateFileList();
-                };
-
-                previewContainer.appendChild(img);
-                previewContainer.appendChild(removeBtn);
-                imagePreview.appendChild(previewContainer);
+            // Remove button
+            const removeBtn = document.createElement('span');
+            removeBtn.classList.add('remove-image');
+            removeBtn.innerHTML = '&times;';
+            removeBtn.onclick = function() {
+                imagePreview.removeChild(previewContainer);
+                selectedImages = selectedImages.filter(i => i !== file);
+                updateFileList();
             };
-            reader.readAsDataURL(file);
-            selectedImages.push(file);
-        });
 
-        updateFileList();
+            previewContainer.appendChild(img);
+            previewContainer.appendChild(removeBtn);
+            imagePreview.appendChild(previewContainer);
+        };
+        reader.readAsDataURL(file);
+        selectedImages.push(file);
     });
 
-    // Recreate the FileList object for form submission
-    function updateFileList() {
-        const dataTransfer = new DataTransfer();
-        selectedImages.forEach(file => dataTransfer.items.add(file));
-        imageInput.files = dataTransfer.files;
-    }
+    updateFileList();
+});
+
+// Recreate the FileList object for form submission
+function updateFileList() {
+    const dataTransfer = new DataTransfer();
+    selectedImages.forEach(file => dataTransfer.items.add(file));
+    imageInput.files = dataTransfer.files;
+}
 
 
 
@@ -652,36 +672,37 @@ function deleteReview(reviewId) {
     if (!confirm("Are you sure you want to delete your review?")) return;
 
     fetch('delete_review.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: `review_id=${reviewId}`
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const reviewElem = document.querySelector(`#review-${reviewId}`);
-            if (reviewElem) reviewElem.remove();
-        } else {
-            alert("Failed to delete review.");
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `review_id=${reviewId}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const reviewElem = document.querySelector(`#review-${reviewId}`);
+                if (reviewElem) reviewElem.remove();
+            } else {
+                alert("Failed to delete review.");
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
 }
+
 function editComment(commentId) {
     var commentText = document.getElementById('comment-' + commentId);
     var editButton = document.querySelector('button[onclick="editComment(' + commentId + ')"]');
     var saveButton = document.querySelector('button[onclick="saveComment(' + commentId + ')"]');
 
     // Make the comment editable
-    commentText.contentEditable = 'true';  
-    commentText.style.backgroundColor = '#f0f0f0';  // Optional: highlight the editable area
+    commentText.contentEditable = 'true';
+    commentText.style.backgroundColor = '#f0f0f0'; // Optional: highlight the editable area
 
     // Show the Save button, hide the Edit button
-    editButton.style.display = 'none';  
+    editButton.style.display = 'none';
     saveButton.style.display = 'inline';
 }
 
@@ -730,16 +751,13 @@ function deleteComment(commentId) {
                 // Find the comment container by comment ID and hide it
                 var commentDiv = document.getElementById('comment-' + commentId);
                 var reviewPlaceCommentDiv = commentDiv.closest('.review_placeComment');
-                reviewPlaceCommentDiv.style.display = 'none';  // Hide the div
+                reviewPlaceCommentDiv.style.display = 'none'; // Hide the div
             } else {
-                alert(response.message);  // Show an error message if needed
+                alert(response.message); // Show an error message if needed
             }
         } catch (e) {
             console.error("Invalid JSON response", xhr.responseText);
         }
     };
 }
-
-
-
 </script>
