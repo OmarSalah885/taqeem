@@ -283,3 +283,280 @@
     }
 
 }
+
+.media_added {
+    &--title {
+        color: $red-900;
+        margin-bottom: 2.4rem;
+    }
+
+    &--fetured {
+        margin-bottom: 4.8rem;
+
+        &_img {
+            position: relative;
+            max-width: 50rem;
+            height: 40rem;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            a {
+                position: absolute;
+                right: -1rem;
+                top: -1rem;
+                width: 3.6rem;
+                height: 3.6rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 1.4rem;
+                border-radius: 50%;
+                text-decoration: none;
+                font-size: $F-S;
+                background-color: $red-600;
+                color: $red-00;
+                transition: all .3s;
+
+                &:hover {
+                    width: 4rem;
+                    height: 4rem;
+                    right: -1.4rem;
+                    top: -1.4rem;
+                    background-color: $red-700;
+                }
+            }
+        }
+    }
+
+    &--gallery {
+        &_gird {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+            gap: 2.4rem;
+            margin-bottom: 4.8rem;
+
+            &_item {
+                position: relative;
+                max-width: 20rem;
+                height: 20rem;
+
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
+
+                a {
+                    position: absolute;
+                    right: -1rem;
+                    top: -1rem;
+                    width: 3.6rem;
+                    height: 3.6rem;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 1.4rem;
+                    border-radius: 50%;
+                    text-decoration: none;
+                    font-size: $F-S;
+                    background-color: $red-600;
+                    color: $red-00;
+                    transition: all .3s;
+
+                    &:hover {
+                        width: 4rem;
+                        height: 4rem;
+                        right: -1.4rem;
+                        top: -1.4rem;
+                        background-color: $red-700;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.media_added--gallery {
+    &_grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+        gap: 2.4rem;
+
+        &_item {
+            position: relative;
+            max-width: 30rem;
+            height: 20rem;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            a {
+                position: absolute;
+                right: -1rem;
+                top: -1rem;
+                width: 3.6rem;
+                height: 3.6rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 1.4rem;
+                border-radius: 50%;
+                text-decoration: none;
+                font-size: $F-S;
+                background-color: $red-600;
+                color: $red-00;
+                transition: all .3s;
+
+                &:hover {
+                    width: 4rem;
+                    height: 4rem;
+                    right: -1.4rem;
+                    top: -1.4rem;
+                    background-color: $red-700;
+                }
+            }
+        }
+    }
+}
+
+.add-menu_added {
+    h3 {
+        color: $red-900;
+        margin-bottom: 2.4rem;
+    }
+
+    .add-menu_added-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+        gap: 2.4rem;
+
+        &_item {
+            position: relative;
+            max-width: 30rem;
+            height: 30rem;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            &--info {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                justify-content: center;
+                background-color: rgba(0, 0, 0, .5);
+                color: white;
+                padding: .8rem;
+
+                h4 {
+                    font-size: $F-XS;
+                    margin-bottom: 1.2rem;
+                }
+
+                p {
+                    font-size: $F-XXS;
+                    margin-bottom: 1.2rem;
+                }
+            }
+
+            a {
+                position: absolute;
+                right: -1rem;
+                top: -1rem;
+                width: 3.6rem;
+                height: 3.6rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 1.4rem;
+                border-radius: 50%;
+                text-decoration: none;
+                font-size: $F-S;
+                background-color: $red-600;
+                color: $red-00;
+                transition: all .3s;
+
+                &:hover {
+                    width: 4rem;
+                    height: 4rem;
+                    right: -1.4rem;
+                    top: -1.4rem;
+                    background-color: $red-700;
+                }
+            }
+        }
+    }
+}
+
+.added-faqs {
+    h3 {
+        color: $red-900;
+        margin-bottom: 2.4rem;
+    }
+
+    &-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+
+        &_item {
+            position: relative;
+            width: 100%;
+            background-color: $red-00;
+            border: 1px solid $red-500;
+            padding: 1.2rem;
+
+            a {
+                position: absolute;
+                right: -1rem;
+                top: -1rem;
+                width: 3.6rem;
+                height: 3.6rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 1.4rem;
+                border-radius: 50%;
+                text-decoration: none;
+                font-size: $F-S;
+                background-color: $red-600;
+                color: $red-00;
+                transition: all .3s;
+
+
+                &:hover {
+                    width: 4rem;
+                    height: 4rem;
+                    right: -1.4rem;
+                    top: -1.4rem;
+                    background-color: $red-700;
+                }
+            }
+
+            h4 {
+                font-size: $F-XS;
+                margin-bottom: 1.2rem;
+            }
+
+            p {
+                font-size: $F-XXS;
+                margin-bottom: 1.2rem;
+            }
+        }
+    }
+}
