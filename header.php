@@ -201,13 +201,13 @@ if (!isset($_SESSION['profile_image']) || !isset($_SESSION['first_name']) || !is
                 <div class="mobile_overlay--content_links">
                     <?php if (isset($_SESSION['user_id'])): ?>
                     <!-- Display user profile when logged in -->
-                    <div class="mobile_user_profile">
-                        <img src="<?php echo htmlspecialchars($_SESSION['profile_image'] ?? 'assets/images/profiles/pro_null.png'); ?>"
+                    <a href="profile.php?user_id=<?php echo htmlspecialchars($_SESSION['user_id']); ?>"
+                        class="navbar_profile">
+                        <img src="<?php echo htmlspecialchars($_SESSION['profile_image'] ?? 'assets/images/profiles/pro_null.png') . '?v=' . time(); ?>"
                             alt="User Profile">
                         <span><?php echo htmlspecialchars($_SESSION['first_name'] . ' ' . $_SESSION['last_name']); ?></span>
-                    </div>
+                    </a>
                     <a href="logout.php">Log Out</a>
-                    <a href="profile.php">Profile</a>
                     <?php else: ?>
                     <!-- Display login and signup links when not logged in -->
                     <a id="login-nav_m" href="#">log in</a>

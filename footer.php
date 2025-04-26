@@ -43,10 +43,14 @@ include 'db_connect.php';
 
 <script src="assets/js/load_more.js"></script>
 <script src="assets/js/place.js"></script>
-<script src="assets/js/script.js"></script>
+<!-- <script src="assets/js/script.js"></script> -->
 <script src="assets/js/map.js"></script>
 <script src="assets/js/review_interactions.js"></script>
 <script src="assets/js/save_interactions.js"></script>
 <script src="assets/js/reply_functionality.js"></script>
+<script src="assets/js/search.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/mobile-menu.js"></script>
+<script src="assets/js/carousel.js"></script>
 
 </html>
