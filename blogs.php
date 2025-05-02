@@ -19,7 +19,7 @@ include 'header.php';
 
     <div class="blogs">
         <div class="blogs_grid">
-        <?php
+            <?php
         $posts_per_page = 9;
         $page = isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0 ? (int)$_GET['page'] : 1;
         $offset = ($page - 1) * $posts_per_page;
@@ -65,7 +65,7 @@ include 'header.php';
             echo "<p>No blogs found.</p>";
         }
         ?>
-        </div>  <!-- End of blogs_grid -->
+        </div> <!-- End of blogs_grid -->
 
         <!-- Pagination -->
         <div class="listing_indicator">
@@ -80,11 +80,11 @@ include 'header.php';
                 // Display previous button
                 if ($page > 1):
                 ?>
-                    <li class="indicator_item">
-                        <a href="?page=<?php echo $page - 1; ?>">
-                            <i class="fa-solid fa-chevron-left"></i>
-                        </a>
-                    </li>
+                <li class="indicator_item">
+                    <a href="?page=<?php echo $page - 1; ?>">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </a>
+                </li>
                 <?php endif; ?>
 
                 <!-- Display page numbers -->
@@ -96,11 +96,11 @@ include 'header.php';
 
                 <!-- Display next button -->
                 <?php if ($page < $total_pages): ?>
-                    <li class="indicator_item">
-                        <a href="?page=<?php echo $page + 1; ?>">
-                            <i class="fa-solid fa-chevron-right"></i>
-                        </a>
-                    </li>
+                <li class="indicator_item">
+                    <a href="?page=<?php echo $page + 1; ?>">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                </li>
                 <?php endif; ?>
             </ul>
         </div>
