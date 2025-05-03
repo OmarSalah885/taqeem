@@ -93,7 +93,7 @@ if (isset($_SESSION['user_id'])) {
                             alt="User Image">
                         <p><?php echo htmlspecialchars($review['first_name'] . ' ' . $review['last_name']); ?></p>
                     </a>
-                    <a href="place.php?id=<?php echo $review['place_id']; ?>">
+                    <a href="single-place.php?place_id=<?php echo $review['place_id']; ?>#review_<?php echo $review['review_id']; ?>">
                         <img class="activity_grid--item_img_user-img"
                             src="<?php echo htmlspecialchars($review['place_image'] ?? 'assets/images/listing.jpg'); ?>"
                             alt="Place Image">
@@ -114,7 +114,7 @@ if (isset($_SESSION['user_id'])) {
                 <div class="activity_grid--item_content">
                     <div class="activity_grid--item_content-info">
                         <div class="activity_grid--item_content-info_name">
-                            <a href="place.php?id=<?php echo $review['place_id']; ?>">
+                            <a href="single-place.php?place_id=<?php echo $review['place_id']; ?>">
                                 <h3><?php echo htmlspecialchars($review['place_name']); ?></h3>
                             </a>
                             <div class="activity_stars">

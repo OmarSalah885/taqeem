@@ -72,7 +72,7 @@ $liked_reviews_result = $liked_reviews_query->get_result();
                         <p><?php echo htmlspecialchars($liked_review['first_name'] . ' ' . $liked_review['last_name']); ?>
                         </p>
                     </a>
-                    <a href="place.php?id=<?php echo $liked_review['place_id']; ?>">
+                    <a href="single-place.php?place_id=<?php echo $liked_review['place_id']; ?>#review_<?php echo $liked_review['review_id']; ?>">
                         <img class="activity_grid--item_img_user-img"
                             src="<?php echo htmlspecialchars($liked_review['place_image'] ?? 'assets/images/listing.jpg'); ?>"
                             alt="Place Image">

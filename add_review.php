@@ -1,15 +1,15 @@
 <?php
-include 'config.php';
 session_start();
+include 'config.php';
 include 'db_connect.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
-    if (isset($_POST['place_id']) && is_numeric($_POST['place_id'])) {
-        $place_id = (int)$_POST['place_id'];
-    } else {
-        header("Location: ss.php?error=invalid_place_id");
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!isset($_POST['place_id']) || !is_numeric($_POST['place_id'])) {
+        header("Location: single-place.php?error=invalid_place_id");
         exit;
     }
+
+    $place_id = (int)$_POST['place_id'];
 
     if (isset($_SESSION['user_id'])) {
         $user_id = $_SESSION['user_id'];
@@ -19,10 +19,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
 
         // Validate input
         if ($rating < 1 || $rating > 5) {
-            header("Location: ss.php?error=invalid_rating");
+            header("Location: single-place.php?error=invalid_rating&place_id=$place_id");
             exit;
         } elseif (empty($review_text)) {
-            header("Location: ss.php?error=empty_review");
+            header("Location: single-place.php?error=empty_review&place_id=$place_id");
             exit;
         }
 
@@ -37,14 +37,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
 
             if ($update_query->execute()) {
                 handleImageUploads($review_id, $conn);
-                header("Location: single-place.php?place_id=$place_id#reviews");
+                header("Location: single-place.php?place_id=$place_id#review_$new_review_id");
                 exit;
             } else {
-                header("Location: single-place.php?error=update_failed");
+                header("Location: single-place.php?error=update_failed&place_id=$place_id");
                 exit;
             }
         } else {
-            // Insert a new review
+            // Insert new review
             $insert_query = $conn->prepare("
                 INSERT INTO reviews (place_id, user_id, rating, review_text, created_at)
                 VALUES (?, ?, ?, ?, NOW())
@@ -54,22 +54,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
             if ($insert_query->execute()) {
                 $new_review_id = $conn->insert_id;
                 handleImageUploads($new_review_id, $conn);
-                header("Location: single-place.php?place_id=$place_id#reviews");
+                header("Location: single-place.php?place_id=$place_id#review_$new_review_id");
                 exit;
             } else {
-                header("Location: single-place.php?error=insert_failed");
+                header("Location: single-place.php?error=insert_failed&place_id=$place_id");
                 exit;
             }
         }
     } else {
-        header("Location: single-place.php?error=not_logged_in");
+        header("Location: single-place.php?error=not_logged_in&place_id=$place_id");
         exit;
     }
 }
 
+// Upload function as before...
 function handleImageUploads($review_id, $conn) {
     if (!empty($_FILES['images']['name'][0])) {
-        $upload_dir = 'assets/images/review_images/'; // Update to the correct directory
+        $upload_dir = 'assets/images/review_images/';
         if (!is_dir($upload_dir)) {
             mkdir($upload_dir, 0777, true);
         }
@@ -85,7 +86,6 @@ function handleImageUploads($review_id, $conn) {
             $target_file = $upload_dir . uniqid() . '_' . $file_name;
 
             if (move_uploaded_file($tmp_name, $target_file)) {
-                // Insert the image URL into the database
                 $image_query = $conn->prepare("
                     INSERT INTO review_images (review_id, image_url, uploaded_at)
                     VALUES (?, ?, NOW())
