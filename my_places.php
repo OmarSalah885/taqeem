@@ -64,7 +64,7 @@ $places_result = $places_query->get_result();
             <?php while ($place = $places_result->fetch_assoc()): ?>
             <div class="listing_grid--item">
                 <div class="listing_grid--item-img">
-                    <a href="place.php?id=<?php echo $place['id']; ?>" class="listing_grid--item-img_img">
+                    <a href="single-place.php?place_id=<?php echo $place['id']; ?>" class="listing_grid--item-img_img">
                         <img src="<?php echo htmlspecialchars($place['featured_image'] ?? 'assets/images/listing.jpg'); ?>"
                             alt="Place Image">
                     </a>

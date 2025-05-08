@@ -69,10 +69,12 @@ $collections_result = $collections_query->get_result();
             <?php while ($collection = $collections_result->fetch_assoc()): ?>
             <div class="listing_grid--item">
                 <div class="listing_grid--item-img">
-                    <a href="place.php?id=<?php echo $collection['place_id']; ?>" class="listing_grid--item-img_img">
-                        <img src="<?php echo htmlspecialchars($collection['featured_image'] ?? 'assets/images/listing.jpg'); ?>"
-                            alt="Place Image">
-                    </a>
+                <a href="place.php?id=<?php echo $collection['place_id']; ?>">
+    <img class="activity_grid--item_img_user-img"
+        src="<?php echo htmlspecialchars($collection['featured_image'] ?? 'assets/images/listing.jpg'); ?>"
+        alt="Place Image">
+</a>
+
                     <a href="listing.php?category_id=<?php echo urlencode($collection['category_id']); ?>"
                         class="listing_grid--item-img_category">
                         <i

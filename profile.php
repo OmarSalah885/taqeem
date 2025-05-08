@@ -159,7 +159,7 @@ include 'header.php';
                         while ($place = $places_result->fetch_assoc()): ?>
                             <div class="listing_grid--item">
                                 <div class="listing_grid--item-img">
-                                    <a href="place.php?id=<?php echo $place['id']; ?>" class="listing_grid--item-img_img">
+                                <a href="single-place.php?place_id=<?php echo $place['id']; ?>" class="listing_grid--item-img_img">
                                         <img src="<?php echo htmlspecialchars($place['featured_image'] ?? 'assets/images/listing.jpg'); ?>" alt="Place Image">
                                     </a>
                                     <a href="listing.php?category_id=<?php echo urlencode($place['category_id']); ?>" class="listing_grid--item-img_category">
@@ -189,7 +189,7 @@ include 'header.php';
                                             <a href="#"><?php echo htmlspecialchars($tag); ?></a>
                                         <?php endforeach; ?>
                                     </div>
-                                    <a class="listing_grid--item-content_name" href="place.php?id=<?php echo $place['id']; ?>">
+                                    <a class="listing_grid--item-content_name" href="single-place.php?place_id=<?php echo $place['id']; ?>">
                                         <?php echo htmlspecialchars($place['name']); ?>
                                     </a>
                                     <a href="#" class="listing_grid--item-content_location">
@@ -279,7 +279,7 @@ include 'header.php';
                                 </a>
 
                                 <!-- Review Image -->
-                                <a href="singe_place.php?place_id=<?php echo $review['place_id']; ?>">
+                                <a href="single-place.php?place_id=<?php echo $review['place_id']; ?>#review_<?php echo $review['review_id']; ?>">
                                     <img class="activity_grid--item_img_user-img" src="<?php echo htmlspecialchars($review['place_image'] ?? 'assets/images/listing.jpg'); ?>" alt="Place Image">
                                 </a>
 
@@ -383,7 +383,7 @@ include 'header.php';
                                 <img src="<?php echo htmlspecialchars($liked_review['profile_image'] ?? 'assets/images/profiles/pro_null.png'); ?>" alt="User Image">
                                 <p><?php echo htmlspecialchars($liked_review['first_name'] . ' ' . $liked_review['last_name']); ?></p>
                             </a>
-                            <a href="place.php?id=<?php echo $liked_review['place_id']; ?>">
+                            <a href="single-place.php?place_id=<?php echo $liked_review['place_id']; ?>#review_<?php echo $liked_review['review_id']; ?>">
                                 <img class="activity_grid--item_img_user-img" src="<?php echo htmlspecialchars($liked_review['place_image'] ?? 'assets/images/listing.jpg'); ?>" alt="Place Image">
                             </a>
                             <!-- Like Icon -->
@@ -405,7 +405,7 @@ include 'header.php';
                         <div class="activity_grid--item_content">
                             <div class="activity_grid--item_content-info">
                                 <div class="activity_grid--item_content-info_name">
-                                    <a href="place.php?id=<?php echo $liked_review['place_id']; ?>">
+                                    <a href="place.php?place_id=<?php echo $liked_review['place_id']; ?>">
                                         <h3><?php echo htmlspecialchars($liked_review['place_name']); ?></h3>
                                     </a>
                                     <div class="activity_stars">
@@ -423,7 +423,7 @@ include 'header.php';
                             <p>
                                 <?php echo htmlspecialchars(substr($liked_review['review_text'], 0, 150)); ?>
                                 <?php if (strlen($liked_review['review_text']) > 150): ?>
-                                    <a href="review_details.php?id=<?php echo $liked_review['review_id']; ?>" class="read-more">Read more</a>
+                                    <a href="single-place.php?place_id=<?php echo $liked_review['place_id']; ?>#review_<?php echo $liked_review['review_id']; ?>" class="read-more">Read more</a>
                                 <?php endif; ?>
                             </p>
                         </div>
@@ -473,7 +473,7 @@ include 'header.php';
                     ?>
                     <div class="listing_grid--item">
                         <div class="listing_grid--item-img">
-                            <a href="place.php?id=<?php echo $saved_place['place_id']; ?>" class="listing_grid--item-img_img">
+                            <a href="single-place.php?place_id=<?php echo $saved_place['place_id']; ?>" class="listing_grid--item-img_img">
                                 <img src="<?php echo htmlspecialchars($saved_place['featured_image'] ?? 'assets/images/listing.jpg'); ?>" alt="Place Image">
                             </a>
                             <a href="listing.php?category_id=<?php echo urlencode($saved_place['category_id']); ?>" class="listing_grid--item-img_category">
@@ -504,7 +504,7 @@ include 'header.php';
                                 <a href="#"><?php echo htmlspecialchars($tag); ?></a>
                                 <?php endforeach; ?>
                             </div>
-                            <a class="listing_grid--item-content_name" href="place.php?id=<?php echo $saved_place['place_id']; ?>">
+                            <a class="listing_grid--item-content_name" href="single-place.php?place_id=<?php echo $saved_place['place_id']; ?>">
                                 <?php echo htmlspecialchars($saved_place['name']); ?>
                             </a>
                             <a href="#" class="listing_grid--item-content_location">
