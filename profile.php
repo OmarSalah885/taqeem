@@ -1,7 +1,7 @@
 <?php
-include 'config.php'; // Include session settings
-include 'db_connect.php'; // Include database connection
-session_start(); // Start the session
+require_once 'config.php';
+require_once 'db_connect.php';
+session_start();
 
 // Get the profile user ID from the query string
 $profile_user_id = isset($_GET['user_id']) ? (int)$_GET['user_id'] : 0;

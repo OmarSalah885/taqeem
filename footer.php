@@ -1,6 +1,4 @@
-<?php
-include 'db_connect.php';
-?>
+
 <footer class="footer">
     <div class="footer_color">
         <div class="footer_top">

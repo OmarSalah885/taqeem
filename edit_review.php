@@ -1,9 +1,9 @@
 <?php
 // edit_review.php
 
+require_once 'config.php';
+require_once 'db_connect.php';
 session_start();
-include 'config.php';
-include 'db_connect.php';
 
 // 1. Check required input and login
 if (!isset($_SESSION['user_id']) || !isset($_POST['review_id'])) {

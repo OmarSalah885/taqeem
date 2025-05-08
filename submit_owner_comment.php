@@ -1,7 +1,7 @@
 <?php
-include 'config.php';
+require_once 'config.php';
+require_once 'db_connect.php';
 session_start();
-include 'db_connect.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['user_id'])) {
     $review_id = (int)$_POST['review_id'];

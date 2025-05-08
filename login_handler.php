@@ -1,8 +1,9 @@
 <?php
-// filepath: c:\xampp\htdocs\taqeem\login_handler.php
+// filepath: c:xampphtdocstaqeemlogin_handler.php
 
-include 'config.php'; // Include session settings
-session_start(); // Start the session
+require_once 'config.php';
+require_once 'db_connect.php';
+session_start();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Retrieve and sanitize inputs

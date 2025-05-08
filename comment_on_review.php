@@ -1,7 +1,7 @@
 <?php
-include 'config.php';
+require_once 'config.php';
+require_once 'db_connect.php';
 session_start();
-include 'db_connect.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_SESSION['user_id'])) {

@@ -1,6 +1,7 @@
 <?php
-include 'config.php';
-include 'db_connect.php';
+
+require_once 'db_connect.php';
+
 
 // Number of reviews to load per request
 $limit = 8;

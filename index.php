@@ -1,6 +1,7 @@
 <?php
-include 'config.php'; // Include session settings
-session_start(); // Start the session
+require_once 'config.php';
+require_once 'db_connect.php';
+session_start();
 include 'header.php'; // Include the header
 ?>
 

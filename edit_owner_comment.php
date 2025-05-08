@@ -1,6 +1,7 @@
 <?php
+require_once 'config.php';
+require_once 'db_connect.php';
 session_start();
-require_once 'db_connection.php'; // Make sure this includes your database connection
 
 if (isset($_POST['update_comment'])) {
     $comment_id = $_POST['comment_id'];

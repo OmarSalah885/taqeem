@@ -1,14 +1,31 @@
 <?php
-include 'config.php';
-session_start(); // Ensure this is at the top of the file
-include 'db_connect.php';
+require_once 'config.php';
+require_once 'db_connect.php';
+session_start();
 
 if (isset($_GET['place_id']) && is_numeric($_GET['place_id'])) {
     $place_id = (int)$_GET['place_id'];
 } else {
     die("Invalid or missing place ID");
 }
+
+// Check if the place exists
+$place_check = $conn->prepare("SELECT * FROM places WHERE id = ?");
+$place_check->bind_param("i", $place_id);
+$place_check->execute();
+$place_result = $place_check->get_result();
+
+if ($place_result->num_rows === 0) {
+    // Redirect to 404 page or show error message
+    header("Location: /404.php");
+    exit;
+}
+
+$place = $place_result->fetch_assoc();
+$place_check->close();
+
 include 'header.php';
+
 
 $is_liked_reviews = [];
 $reviews = [];
@@ -150,6 +167,56 @@ if (isset($_SESSION['user_id'])) {
         </div>
     </div>
     <?php endif; ?>
+
+    <?php
+// Fetch contact information for the place
+$contact_query = $conn->prepare("SELECT email, phone_1, phone_2, website, facebook_url, instagram_url, twitter_url FROM places WHERE id = ?");
+$contact_query->bind_param("i", $place_id); // Use dynamic place_id
+$contact_query->execute();
+$contact_result = $contact_query->get_result();
+
+if ($contact = $contact_result->fetch_assoc()): 
+    // Only show CONTACT section if at least one contact field is not empty
+    if (!empty($contact['email']) || !empty($contact['phone_1']) || !empty($contact['phone_2']) || !empty($contact['website']) ||
+        !empty($contact['facebook_url']) || !empty($contact['instagram_url']) || !empty($contact['twitter_url'])):
+?>
+    <div class="place_CONTACT">
+        <h2 class="place-title">CONTACT INFO</h2>
+        <div class="place_CONTACT--info">
+            <?php
+                if (!empty($contact['email'])) {
+                    echo '<div class="place_CONTACT--info-item">EMAIL: <a href="mailto:' . htmlspecialchars($contact['email']) . '">' . htmlspecialchars($contact['email']) . '</a></div>';
+                }
+                if (!empty($contact['website'])) {
+                    echo '<div class="place_CONTACT--info-item">WEBSITE: <a href="' . htmlspecialchars($contact['website']) . '" target="_blank">' . htmlspecialchars($contact['website']) . '</a></div>';
+                }
+                if (!empty($contact['phone_1'])) {
+                    echo '<div class="place_CONTACT--info-item">PHONE(1): <a href="tel:' . htmlspecialchars($contact['phone_1']) . '">' . htmlspecialchars($contact['phone_1']) . '</a></div>';
+                }
+                if (!empty($contact['phone_2'])) {
+                    echo '<div class="place_CONTACT--info-item">PHONE(2): <a href="tel:' . htmlspecialchars($contact['phone_2']) . '">' . htmlspecialchars($contact['phone_2']) . '</a></div>';
+                }
+            ?>
+        </div>
+        <div class="place_CONTACT--social">
+            <?php
+                if (!empty($contact['facebook_url'])) {
+                    echo '<a href="' . htmlspecialchars($contact['facebook_url']) . '" target="_blank"><i class="fa-brands fa-square-facebook"></i></a>';
+                }
+                if (!empty($contact['instagram_url'])) {
+                    echo '<a href="' . htmlspecialchars($contact['instagram_url']) . '" target="_blank"><i class="fa-brands fa-instagram"></i></a>';
+                }
+                if (!empty($contact['twitter_url'])) {
+                    echo '<a href="' . htmlspecialchars($contact['twitter_url']) . '" target="_blank"><i class="fa-brands fa-square-x-twitter"></i></a>';
+                }
+            ?>
+        </div>
+    </div>
+<?php
+    endif;
+endif;
+$contact_query->close();
+?>
 
     <?php
     // MENU section (only if items exist)

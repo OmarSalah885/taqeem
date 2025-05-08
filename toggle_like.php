@@ -1,5 +1,6 @@
 <?php
-include 'db_connect.php'; // Include database connection
+require_once 'config.php';
+require_once 'db_connect.php';
 session_start();
 
 header('Content-Type: application/json'); // Set the response type to JSON

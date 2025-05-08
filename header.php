@@ -17,7 +17,7 @@ if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 
 }
 $_SESSION['LAST_ACTIVITY'] = time(); // Update last activity time
 
-include 'db_connect.php';
+
 
 
 if (!isset($_SESSION['profile_image']) || !isset($_SESSION['first_name']) || !isset($_SESSION['last_name'])) {

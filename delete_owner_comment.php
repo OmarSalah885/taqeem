@@ -1,6 +1,7 @@
 <?php
+require_once 'config.php';
+require_once 'db_connect.php';
 session_start();
-include('db_connect.php');  // Include your database connection
 
 // Check if the user is logged in and the comment ID is provided
 if (isset($_SESSION['user_id']) && isset($_POST['comment_id'])) {

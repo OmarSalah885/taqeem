@@ -1,8 +1,9 @@
 <?php
-// filepath: c:\xampp\htdocs\taqeem\signup_handler.php
+// filepath: c:xampphtdocstaqeemsignup_handler.php
 
-include 'config.php'; // Include session settings
-session_start(); // Start the session
+require_once 'config.php';
+require_once 'db_connect.php';
+session_start();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Retrieve and sanitize inputs
@@ -48,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    include 'db_connect.php'; // Include database connection
+    
 
     // Check if the email already exists
     $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
