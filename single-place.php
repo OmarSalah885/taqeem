@@ -87,9 +87,17 @@ if (isset($_SESSION['user_id'])) {
             ?>
         </div>
         <button class="gallery-btn right-btn">›</button>
-        <?php if ($is_owner): 
-                echo '<a href="#" class="btn__red--l btn__red btn">EDIT PLACE</a>';
-             endif; ?>
+        <?php if ($is_owner): ?>
+ <!--<a href="#" class="btn__red--l btn__red btn">EDIT PLACE</a>-->
+
+  <form action="delete_place.php" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this place? This action cannot be undone.');">
+    <input type="hidden" name="place_id" value="<?= htmlspecialchars($place['id']) ?>">
+    <input type="hidden" name="redirect_to" value="<?= htmlspecialchars($_SERVER['HTTP_REFERER'] ?? 'index.php') ?>">
+    <button type="submit" class="btn__red btn__red--l btn">DELETE PLACE</button>
+</form>
+<?php endif; ?>
+
+
 
     </div>
     <?php
@@ -140,10 +148,27 @@ if (isset($_SESSION['user_id'])) {
                     $category_query->bind_param("i", $place['category_id']);
                     $category_query->execute();
                     $category_result = $category_query->get_result();
-                    $category_name = $category_result->fetch_assoc()['name'] ?? 'Unknown';
-                    $category_query->close();
+                    $category_row = $category_result->fetch_assoc();
+$category_query->close();
 
-                    echo htmlspecialchars($category_name);
+$category_raw = strtolower($category_row['name'] ?? '');
+$category_names = [
+    'restaurants' => 'RESTAURANTS',
+    'shopping' => 'SHOPPING',
+    'active-life' => 'ACTIVE LIFE',
+    'home s' => 'HOME SERVICES',
+    'coffee' => 'COFFEE',
+    'pets' => 'PETS',
+    'plants' => 'PLANTS SHOP',
+    'art' => 'ART',
+    'hotal' => 'HOTELS',
+    'edu' => 'EDUCATION',
+    'health' => 'HEALTH',
+    'workspace' => 'WORKSPACE'
+];
+
+echo isset($category_names[$category_raw]) ? $category_names[$category_raw] : 'Unknown Category';
+
                     ?>
                 </a>
             </div>

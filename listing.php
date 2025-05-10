@@ -114,30 +114,47 @@ if (isset($_SESSION['user_id'])) {
     <div class="listing">
         <div class="pageinfo">
             <div class="pageinfo_content">
-                <h2>
-                    <?php
-                    if (!empty($search)) {
-                        echo "Search Results for: " . htmlspecialchars($search);
-                    } elseif ($category_id > 0) {
-                        // Fetch category name and icon from database
-                        $sql = "SELECT name, icon FROM categories WHERE id = ?";
-                        $stmt = $conn->prepare($sql);
-                        $stmt->bind_param("i", $category_id);
-                        $stmt->execute();
-                        $result = $stmt->get_result();
-                        $category = $result->fetch_assoc();
+    <h2>
+        <?php
+        // Place this mapping array here
+        $category_names = [
+            'restaurants' => 'RESTAURANTS',
+            'shopping' => 'SHOPPING',
+            'active-life' => 'ACTIVE LIFE',
+            'home s' => 'HOME SERVICES',
+            'coffee' => 'COFFEE',
+            'pets' => 'PETS',
+            'plants' => 'PLANTS SHOP',
+            'art' => 'ART',
+            'hotal' => 'HOTELS',
+            'edu' => 'EDUCATION',
+            'health' => 'HEALTH',
+            'workspace' => 'WORKSPACE'
+        ];
 
-                        if ($category) {
-                            echo htmlspecialchars($category['name']);
-                        } else {
-                            echo "Unknown Category";
-                        }
-                    } else {
-                        echo "All Listings";
-                    }
-                    ?>
-                </h2>
-            </div>
+        if (!empty($search)) {
+            echo "Search Results for: " . htmlspecialchars($search);
+        } elseif ($category_id > 0) {
+            $sql = "SELECT name FROM categories WHERE id = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("i", $category_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $category = $result->fetch_assoc();
+
+            if ($category) {
+                $key = strtolower($category['name']); // normalize DB value
+                echo isset($category_names[$key]) ? $category_names[$key] : 'Unknown Category';
+            } else {
+                echo "Unknown Category";
+            }
+        } else {
+            echo "All Listings";
+        }
+        ?>
+    </h2>
+</div>
+
         </div>
 <!-- Filters (Price, Categories, Stars) -->
 <div class="listing_filter">

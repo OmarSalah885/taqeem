@@ -107,39 +107,40 @@ include 'header.php'; // Include the header
 <div class="activity">
     <h2 class="home-title">Recent Activity</h2>
     <div class="activity_grid" id="activity_grid">
-        <?php
-       $limit = 8; // Initial limit
-        $query = "SELECT 
-            r.id AS review_id, 
-            r.review_text, 
-            r.rating, 
-            p.name AS place_name, 
-            CONCAT(u.first_name, ' ', u.last_name) AS user_name, 
-            u.id AS user_id, -- Fetch user_id
-            u.profile_image AS user_profile_image, 
-            ri.image_url AS review_image, 
-            c.icon AS icon_class
-          FROM reviews r
-          JOIN places p ON r.place_id = p.id
-          JOIN users u ON r.user_id = u.id
-          JOIN review_images ri ON r.id = ri.review_id
-          JOIN categories c ON p.category_id = c.id
-          ORDER BY rand()
-          LIMIT $limit";
+        <?php 
+$limit = 8; // Initial limit
+$query = "SELECT 
+    r.id AS review_id, 
+    r.review_text, 
+    r.rating, 
+    p.name AS place_name, 
+    CONCAT(u.first_name, ' ', u.last_name) AS user_name, 
+    u.id AS user_id,
+    u.profile_image AS user_profile_image, 
+    ri.image_url AS review_image, 
+    c.icon AS icon_class
+FROM reviews r
+JOIN places p ON r.place_id = p.id
+JOIN users u ON r.user_id = u.id
+JOIN review_images ri ON r.id = ri.review_id
+JOIN categories c ON p.category_id = c.id
+ORDER BY rand()
+LIMIT $limit";
 
-        $result = mysqli_query($conn, $query);
-        if (mysqli_num_rows($result) > 0) {
-            while ($row = mysqli_fetch_assoc($result)) {
-                include 'review_card.php'; // Pass $row to the review card
-            }
-        } else {
-            echo "<p>No reviews found.</p>";
-        }
-        ?>
+$result = mysqli_query($conn, $query);
+if (mysqli_num_rows($result) > 0) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        include 'review_card.php';
+    }
+} else {
+    echo "<p>No reviews found.</p>";
+}
+?>
+
         </div>
         <a class="btn__transparent--l btn__transparent btn" id="loadMore">Load more</a>
     </div>
-</div>
+
 
 
 

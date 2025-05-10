@@ -3,10 +3,17 @@ require_once 'config.php';
 require_once 'db_connect.php';
 session_start();
 
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!isset($_SESSION['user_id'])) {
         echo "<script>alert('You must be logged in to add a place.'); window.location.href = 'ad.php';</script>";
         exit;
+    }
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        die('Invalid CSRF token.');
     }
 
     $user_id       = $_SESSION['user_id'];
@@ -33,6 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($errors)) {
         $conn->begin_transaction();
         try {
+            // Insert into places table
             $stmt = $conn->prepare("
                 INSERT INTO places
                   (user_id, category_id, name, price, tags, description,
@@ -67,92 +75,97 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $hoursStmt->close();
 
             // Get category name
-$cat_stmt = $conn->prepare("SELECT name FROM categories WHERE id = ?");
-$cat_stmt->bind_param("i", $category_id);
-$cat_stmt->execute();
-$cat_result = $cat_stmt->get_result();
-$category = $cat_result->fetch_assoc();
-$cat_stmt->close();
+            $cat_stmt = $conn->prepare("SELECT name FROM categories WHERE id = ?");
+            $cat_stmt->bind_param("i", $category_id);
+            $cat_stmt->execute();
+            $cat_result = $cat_stmt->get_result();
+            $category = $cat_result->fetch_assoc();
+            $cat_stmt->close();
 
-$category_name_safe = preg_replace('/[^a-zA-Z0-9-_]/', '_', $category['name']);
-$place_name_safe = preg_replace('/[^a-zA-Z0-9-_]/', '_', $name);
-
-// Create folder structure: assets/images/places/{category_name}/{place_name}/{featured,gallery,menu}
-$base_path = __DIR__ . "/assets/images/places/{$category_name_safe}/{$place_name_safe}";
-$featured_dir = "{$base_path}/featured/";
-$gallery_dir = "{$base_path}/gallery/";
-$menu_dir = "{$base_path}/menu/";
-
-foreach ([$featured_dir, $gallery_dir, $menu_dir] as $dir) {
-    if (!is_dir($dir)) {
-        mkdir($dir, 0755, true);
-    }
-}
-
-// Featured image
-if (isset($_FILES['featured_image']) && $_FILES['featured_image']['error'] === UPLOAD_ERR_OK) {
-    $tmp_name = $_FILES['featured_image']['tmp_name'];
-    $filename = uniqid('feat_', true) . '_' . basename($_FILES['featured_image']['name']);
-    $dest = $featured_dir . $filename;
-    move_uploaded_file($tmp_name, $dest);
-
-    $path = "assets/images/places/{$category_name_safe}/{$place_name_safe}/featured/" . $filename;
-    $stmt = $conn->prepare("UPDATE places SET featured_image = ? WHERE id = ?");
-    $stmt->bind_param("si", $path, $place_id);
-    $stmt->execute();
-    $stmt->close();
-}
-
-
-if (!empty($_FILES['gallery_images']['name'][0])) {
-    foreach ($_FILES['gallery_images']['tmp_name'] as $index => $tmp_name) {
-        if ($_FILES['gallery_images']['error'][$index] === UPLOAD_ERR_OK) {
-            $filename = uniqid('gal_', true) . '_' . basename($_FILES['gallery_images']['name'][$index]);
-            $dest = $gallery_dir . $filename;
-            move_uploaded_file($tmp_name, $dest);
-
-            $path = "assets/images/places/{$category_name_safe}/{$place_name_safe}/gallery/" . $filename;
-            $stmt = $conn->prepare("INSERT INTO place_gallery (place_id, image_url) VALUES (?, ?)");
-            $stmt->bind_param("is", $place_id, $path);
-            $stmt->execute();
-            $stmt->close();
-        }
-    }
-}
-
-
-$menu_items_json = $_POST['menu_items_data'] ?? '';
-if ($menu_items_json) {
-    $menu_items = json_decode($menu_items_json, true);
-    if (is_array($menu_items)) {
-        $menuStmt = $conn->prepare("INSERT INTO menu_items (place_id, name, price, description, image) VALUES (?, ?, ?, ?, ?)");
-        foreach ($menu_items as $item) {
-            $item_name = $item['name'] ?? '';
-            $item_price = $item['price'] ?? 0.00;
-            $item_description = $item['description'] ?? '';
-            $base64_image = $item['image'] ?? '';
-            $image_path = '';
-
-            if ($base64_image) {
-                $data = preg_replace('#^data:image/\w+;base64,#i', '', $base64_image);
-                $data = base64_decode($data);
-
-                $filename = uniqid('menu_', true) . '.jpg';
-                $image_path = "assets/images/places/{$category_name_safe}/{$place_name_safe}/menu/" . $filename;
-                $save_path = __DIR__ . '/' . $image_path;
-
-                file_put_contents($save_path, $data);
+            // Function to sanitize place name only
+            function normalizeName($name) {
+                return strtolower(trim(preg_replace('/[^a-zA-Z0-9]+/', '_', $name)));
             }
 
-            if ($item_name && $image_path) {
-                $menuStmt->bind_param("isdss", $place_id, $item_name, $item_price, $item_description, $image_path);
-                $menuStmt->execute();
-            }
-        }
-        $menuStmt->close();
-    }
-}
+            // Use the exact category name without normalization
+            $category_name_safe = $category['name'];  // No normalization for category name
+            $place_name_safe = normalizeName($name);  // Normalize the place name
 
+            // Create folder structure: assets/images/places/{category_name}/{place_name}/{featured,gallery,menu}
+            $base_path = __DIR__ . "/assets/images/places/{$category_name_safe}/{$place_name_safe}";
+            $featured_dir = "{$base_path}/featured/";
+            $gallery_dir = "{$base_path}/gallery/";
+            $menu_dir = "{$base_path}/menu/";
+
+            foreach ([$featured_dir, $gallery_dir, $menu_dir] as $dir) {
+                if (!is_dir($dir)) {
+                    mkdir($dir, 0755, true);
+                }
+            }
+
+            // Featured image
+            if (isset($_FILES['featured_image']) && $_FILES['featured_image']['error'] === UPLOAD_ERR_OK) {
+                $tmp_name = $_FILES['featured_image']['tmp_name'];
+                $filename = uniqid('feat_', true) . '_' . basename($_FILES['featured_image']['name']);
+                $dest = $featured_dir . $filename;
+                move_uploaded_file($tmp_name, $dest);
+
+                $path = "assets/images/places/{$category_name_safe}/{$place_name_safe}/featured/" . $filename;
+                $stmt = $conn->prepare("UPDATE places SET featured_image = ? WHERE id = ?");
+                $stmt->bind_param("si", $path, $place_id);
+                $stmt->execute();
+                $stmt->close();
+            }
+
+            // Gallery images
+            if (!empty($_FILES['gallery_images']['name'][0])) {
+                foreach ($_FILES['gallery_images']['tmp_name'] as $index => $tmp_name) {
+                    if ($_FILES['gallery_images']['error'][$index] === UPLOAD_ERR_OK) {
+                        $filename = uniqid('gal_', true) . '_' . basename($_FILES['gallery_images']['name'][$index]);
+                        $dest = $gallery_dir . $filename;
+                        move_uploaded_file($tmp_name, $dest);
+
+                        $path = "assets/images/places/{$category_name_safe}/{$place_name_safe}/gallery/" . $filename;
+                        $stmt = $conn->prepare("INSERT INTO place_gallery (place_id, image_url) VALUES (?, ?)");
+                        $stmt->bind_param("is", $place_id, $path);
+                        $stmt->execute();
+                        $stmt->close();
+                    }
+                }
+            }
+
+            // Menu items
+            $menu_items_json = $_POST['menu_items_data'] ?? '';
+            if ($menu_items_json) {
+                $menu_items = json_decode($menu_items_json, true);
+                if (is_array($menu_items)) {
+                    $menuStmt = $conn->prepare("INSERT INTO menu_items (place_id, name, price, description, image) VALUES (?, ?, ?, ?, ?)");
+                    foreach ($menu_items as $item) {
+                        $item_name = $item['name'] ?? '';
+                        $item_price = $item['price'] ?? 0.00;
+                        $item_description = $item['description'] ?? '';
+                        $base64_image = $item['image'] ?? '';
+                        $image_path = '';
+
+                        if ($base64_image) {
+                            $data = preg_replace('#^data:image/\w+;base64,#i', '', $base64_image);
+                            $data = base64_decode($data);
+
+                            $filename = uniqid('menu_', true) . '.jpg';
+                            $image_path = "assets/images/places/{$category_name_safe}/{$place_name_safe}/menu/" . $filename;
+                            $save_path = __DIR__ . '/' . $image_path;
+
+                            file_put_contents($save_path, $data);
+                        }
+
+                        if ($item_name && $image_path) {
+                            $menuStmt->bind_param("isdss", $place_id, $item_name, $item_price, $item_description, $image_path);
+                            $menuStmt->execute();
+                        }
+                    }
+                    $menuStmt->close();
+                }
+            }
 
             // FAQs
             $faq_questions = $_POST['faq_questions'] ?? [];
@@ -183,6 +196,7 @@ if ($menu_items_json) {
 $cats = $conn->query("SELECT id, name FROM categories ORDER BY name ASC")->fetch_all(MYSQLI_ASSOC);
 include 'header.php';
 ?>
+
 
 
 <main class="add-place">
@@ -229,15 +243,37 @@ include 'header.php';
         <input type="text" name="tags" placeholder="TAGS (comma-separated)"
                class="input--red"
                value="<?= htmlspecialchars($_POST['tags'] ?? '') ?>">
-        <select name="category_id" class="input--red" required>
-          <option value="" disabled <?= empty($_POST['category_id']) ? 'selected' : '' ?>>CATEGORY</option>
-          <?php foreach ($cats as $cat): ?>
-            <option value="<?= $cat['id'] ?>"
-                    <?= (($_POST['category_id'] ?? '') == $cat['id']) ? 'selected' : '' ?>>
-              <?= htmlspecialchars($cat['name']) ?>
-            </option>
-          <?php endforeach; ?>
-        </select>
+        <?php
+$category_names = [
+    'restaurants' => 'RESTAURANTS',
+    'shopping' => 'SHOPPING',
+    'active-life' => 'ACTIVE LIFE',
+    'home s' => 'HOME SERVICES',
+    'coffee' => 'COFFEE',
+    'pets' => 'PETS',
+    'plants' => 'PLANTS SHOP',
+    'art' => 'ART',
+    'hotal' => 'HOTELS',
+    'edu' => 'EDUCATION',
+    'health' => 'HEALTH',
+    'workspace' => 'WORKSPACE'
+];
+?>
+
+<select name="category_id" class="input--red" required>
+    <option value="" disabled <?= empty($_POST['category_id']) ? 'selected' : '' ?>>CATEGORY</option>
+    <?php foreach ($cats as $cat): ?>
+        <?php
+            $raw = strtolower($cat['name']);
+            $display = $category_names[$raw] ?? htmlspecialchars($cat['name']);
+        ?>
+        <option value="<?= $cat['id'] ?>"
+                <?= (($_POST['category_id'] ?? '') == $cat['id']) ? 'selected' : '' ?>>
+            <?= $display ?>
+        </option>
+    <?php endforeach; ?>
+</select>
+
       </div>
     </div>
     <!-- CONTACT INFO SECTION -->
@@ -373,7 +409,9 @@ include 'header.php';
         
 
 
-    <!-- TODO: FAQs -->
+    <!-- CSRF Token -->
+    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
+
 
     <button type="submit" class="btn__red--l btn__red btn">ADD PLACE !</button>
     
