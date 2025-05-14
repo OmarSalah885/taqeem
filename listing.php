@@ -3,112 +3,136 @@ require_once 'config.php';
 require_once 'db_connect.php';
 session_start();
 
+include 'header.php';
 
-include 'header.php';  // Ensure the database connection is established in header.php
+// Get filters & search (support both overlay & inline search)
+$category_id = isset($_GET['category_id']) ? (int)$_GET['category_id'] : 0;
 
-// Get category_id, price, search term, and rating from the URL
-$category_id = isset($_GET['category_id']) ? $_GET['category_id'] : 0;
-$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+// Overlay search uses `search_term`, inline uses `search`
+if (!empty($_GET['search_term'])) {
+    $search = trim($_GET['search_term']);
+} elseif (!empty($_GET['search'])) {
+    $search = trim($_GET['search']);
+} else {
+    $search = '';
+}
+
 $price = isset($_GET['price']) ? $_GET['price'] : '';
 $stars = isset($_GET['stars']) ? $_GET['stars'] : '';
-$sort = isset($_GET['sort']) ? $_GET['sort'] : '';
+$sort  = isset($_GET['sort'])  ? $_GET['sort']  : '';
+$page  = isset($_GET['page'])  ? (int)$_GET['page'] : 1;
 
-// Initialize pagination variables
-$items_per_page = 12; // Items per page
-$current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$offset = ($current_page - 1) * $items_per_page;
+// Pagination
+$items_per_page = 12;
+$offset = ($page - 1) * $items_per_page;
 
-// Query building for search, category, price, and rating filters
-$sql = "SELECT * FROM places";
+// Build base SQL and parameters
+$sql        = "SELECT * FROM places";
 $conditions = [];
-$params = [];
+$params     = [];
 
-if (!empty($search)) {
-    $conditions[] = "tags LIKE ?";
-    $params[] = "%$search%";
+// Search by tags
+if ($search !== '') {
+    // Search both tags and place name
+    $conditions[] = "(tags LIKE ? OR name LIKE ?)";
+    $params[]     = "%$search%";
+    $params[]     = "%$search%";
 }
 
+
+// Category filter
 if ($category_id > 0) {
     $conditions[] = "category_id = ?";
-    $params[] = $category_id;
+    $params[]     = $category_id;
 }
 
-if (!empty($price)) {
+// Price filter
+if ($price !== '') {
     $conditions[] = "price = ?";
-    $params[] = $price;
+    $params[]     = $price;
 }
 
-if (!empty($stars)) {
-    $conditions[] = "id IN (SELECT place_id FROM reviews GROUP BY place_id HAVING AVG(rating) >= ?)";
+// Stars (average rating) filter
+if ($stars !== '') {
+    $conditions[] = "id IN (
+        SELECT place_id
+        FROM reviews
+        GROUP BY place_id
+        HAVING AVG(rating) >= ?
+    )";
     $params[] = $stars;
 }
 
+// Combine WHERE clauses
 if (count($conditions) > 0) {
-    $sql .= " WHERE " . implode(' AND ', $conditions);
+    $sql .= " WHERE " . implode(" AND ", $conditions);
 }
 
-// Apply sorting logic if 'sort' parameter is set
+// Sorting
 if (!empty($sort)) {
     switch ($sort) {
-        case '1':  // Stars
+        case '1':
             $sql .= " ORDER BY (SELECT AVG(rating) FROM reviews WHERE place_id = places.id) DESC";
             break;
-        case '2':  // Newest
-            $sql .= " ORDER BY created_at DESC";  // Assuming 'created_at' column exists
+        case '2':
+            $sql .= " ORDER BY created_at DESC";
             break;
-        case '3':  // Price
+        case '3':
             $sql .= " ORDER BY price";
             break;
     }
 } else {
-    $sql .= " ORDER BY RAND()";  // Default sorting is random if no sort option is selected
+    $sql .= " ORDER BY RAND()";
 }
 
-// Fetch total items for pagination
+// === Fetch total items for pagination ===
 $stmt = $conn->prepare($sql);
-if (!empty($params)) {
-    $types = str_repeat('s', count($params));  // Adjust types based on number of params
+if ($params) {
+    $types = str_repeat('s', count($params));
     $stmt->bind_param($types, ...$params);
 }
 $stmt->execute();
 $result = $stmt->get_result();
-$total_items = $result->num_rows;  // Get the total number of items for pagination
+$total_items = $result->num_rows;
 $stmt->close();
 
-// Fetch items for the current page with pagination
+// === Fetch current page items ===
 $sql .= " LIMIT ?, ?";
-$params[] = $offset;  // Offset for pagination
+$params[] = $offset;
 $params[] = $items_per_page;
 
 $stmt = $conn->prepare($sql);
-$types = str_repeat('s', count($params) - 2) . 'ii';  // Adjust types for pagination parameters
+// Now last two params are integers
+$types = str_repeat('s', count($params) - 2) . 'ii';
 $stmt->bind_param($types, ...$params);
 $stmt->execute();
 $result = $stmt->get_result();
+
 $places = [];
 while ($row = $result->fetch_assoc()) {
     $places[] = $row;
 }
+$stmt->close();
 
-// Pagination calculation
-$total_pages = ceil($total_items / $items_per_page);
-$current_page = max(1, min($total_pages, $current_page));  // Ensure the page is within bounds
-?>
+// Calculate pagination
+$total_pages  = (int)ceil($total_items / $items_per_page);
+$current_page = max(1, min($total_pages, $page));
 
-<?php
-// Fetch saved places for the logged-in user
+// Fetch saved places for logged-in user
 $saved_places = [];
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
-    $saved_places_query = $conn->prepare("SELECT place_id FROM saved_places WHERE user_id = ?");
-    $saved_places_query->bind_param("i", $user_id);
-    $saved_places_query->execute();
-    $saved_places_result = $saved_places_query->get_result();
-    while ($saved_place = $saved_places_result->fetch_assoc()) {
-        $saved_places[] = $saved_place['place_id'];
+    $q = $conn->prepare("SELECT place_id FROM saved_places WHERE user_id = ?");
+    $q->bind_param("i", $user_id);
+    $q->execute();
+    $rs = $q->get_result();
+    while ($r = $rs->fetch_assoc()) {
+        $saved_places[] = $r['place_id'];
     }
+    $q->close();
 }
 ?>
+
 
 <main>
     <div class="listing">

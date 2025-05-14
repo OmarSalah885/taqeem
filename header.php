@@ -123,12 +123,44 @@ if (!isset($_SESSION['profile_image']) || !isset($_SESSION['first_name']) || !is
         </nav>
 
         <div class="navbar_search--overlay" id="search-overlay">
-    <a id="close-btn" href="#">X</a>
-    <form class="navbar_search--overlay-content" method="GET" action="blogs.php" >
-            <input type="text" name="search_term" placeholder="Search blogs or tags">
-            <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
-    </form>
+  <a id="close-btn" href="#">X</a>
+  <form class="navbar_search--overlay-content" method="GET">
+    <input
+      type="text"
+      name="search_term"
+      id="search-term"
+      placeholder="Search places or tags"
+    >
+    <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+  </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const currentPage = window.location.pathname;
+  const searchForm  = document.querySelector('.navbar_search--overlay-content');
+  const searchInput = document.getElementById('search-term');
+
+  // Default to places search
+  let formAction     = 'listing.php';
+  let placeholderText = 'Search places or tags';
+
+  // If we detect a blog page, switch to blog search
+  if (currentPage.includes('blogs.php') || currentPage.includes('single-blog.php')) {
+    formAction      = 'blogs.php';
+    placeholderText = 'Search blogs or tags';
+  }
+
+  // Apply
+  searchForm.setAttribute('action', formAction);
+  searchInput.setAttribute('placeholder', placeholderText);
+
+  console.log('Search form ➞', formAction, '| placeholder ➞', placeholderText);
+});
+</script>
+
+
+
 
         <div class="LogOverlay">
             <div class="LogOverlay__content">
@@ -235,6 +267,3 @@ if (!isset($_SESSION['profile_image']) || !isset($_SESSION['first_name']) || !is
             </div>
         </div>
     </nav>
-</body>
-
-</html>
