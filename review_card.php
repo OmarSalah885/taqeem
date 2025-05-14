@@ -35,8 +35,16 @@ if (isset($_SESSION['user_id'])) {
             <p><?php echo htmlspecialchars($row['user_name'] ?? 'Unknown User'); ?></p>
         </a>
         
-        <!-- Review Image -->
-        <a href="#"><img class="activity_grid--item_img_user-img" src="<?php echo htmlspecialchars($row['review_image']); ?>" alt="Review Image"></a>
+        <a href="single-place.php?place_id=<?php echo $row['place_id']; ?>&review_id=<?php echo $row['review_id']; ?>#review_<?php echo $row['review_id']; ?>">
+    <img class="activity_grid--item_img_user-img" src="<?php echo htmlspecialchars($row['review_image']); ?>" alt="Review Image">
+</a>
+
+
+
+
+
+
+
         <a class="activity_grid--item_img_like" href="#" onclick="toggleLike(event, <?php echo $row['review_id']; ?>)">
             <i class="<?php echo $is_liked ? 'fa-solid fa-heart' : 'fa-regular fa-heart'; ?>"></i>
         </a>
@@ -45,9 +53,11 @@ if (isset($_SESSION['user_id'])) {
     <div class="activity_grid--item_content">
         <div class="activity_grid--item_content-info">
             <div class="activity_grid--item_content-info_name">
-                <a href="#">
-                    <h3><?php echo htmlspecialchars($row['place_name']); ?></h3>
-                </a>
+                <a href="single-place.php?place_id=<?php echo $row['place_id']; ?>">
+    <h3><?php echo htmlspecialchars($row['place_name']); ?></h3>
+</a>
+
+
                 <div class="activity_stars">
                     <?php
                     $rating = $row['rating'];
@@ -60,15 +70,16 @@ if (isset($_SESSION['user_id'])) {
                     ?>
                 </div>
             </div>
-            <a class="activity_grid--item_content-info_link" href="#">
-                <i class="<?php echo htmlspecialchars($row['icon_class'] ?? 'fa-solid fa-question'); ?>"></i>
-            </a>
+            <a class="activity_grid--item_content-info_link" href="listing.php?category_id=<?php echo htmlspecialchars($row['category_id']); ?>">
+    <i class="<?php echo htmlspecialchars($row['icon_class'] ?? 'fa-solid fa-question'); ?>"></i>
+</a>
+
         </div>
         
         <p>
             <?php echo htmlspecialchars($short_review); ?>
             <?php if (strlen($full_review) > $max_length): ?>
-                <a href="review_details.php?id=<?php echo htmlspecialchars($row['review_id']); ?>" class="read-more">Read more</a>
+                <a class="read-more" href="single-place.php?place_id=<?php echo $row['place_id']; ?>&review_id=<?php echo $row['review_id']; ?>#review_<?php echo $row['review_id']; ?>">Read more</a>
             <?php endif; ?>
         </p>
     </div>

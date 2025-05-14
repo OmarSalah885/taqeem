@@ -17,8 +17,7 @@ include 'header.php'; // Include the header
                         <h1>Search for the
                             best restaurants out there
                         </h1>
-                        <a class="btn__red--l btn__red btn">see
-                            more</a>
+                        <a href="listing.php?category_id=1" class="btn__red--l btn__red btn">See More</a>
                     </div>
                 </div>
             </div>
@@ -30,8 +29,7 @@ include 'header.php'; // Include the header
                         <h1>Search for the
                             best restaurants out there
                         </h1>
-                        <a class="btn__red--l btn__red btn">see
-                            more</a>
+                        <a href="listing.php?category_id=1" class="btn__red--l btn__red btn">See More</a>
                     </div>
                 </div>
             </div>
@@ -43,8 +41,7 @@ include 'header.php'; // Include the header
                         <h1>Search for the
                             best restaurants out there
                         </h1>
-                        <a class="btn__red--l btn__red btn">see
-                            more</a>
+                        <a href="listing.php?category_id=1" class="btn__red--l btn__red btn">See More</a>
                     </div>
                 </div>
             </div>
@@ -114,11 +111,13 @@ $query = "SELECT
     r.review_text, 
     r.rating, 
     p.name AS place_name, 
+    p.id AS place_id,
     CONCAT(u.first_name, ' ', u.last_name) AS user_name, 
     u.id AS user_id,
     u.profile_image AS user_profile_image, 
     ri.image_url AS review_image, 
-    c.icon AS icon_class
+    c.icon AS icon_class,
+    c.id AS category_id  -- ✅ Fetch category ID
 FROM reviews r
 JOIN places p ON r.place_id = p.id
 JOIN users u ON r.user_id = u.id
@@ -126,6 +125,8 @@ JOIN review_images ri ON r.id = ri.review_id
 JOIN categories c ON p.category_id = c.id
 ORDER BY rand()
 LIMIT $limit";
+
+
 
 $result = mysqli_query($conn, $query);
 if (mysqli_num_rows($result) > 0) {
@@ -185,18 +186,18 @@ if (mysqli_num_rows($result) > 0) {
                 $shortContent = (strlen($content) > 200) ? substr($content, 0, 200) . '...' : $content;
 
                 echo '<div class="homeBlog_blogs--item">
-                        <div class="homeBlog_blogs--item-img">
-                            <a href="single-blog.php?id=' . $id . '" class="homeBlog_blogs--item-img_img" style="text-decoration: none;">
-                                <img src="' . $image . '" alt="Blog Image">
-                            </a>
-                            <div class="homeBlog_blogs--item-img_tags">';
-                            
-                // Display tags dynamically
-                foreach ($tags as $tag) {
-                    echo '<a href="#" style="text-decoration: none;">' . htmlspecialchars(trim($tag)) . '</a>';
-                }
+            <div class="homeBlog_blogs--item-img">
+                <a href="single-blog.php?id=' . $id . '" class="homeBlog_blogs--item-img_img" style="text-decoration: none;">
+                    <img src="' . $image . '" alt="Blog Image">
+                </a>
+                <div class="homeBlog_blogs--item-img_tags">';
+    
+    // Display tags dynamically
+    foreach ($tags as $tag) {
+        echo '<a href="blogs.php?search_term=' . urlencode(trim($tag)) . '" style="text-decoration: none;">' . htmlspecialchars(trim($tag)) . '</a>';
+    }
 
-                echo '      </div>
+    echo '  </div>
                         </div>
                         <div class="homeBlog_blogs--item-text">
                             <a href="single-blog.php?id=' . $id . '" class="homeBlog_blogs--item-text_title" style="text-decoration: none;">' . $title . '</a>

@@ -80,7 +80,7 @@ if (!isset($_SESSION['profile_image']) || !isset($_SESSION['first_name']) || !is
                 <div class="navbar_container--menu-L">
                     <a href="./index.php">home</a>
 
-                    <a href="blogs.php">blog</a>
+                    <a href="blogs.php">blogs</a>
                     <a href="listing.php">categories</a>
                     <a href="./index.php#aboutUs">about us</a>
                 </div>

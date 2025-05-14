@@ -40,17 +40,19 @@ $types = str_repeat('i', count($selected_ids));
 
 $stmt = $conn->prepare("
     SELECT 
-        r.id AS review_id, 
-        r.review_text, 
-        r.rating, 
-        r.created_at, 
-        p.id AS place_id, 
-        p.name AS place_name, 
-        ri.image_url AS review_image,
-        c.icon AS icon_class, 
-        u.id AS user_id, 
-        CONCAT(u.first_name, ' ', u.last_name) AS user_name, 
-        u.profile_image AS user_profile_image
+    r.id AS review_id, 
+    r.review_text, 
+    r.rating, 
+    r.created_at, 
+    p.id AS place_id, 
+    p.name AS place_name, 
+    ri.image_url AS review_image,
+    c.icon AS icon_class,
+    c.id AS category_id,  -- ✅ Add this line
+    u.id AS user_id, 
+    CONCAT(u.first_name, ' ', u.last_name) AS user_name, 
+    u.profile_image AS user_profile_image
+
     FROM reviews r
     INNER JOIN review_images ri ON r.id = ri.review_id
     INNER JOIN places p ON r.place_id = p.id

@@ -711,6 +711,15 @@ function showEditForm(reviewId) {
         s.style.color = s.getAttribute('data-value') <= rating ? '#A21111' : '#D0D0D0';
     });
 }
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.location.hash) {
+        // If there's a hash in the URL, smooth scroll to the target element
+        document.querySelector(window.location.hash).scrollIntoView({
+            behavior: 'smooth'
+        });
+    }
+});
+
 
 
 const imageInput = document.getElementById('imageInput');
