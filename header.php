@@ -88,8 +88,9 @@ if (!isset($_SESSION['profile_image']) || !isset($_SESSION['first_name']) || !is
                     <a href="index.php"><img src="assets/images/logo.png" alt="logo"></a>
                 </div>
                 <div class="navbar_container--menu-R">
-                    <a class="btn__red--m btn__red btn" id="search-btn" href="#"><i
-                            class="fa-solid fa-magnifying-glass"></i></a>
+                    <a class="btn__red--m btn__red btn" id="search-btn" href="#"><i class="fa-solid fa-magnifying-glass"></i></a>
+                    
+
                     <?php if (isset($_SESSION['user_id'])): ?>
                     <!-- Show profile link when the user is logged in -->
                     <a href="profile.php?user_id=<?php echo htmlspecialchars($_SESSION['user_id']); ?>"
@@ -122,10 +123,12 @@ if (!isset($_SESSION['profile_image']) || !isset($_SESSION['first_name']) || !is
         </nav>
 
         <div class="navbar_search--overlay" id="search-overlay">
-            <a id="close-btn" href="#">X</a>
-            <div class="navbar_search--overlay-content"><input type="text" placeholder="search"><button><i
-                        class="fa-solid fa-magnifying-glass"></i></button></div>
-        </div>
+    <a id="close-btn" href="#">X</a>
+    <form class="navbar_search--overlay-content" method="GET" action="blogs.php" >
+            <input type="text" name="search_term" placeholder="Search blogs or tags">
+            <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+    </form>
+</div>
 
         <div class="LogOverlay">
             <div class="LogOverlay__content">

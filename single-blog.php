@@ -112,17 +112,20 @@ foreach ($comments as $comment) {
         <img src="<?php echo htmlspecialchars($blog['image']); ?>" alt>
     </div>
     <div class="single-blog_tags">
-        <?php
-            if (!empty($blog['tags'])) {
-                $tags = explode(',', $blog['tags']); // Assuming tags are stored as a comma-separated string
-                foreach ($tags as $tag): ?>
-        <a href="#"><?php echo htmlspecialchars($tag); ?></a>
-        <?php endforeach;
-            } else {
-                echo "<p>No tags available for this blog.</p>";
-            }
-            ?>
-    </div>
+    <?php
+        if (!empty($blog['tags'])) {
+            $tags = explode(',', $blog['tags']); // Assuming tags are stored as a comma-separated string
+            foreach ($tags as $tag): ?>
+                <a href="blogs.php?search_term=<?php echo urlencode(trim($tag)); ?>" style="text-decoration: none;">
+                    <?php echo htmlspecialchars(trim($tag)); ?>
+                </a>
+    <?php endforeach;
+        } else {
+            echo "<p>No tags available for this blog.</p>";
+        }
+    ?>
+</div>
+
     <h1 class="single-blog_title"><?php echo htmlspecialchars($blog['title']); ?></h1>
     <div class="single-blog_content">
         <div class="single-blog_content--paragraph">

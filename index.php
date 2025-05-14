@@ -165,7 +165,7 @@ if (mysqli_num_rows($result) > 0) {
     </div>
 
     <div class="homeBlog">
-    <h2 class="home-title">Categories</h2>
+    <h2 class="home-title"> Our Blogs</h2>
     <div class="homeBlog_blogs">
         <?php
         // Query to fetch 3 random blogs

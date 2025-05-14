@@ -88,7 +88,8 @@ if (isset($_SESSION['user_id'])) {
         </div>
         <button class="gallery-btn right-btn">›</button>
         <?php if ($is_owner): ?>
- <!--<a href="#" class="btn__red--l btn__red btn">EDIT PLACE</a>-->
+<!--<a href="add-place.php?id=<?= $place_id ?>" class="btn__red--l btn__red btn">EDIT PLACE</a>-->
+
 
   <form action="delete_place.php" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this place? This action cannot be undone.');">
     <input type="hidden" name="place_id" value="<?= htmlspecialchars($place['id']) ?>">
