@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 10, 2025 at 10:47 AM
+-- Generation Time: May 15, 2025 at 10:24 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -347,13 +347,6 @@ CREATE TABLE `opening_hours` (
 --
 
 INSERT INTO `opening_hours` (`id`, `place_id`, `day`, `open_time`, `close_time`) VALUES
-(1024, 1, 'Monday', '10:00:00', '11:00:00'),
-(1025, 1, 'Tuesday', '10:00:00', '11:00:00'),
-(1026, 1, 'Wednesday', '10:00:00', '11:00:00'),
-(1027, 1, 'Thursday', '10:00:00', '11:00:00'),
-(1028, 1, 'Friday', '10:00:00', '11:00:00'),
-(1029, 1, 'Saturday', '10:00:00', '11:00:00'),
-(1030, 1, 'Sunday', '10:00:00', '11:00:00'),
 (1031, 6, 'Monday', '10:00:00', '11:00:00'),
 (1032, 6, 'Tuesday', '10:00:00', '11:00:00'),
 (1033, 6, 'Wednesday', '10:00:00', '11:00:00'),
@@ -423,7 +416,14 @@ INSERT INTO `opening_hours` (`id`, `place_id`, `day`, `open_time`, `close_time`)
 (1097, 51, 'Thursday', '10:00:00', '11:00:00'),
 (1098, 51, 'Friday', '10:00:00', '11:00:00'),
 (1099, 51, 'Saturday', '10:00:00', '11:00:00'),
-(1100, 51, 'Sunday', '10:00:00', '11:00:00');
+(1100, 51, 'Sunday', '10:00:00', '11:00:00'),
+(1360, 1, 'Monday', '10:00:00', '11:00:00'),
+(1361, 1, 'Tuesday', '10:04:00', '11:00:00'),
+(1362, 1, 'Wednesday', '10:00:00', '11:00:00'),
+(1363, 1, 'Thursday', '10:00:00', '11:00:00'),
+(1364, 1, 'Friday', '10:42:00', '11:00:00'),
+(1365, 1, 'Saturday', '10:00:00', '11:00:00'),
+(1366, 1, 'Sunday', '10:00:00', '11:00:00');
 
 -- --------------------------------------------------------
 
@@ -458,7 +458,7 @@ CREATE TABLE `places` (
 --
 
 INSERT INTO `places` (`id`, `user_id`, `category_id`, `name`, `price`, `tags`, `description`, `country`, `city`, `google_map_location`, `email`, `phone_1`, `phone_2`, `website`, `facebook_url`, `instagram_url`, `twitter_url`, `featured_image`, `created_at`) VALUES
-(1, 1, 1, 'Zarb House', '$$$', 'Jordanian, BBQ, Traditional', 'A must-visit for lovers of authentic Jordanian zarb, slow-cooked underground.', 'Jordan', 'Amman', 'https://goo.gl/maps/example1', 'contact@zarbhouse.com', '0791234567', '0797676767', 'https://zarbhouse.com', NULL, NULL, 'https://x.com/home', 'assets/images/places/restaurants/RM(1).jpg', '2025-03-15 11:37:28'),
+(1, 1, 1, 'Zarb House', '$$$', 'Jordanian, BBQ, Traditional', 'A must-visit for lovers of authentic Jordanian zarb, slow-cooked underground.', 'Jordan', 'Amman', 'https://goo.gl/maps/example1', 'contact@zarbhouse.com', '0791234567', '0797676767', 'https://zarbhouse.com', 'http://localhost/taqeem/add-place.php', '', 'https://x.com/home', 'assets/images/places/restaurants/RM(1).jpg', '2025-03-15 11:37:28'),
 (2, 2, 1, 'Habibah Sweets', '$', 'Desserts, Sweets, Kunafa', 'Famous for its mouthwatering kunafa, a true taste of Amman.', 'Jordan', 'Amman', 'https://goo.gl/maps/example2', 'info@habibahsweets.com', '0792345678', NULL, NULL, 'https://facebook.com/habibah', NULL, 'https://x.com/home', 'assets/images/places/restaurants/RM(2).jpg', '2025-03-15 11:37:28'),
 (3, 3, 1, 'Shawarma Reem', '$', 'Shawarma, Fast Food, Street Food', 'One of the best shawarma spots in Amman, known for its rich flavors.', 'Jordan', 'Amman', 'https://goo.gl/maps/example3', NULL, '0793456789', NULL, NULL, NULL, NULL, NULL, 'assets/images/places/restaurants/RM(3).jpg', '2025-03-15 11:37:28'),
 (4, 4, 1, 'Fakhr El-Din', '$$$', 'Lebanese, Fine Dining', 'A high-end Lebanese restaurant offering exquisite dishes and great ambiance.', 'Jordan', 'Amman', 'https://goo.gl/maps/example4', 'reservations@fakhreldin.com', '0794567890', NULL, 'https://fakhreldin.com', 'https://facebook.com/fakhreldin', 'https://instagram.com/fakhreldin', NULL, 'assets/images/places/restaurants/RM(4).jpg', '2025-03-15 11:37:28'),
@@ -577,9 +577,9 @@ INSERT INTO `places` (`id`, `user_id`, `category_id`, `name`, `price`, `tags`, `
 (117, 28, 11, 'Al-Bashir Health Center', '$$', 'Health Center, Public, Family Medicine', 'A health center offering a wide range of public healthcare services, including family medicine, vaccinations, and general checkups.', 'Jordan', 'Amman', 'https://goo.gl/maps/example83', 'info@bashirhealthcenter.jo', '0796363636', NULL, 'https://bashirhealthcenter.jo', NULL, NULL, NULL, 'assets/images/places/health/h(14).jpg', '2025-03-15 11:46:39'),
 (118, 1, 12, 'Co-Work Hub', '$$', 'Workspace, Co-Working, Offices', 'Co-Work Hub is a modern co-working space offering flexible office solutions, meeting rooms, and collaboration opportunities for startups and entrepreneurs.', 'Jordan', 'Amman', 'https://goo.gl/maps/example84', 'info@coworkhub.jo', '0796464646', NULL, 'https://coworkhub.jo', NULL, NULL, NULL, 'assets/images/places/workspace/work(1).jpg', '2025-03-15 11:47:35'),
 (119, 3, 12, 'The Office', '$$$', 'Workspace, Premium Offices, Events', 'The Office offers premium office spaces with advanced facilities, ideal for businesses looking for a professional and creative environment.', 'Jordan', 'Amman', 'https://goo.gl/maps/example85', 'contact@theoffice.jo', '0796565656', NULL, 'https://theoffice.jo', 'https://facebook.com/theoffice.jo', 'https://instagram.com/theoffice.jo', NULL, 'assets/images/places/workspace/work(2).jpg', '2025-03-15 11:47:35'),
-(120, 7, 12, 'Flexi Spaces', '$$', 'Workspace, Shared Offices, Flexible Plans', 'Flexi Spaces offers shared offices with flexible plans, giving companies the ability to scale their workspace according to needs.', 'Jordan', 'Amman', 'https://goo.gl/maps/example86', 'info@flexispaces.jo', '0796666666', NULL, 'https://flexispaces.jo', NULL, NULL, NULL, 'assets/images/places/workspace/work(3).jpg', '2025-03-15 11:47:35'),
-(121, 9, 12, 'Startup Space', '$$', 'Workspace, Co-Working, Networking', 'Startup Space is designed for startups and small businesses, providing co-working areas, networking opportunities, and business support services.', 'Jordan', 'Amman', 'https://goo.gl/maps/example87', 'info@startupspace.jo', '0796767676', NULL, 'https://startupspace.jo', NULL, NULL, 'https://x.com/home', 'assets/images/places/workspace/work(4).jpg', '2025-03-15 11:47:35');
+(120, 7, 12, 'Flexi Spaces', '$$', 'Workspace, Shared Offices, Flexible Plans', 'Flexi Spaces offers shared offices with flexible plans, giving companies the ability to scale their workspace according to needs.', 'Jordan', 'Amman', 'https://goo.gl/maps/example86', 'info@flexispaces.jo', '0796666666', NULL, 'https://flexispaces.jo', NULL, NULL, NULL, 'assets/images/places/workspace/work(3).jpg', '2025-03-15 11:47:35');
 INSERT INTO `places` (`id`, `user_id`, `category_id`, `name`, `price`, `tags`, `description`, `country`, `city`, `google_map_location`, `email`, `phone_1`, `phone_2`, `website`, `facebook_url`, `instagram_url`, `twitter_url`, `featured_image`, `created_at`) VALUES
+(121, 9, 12, 'Startup Space', '$$', 'Workspace, Co-Working, Networking', 'Startup Space is designed for startups and small businesses, providing co-working areas, networking opportunities, and business support services.', 'Jordan', 'Amman', 'https://goo.gl/maps/example87', 'info@startupspace.jo', '0796767676', NULL, 'https://startupspace.jo', NULL, NULL, 'https://x.com/home', 'assets/images/places/workspace/work(4).jpg', '2025-03-15 11:47:35'),
 (122, 11, 12, 'Co-Work Jordan', '$$', 'Workspace, Shared Offices, Startups', 'Co-Work Jordan offers shared office spaces for entrepreneurs, freelancers, and small teams, fostering collaboration and business growth.', 'Jordan', 'Amman', 'https://goo.gl/maps/example88', 'info@coworkjordan.com', '0796868686', NULL, 'https://coworkjordan.com', NULL, NULL, NULL, 'assets/images/places/workspace/work(5).jpg', '2025-03-15 11:47:35'),
 (123, 13, 12, 'The Foundry', '$$$', 'Workspace, Premium Offices, Networking', 'The Foundry is a co-working space offering private offices, shared desks, and events for business professionals and entrepreneurs.', 'Jordan', 'Amman', 'https://goo.gl/maps/example89', 'contact@thefoundry.jo', '0796969696', '0797676767', 'https://thefoundry.jo', 'https://facebook.com/thefoundry.jo', 'https://instagram.com/thefoundry.jo', 'https://x.com/home', 'assets/images/places/workspace/work(6).jpg', '2025-03-15 11:47:35'),
 (124, 15, 12, 'Hub 25', '$$', 'Workspace, Shared Offices, Creative', 'Hub 25 offers flexible co-working spaces for creatives, startups, and freelancers, with high-speed internet, meeting rooms, and community events.', 'Jordan', 'Amman', 'https://goo.gl/maps/example90', 'info@hub25.jo', '0797070707', NULL, 'https://hub25.jo', NULL, NULL, NULL, 'assets/images/places/workspace/work(7).jpg', '2025-03-15 11:47:35'),
@@ -589,6 +589,36 @@ INSERT INTO `places` (`id`, `user_id`, `category_id`, `name`, `price`, `tags`, `
 (128, 23, 12, 'Collaborative Space', '$$', 'Workspace, Shared Offices, Networking', 'Collaborative Space offers open desks, private offices, and event spaces, creating a hub for collaboration and innovation.', 'Jordan', 'Amman', 'https://goo.gl/maps/example94', 'info@collaborativespace.jo', '0797474747', NULL, 'https://collaborativespace.jo', NULL, NULL, NULL, 'assets/images/places/workspace/work(11).jpg', '2025-03-15 11:47:35'),
 (129, 25, 12, 'CoWork +', '$$', 'Workspace, Flexible, Networking', 'CoWork + provides flexible office spaces with all the amenities needed for entrepreneurs, remote workers, and small businesses.', 'Jordan', 'Amman', 'https://goo.gl/maps/example95', 'info@coworkplus.jo', '0797575757', '0797676767', 'https://coworkplus.jo', NULL, NULL, NULL, 'assets/images/places/workspace/work(14).jpg', '2025-03-15 11:47:35'),
 (130, 27, 12, 'The Business Hub', '$$$', 'Workspace, Business Support, Office Spaces', 'The Business Hub offers a professional environment with fully equipped office spaces and business support services, ideal for corporations and entrepreneurs.', 'Jordan', 'Amman', 'https://goo.gl/maps/example96', 'info@businesshub.jo', '0797676767', NULL, 'https://businesshub.jo', NULL, NULL, 'https://x.com/home', 'assets/images/places/workspace/work(15).jpg', '2025-03-15 11:47:35');
+
+--
+-- Triggers `places`
+--
+DELIMITER $$
+CREATE TRIGGER `revert_to_guest_after_place_delete` AFTER DELETE ON `places` FOR EACH ROW BEGIN
+  DECLARE place_count INT;
+
+  -- Count how many places the user still has
+  SELECT COUNT(*) INTO place_count
+  FROM places
+  WHERE user_id = OLD.user_id;
+
+  -- If zero places remain and user is not Admin, set role to Guest
+  IF place_count = 0 THEN
+    UPDATE users
+    SET role = 'Guest'
+    WHERE id = OLD.user_id AND role != 'Admin';
+  END IF;
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `set_owner_role_after_place_insert` AFTER INSERT ON `places` FOR EACH ROW BEGIN
+  UPDATE users
+  SET role = 'Owner'
+  WHERE id = NEW.user_id AND role != 'Admin';
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -631,7 +661,6 @@ INSERT INTO `place_gallery` (`id`, `place_id`, `image_url`) VALUES
 (22, 8, 'assets/images/places/restaurants/R(2).jpg'),
 (23, 8, 'assets/images/places/restaurants/R(3).jpg'),
 (24, 8, 'assets/images/places/restaurants/R(4).jpg'),
-(25, 1, 'assets/images/places/restaurants/RM(1).jpg'),
 (26, 2, 'assets/images/places/restaurants/RM(2).jpg'),
 (27, 3, 'assets/images/places/restaurants/RM(3).jpg'),
 (28, 4, 'assets/images/places/restaurants/RM(4).jpg'),
@@ -2110,7 +2139,7 @@ CREATE TABLE `users` (
   `gender` enum('Male','Female') DEFAULT NULL,
   `about_me` text DEFAULT NULL,
   `location` varchar(255) DEFAULT NULL,
-  `role` enum('Guest','Owner') DEFAULT 'Guest',
+  `role` enum('Guest','Owner','Admin') DEFAULT 'Guest',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `visibility` enum('public','private') DEFAULT 'public'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -2120,38 +2149,38 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `first_name`, `last_name`, `email`, `password`, `profile_image`, `gender`, `about_me`, `location`, `role`, `created_at`, `visibility`) VALUES
-(1, 'Ali', 'feras', 'ali.ghaddad@example.com', '$2y$10$ccRtfDH.R08bAdaX8vHCMeHkKEW.RF2wBHy/X9fh9P8mjPYMZiK52', 'assets/images/profiles/6805134cec41e.jpg', 'Male', 'Hi, I’m Ali! I love discovering great local spots, whether it’s a cozy café, a hidden bookstore, or a restaurant with the best food in town. I enjoy sharing honest reviews to help others find amazing experiences. When I’m not trying new places, I’m usually working on tech-related topics or exploring programming.', 'Amman, Jordan middle town', 'Guest', '2025-03-15 09:24:35', 'private'),
-(2, 'Fatima', 'Al-Abed', 'fatima.alabed@example.com', '$2y$10$OeBoqwucgy370kpRojZSDOzKumpQkfA6bc85O0yWolJQg6p3wvuHm', 'assets/images/profiles/w(1).jpg', 'Female', 'Hi, I’m Fatima! Always on the lookout for new books to read and cool writing spots. I love sharing my thoughts and experiences with others, especially in literary spaces. When I’m not reading, I’m writing or learning more about the world of words!', 'Irbid, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
-(3, 'Hassan', 'Ali', 'hassan.ali@example.com', '$2y$10$JkN6S6zL9iT2Hfzfxw58IOJsIxWeHtbBWS9IHA11gRvPIZF2QbiYC', 'assets/images/profiles/m(2).jpg', 'Male', 'Hassan here! Passionate about tech, especially programming. Whether it’s a hidden tech hub or a cozy café where I can work on my next project, I love sharing my experiences with others. Excited to hear any recommendations you may have!', 'Zarqa, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
-(4, 'Reem', 'Al-Shami', 'reem.ashami@example.com', '$2y$10$16sUDN80Rz2QBzD3pySA3eZQUu7O8DnQJ7WmMdLZgdNsFeGRxkTuG', 'assets/images/profiles/w(2).jpg', 'Female', 'Hey! I’m Reem, and I’m all about traveling and learning about new cultures. There’s nothing better than exploring new places, trying new foods, and sharing my experiences. Always on the hunt for the next great destination!', 'Amman, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
-(5, 'Yousef', 'Najjar', 'yousef.najjar@example.com', '$2y$10$SNVjT2gGZSlZXd5VsdDoluXG/z/V1R8kYW6GgE7CWl3XaNIoHjSfq', NULL, 'Male', 'Hi, I’m Yousef! Passionate about technology and music, I love discovering places that allow me to enjoy both. Whether it’s a café with great Wi-Fi or a cozy bar with live music, I’m always looking for something new and exciting.', NULL, 'Guest', '2025-03-15 09:24:35', 'public'),
-(6, 'sara', 'Al-Hussein', 'sara.hussein@example.com', '$2y$10$LrYSWyze3E/4USJkcxssUOPSabTFTGXvLWSJBFJeCIu1q1H7LU9MC', 'assets/images/profiles/68052c835e4c5.jpg', 'Female', 'I’m Sara! I’m a fan of writing and reading, and I enjoy sharing my thoughts with others. Whether it’s at a quiet bookstore or a bustling café, I love finding places that inspire creativity and help me unwind!', 'Aqaba, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
-(7, 'Mahmoud', 'Al-Khateeb', 'mahmoud.khateeb@example.com', '$2y$10$9Ijuo07.AxqGUS8pDpxXZ.w/lGwRKhvbDZcMe8M3aUAdOZ4VvVk.m', NULL, 'Male', 'Mahmoud here! Passionate about programming and data analysis. I’m always discovering new spots to work, relax, and explore. On the lookout for hidden gems that spark creativity and offer a peaceful atmosphere.', 'Amman, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
-(8, 'Layla', 'Al-Sabbah', 'layla.alsabbah@example.com', '$2y$10$M8JN.cvcL47NcR4fiq4WpuVOBicKM2zAvcMosEdzadBEX3hzKz0ma', 'assets/images/profiles/w(3).jpg', 'Female', 'Hi, I’m Layla! As a civil engineering student, I seek quiet spots where I can focus. When I’m not studying, I love exploring new places and discovering unique spots in the city.', 'Karak, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
-(9, 'Imad', 'Issa', 'imad.issa@example.com', '$2y$10$fH8Sw3rRwqe7pL9yi.WmROZvp/GPphyntNlx3kkA5qyzA9fyBAsuS', 'assets/images/profiles/m(3).jpg', 'Male', 'Imad here! I work in digital marketing and love exploring new places with a strong online presence. Whether it’s a café with great Wi-Fi or a tech hub, I’m always excited to discover new spots that help me grow in my career.', 'Irbid, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
-(10, 'Huda', 'Al-hayck', 'huda.almajali@example.com', '$2y$10$ZTFmqlbBKKM.D6Sp8emsoeF49vFnYUjUiOeyiOtAtOjbueCU1R5xa', 'assets/images/profiles/68050b9dadb4d.jpg', 'Female', 'Hey, I’m Huda! Art and music are my passions. I love exploring places with a creative vibe—whether it’s an art gallery or a café with live music. Always looking for inspiration! and i hate how ppl look like from close .', '55 downtown, amman', 'Guest', '2025-03-15 09:24:35', 'private'),
-(11, 'Tarek', 'Al-Maghribi', 'tarek.almaghroubi@example.com', '$2y$10$Zqyx7C46.IUP08ixctQ0velvdbYDYpgUR/6qwnvOrY9zucgUJeTVS', NULL, 'Male', 'I’m Tarek! A web developer who enjoys exploring new techniques and trends. When I’m not working on projects, I love finding spots to grab a coffee, work on code, or relax.', 'Amman, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
-(12, 'Shrouq', 'Al-Hamd', 'shrouq.alhamd@example.com', '$2y$10$cIFefbB1JV5Gc65aFUj4IeKWLCz3B5eevbyb3QUZoctt8rUeXoiOG', NULL, NULL, 'Hey, I’m Shrouq! As an engineering student, I’m always on the hunt for places to study and explore. Whether it’s a quiet library or a cozy café, I’m looking for the perfect environment to enhance my learning.', NULL, 'Guest', '2025-03-15 09:24:35', 'public'),
-(13, 'Bassam', 'Al-Zghoul', 'bassam.alzghoul@example.com', '$2y$10$ymRNsLk08nqrV7asVhvVbeNePZ6.X/YT3ZAAkZrv5oSin3pmZ7T9C', 'assets/images/profiles/m(4).jpg', 'Male', 'I’m Bassam! I’m passionate about programming and artificial intelligence, and I enjoy visiting tech hubs and innovative spaces. I love discovering places where I can both learn and relax at the same time.', 'Mafraq, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
-(14, 'Mona', 'Al-Taha', 'mona.althaha@example.com', '$2y$10$CJefyyne6aT95n8FLPJLrOxD3QjJsJBN/Ut.ALzMBwkB3Xowito16', 'assets/images/profiles/w(4).jpg', 'Female', 'Hi! I’m Mona, passionate about design and technology. I love exploring places that inspire my creativity, whether it’s a design studio or a café with a modern vibe.', 'Salt, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
-(15, 'Khaled', 'Al-Shehadeh', 'khaled.alshehadeh@example.com', '$2y$10$mC9z/KGQjiVL5dJ7r5TKouX3ptnXR1ZJCX2fimHcwdI2m.pf9aIN.', NULL, NULL, 'I’m Khaled! I create digital content and love finding new spaces to fuel my creativity. Whether it’s a trendy café or a digital hub, I’m always excited to discover new spots.', 'Amman, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
-(16, 'Lina', 'Al-Sabbagh', 'lina.alsabbagh@example.com', '$2y$10$CTUKIb7RmEVvWdvaS/Q3.e5QI7VqeqSgs64rZQxM1t2H3UkLsHc1e', NULL, 'Female', 'Lina here! Passionate about project management and photography. I love finding peaceful spots to get inspired, whether it’s a scenic viewpoint or a calm park.', 'Zarqa, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
-(17, 'Faisal', 'Al-Qudah', 'faisal.alqudah@example.com', '$2y$10$mEyOoCsg7ZgEXOchQJ7kI.FVD67L3Xp9OXFEGauVlkY9n.ZSggZwC', 'assets/images/profiles/m(5).jpg', 'Male', 'Hi! I’m Faisal, specializing in mobile app development. I enjoy discovering new spots that help me relax and focus. Whether it’s a coffee shop or a quiet park, I love finding new places to recharge and get creative.', 'Amman, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
-(18, 'Nadine', 'Al-Fayez', 'nadine.alfayez@example.com', '$2y$10$gJg1KWHoy0AgrQKLb3myrOEZZrh/rK.xSGbgDHLtNZa5mAQrAKMv2', NULL, NULL, 'I’m Nadine! A designer who loves modern aesthetics. I enjoy finding new spots with a cool, artistic vibe where I can work or unwind. Always looking for something fresh!', 'Irbid, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
-(19, 'Rami', 'Al-Khalil', 'rami.alkhalil@example.com', '$2y$10$QcDVNUX4VUQ90ZCBDObwP.B00SFvUbYF6rofe5sJPCyJX719cB9Im', 'assets/images/profiles/m(6).jpg', 'Male', 'Rami here! I love web development and learning new frameworks. I visit tech hubs to find creative places to code, work, and unwind. Got any hidden gems? Let me know!', 'Aqaba, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
-(20, 'Dina', 'Al-Tal', 'dina.altar@example.com', '$2y$10$WvXlp6cO.IAZaLMNHiGYWuG8Hpl1forWxTq0UbaK6t.KcMqJdiRGu', 'assets/images/profiles/w(5).jpg', 'Female', 'I’m Dina! As a content creator and digital marketer, I enjoy finding new places that inspire me. Whether it’s a lively tech space or a café with great ambiance, I’m always on the lookout for fresh ideas.', 'Amman, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
-(21, 'Omar', 'Al-Jamal', 'omar.aljamal@example.com', '$2y$10$S4sxX3dKNTBxtXZn62Y61uNenSI.uyw8LATheIbxvLd75RNdt1.0m', 'assets/images/profiles/m(7).jpg', 'Male', 'Hey, I’m Omar! A software engineer who loves solving complex problems. I find peace in quiet spots to code, brainstorm, and unwind. Whether it’s a café or park bench, I’m always looking for creative places to focus.', NULL, 'Guest', '2025-03-15 09:24:35', 'public'),
-(22, 'Salma', 'Al-Hadid', 'salma.alhadid@example.com', '$2y$10$sr8kEGGxLFvKcUtXVlwbGuBy7KbTJy7zb1HaZuw5q4rtQ6C4M5M8C', NULL, NULL, 'I’m Salma! Passionate about the environment and sustainability. I love discovering eco-friendly spots and businesses that align with my values. Whether it’s a green café or a sustainable store, I’m always finding places that make a positive impact.', 'Karak, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
-(23, 'Ziad', 'Al-Najjar', 'ziad.alnajjar@example.com', '$2y$10$EISijJLKXYVkMtuJYzFWtuVMOcJkFbJHH55fKfEksOi65RKedyClK', NULL, 'Male', 'Ziad here! Passionate about sports and technology. I love finding new places to stay active, whether it’s a sports bar or a gym with a great vibe. When I’m not working, I’m usually exploring new spots to enjoy life.', 'Mafraq, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
-(24, 'Nour', 'Al-Razaz', 'nour.alrazaz@example.com', '$2y$10$SF3geSyE9KZiTIjt6dKue.eUm5YuS4n4RM5uNcIjZ4vkMhChX7uqm', 'assets/images/profiles/w(6).jpg', 'Female', 'Hi, I’m Nour! I enjoy learning about new cultures and languages. I love discovering places that reflect the world’s diversity, whether it’s a multicultural café or a cultural center. I’m always looking for fresh experiences.', 'Amman, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
-(25, 'Yara', 'Al-Masri', 'yara.almasri@example.com', '$2y$10$zWRed7H/X/qdkSHknZaKO.T1345yHkiEjberTd1lGq14gHNUcDFBa', 'assets/images/profiles/w(7).jpg', 'Female', 'Yara here! I’m a UX/UI designer who enjoys creative challenges. I love finding places that spark my creativity, whether it’s a design studio or a peaceful park. Always on the lookout for new spots to fuel my passion.', 'Irbid, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
-(26, 'Tariq', 'Al-Qaisi', 'tariq.alqaisi@example.com', '$2y$10$Fj4WlXsdsIZAvgh6IZZ8y./chv41Rzb8E8Wc84MJxofKVWyXIW5Jm', 'assets/images/profiles/m(8).jpg', 'Male', 'I’m Tariq! A web developer who loves exploring new places that are both inspiring and productive. Whether it’s a coffee shop or a quiet corner to code, I’m always looking for the perfect spot to get creative.', 'Amman, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
-(27, 'Maya', 'Al-Rashid', 'maya.alrashid@example.com', '$2y$10$VH2ird3eqp.P402I1wqqUeBYSkLJQ2EgczxF8WjYFVtP2qhfrOZ5a', 'assets/images/profiles/w(8).jpg', 'Female', 'Maya here! Passionate about graphic design and art, I love finding new places to explore my creative side. Whether it’s an art gallery, a museum, or a design studio, I’m always searching for fresh ideas and inspiration.', 'Zarqa, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
-(28, 'Mazen', 'Al-Raqqad', 'mazen.alraqqad@example.com', '$2y$10$oe6OBBx.m.R8tLcmGj9mwufFMaeF30Pkeu2/oHgTs6CM8tz24QBsi', 'assets/images/profiles/m(9).jpg', 'Male', 'Mazen here! Specializing in system architecture and cloud computing, I enjoy finding spots to relax and recharge. Whether it’s a quiet café or a peaceful park, I love discovering places to clear my mind.', NULL, 'Guest', '2025-03-15 09:24:35', 'public'),
+(1, 'Ali', 'feras', 'ali.ghaddad@example.com', '$2y$10$ccRtfDH.R08bAdaX8vHCMeHkKEW.RF2wBHy/X9fh9P8mjPYMZiK52', 'assets/images/profiles/6805134cec41e.jpg', 'Male', 'Hi, I’m Ali! I love discovering great local spots, whether it’s a cozy café, a hidden bookstore, or a restaurant with the best food in town. I enjoy sharing honest reviews to help others find amazing experiences. When I’m not trying new places, I’m usually working on tech-related topics or exploring programming.', 'Amman, Jordan middle town', 'Owner', '2025-03-15 09:24:35', 'private'),
+(2, 'Fatima', 'Al-Abed', 'fatima.alabed@example.com', '$2y$10$OeBoqwucgy370kpRojZSDOzKumpQkfA6bc85O0yWolJQg6p3wvuHm', 'assets/images/profiles/w(1).jpg', 'Female', 'Hi, I’m Fatima! Always on the lookout for new books to read and cool writing spots. I love sharing my thoughts and experiences with others, especially in literary spaces. When I’m not reading, I’m writing or learning more about the world of words!', 'Irbid, Jordan', 'Owner', '2025-03-15 09:24:35', 'public'),
+(3, 'Hassan', 'Ali', 'hassan.ali@example.com', '$2y$10$JkN6S6zL9iT2Hfzfxw58IOJsIxWeHtbBWS9IHA11gRvPIZF2QbiYC', 'assets/images/profiles/m(2).jpg', 'Male', 'Hassan here! Passionate about tech, especially programming. Whether it’s a hidden tech hub or a cozy café where I can work on my next project, I love sharing my experiences with others. Excited to hear any recommendations you may have!', 'Zarqa, Jordan', 'Owner', '2025-03-15 09:24:35', 'public'),
+(4, 'Reem', 'Al-Shami', 'reem.ashami@example.com', '$2y$10$16sUDN80Rz2QBzD3pySA3eZQUu7O8DnQJ7WmMdLZgdNsFeGRxkTuG', 'assets/images/profiles/w(2).jpg', 'Female', 'Hey! I’m Reem, and I’m all about traveling and learning about new cultures. There’s nothing better than exploring new places, trying new foods, and sharing my experiences. Always on the hunt for the next great destination!', 'Amman, Jordan', 'Owner', '2025-03-15 09:24:35', 'public'),
+(5, 'Yousef', 'Najjar', 'yousef.najjar@example.com', '$2y$10$SNVjT2gGZSlZXd5VsdDoluXG/z/V1R8kYW6GgE7CWl3XaNIoHjSfq', NULL, 'Male', 'Hi, I’m Yousef! Passionate about technology and music, I love discovering places that allow me to enjoy both. Whether it’s a café with great Wi-Fi or a cozy bar with live music, I’m always looking for something new and exciting.', NULL, 'Owner', '2025-03-15 09:24:35', 'public'),
+(6, 'sara', 'Al-Hussein', 'sara.hussein@example.com', '$2y$10$LrYSWyze3E/4USJkcxssUOPSabTFTGXvLWSJBFJeCIu1q1H7LU9MC', 'assets/images/profiles/68052c835e4c5.jpg', 'Female', 'I’m Sara! I’m a fan of writing and reading, and I enjoy sharing my thoughts with others. Whether it’s at a quiet bookstore or a bustling café, I love finding places that inspire creativity and help me unwind!', 'Aqaba, Jordan', 'Owner', '2025-03-15 09:24:35', 'public'),
+(7, 'Mahmoud', 'Al-Khateeb', 'mahmoud.khateeb@example.com', '$2y$10$9Ijuo07.AxqGUS8pDpxXZ.w/lGwRKhvbDZcMe8M3aUAdOZ4VvVk.m', NULL, 'Male', 'Mahmoud here! Passionate about programming and data analysis. I’m always discovering new spots to work, relax, and explore. On the lookout for hidden gems that spark creativity and offer a peaceful atmosphere.', 'Amman, Jordan', 'Owner', '2025-03-15 09:24:35', 'public'),
+(8, 'Layla', 'Al-Sabbah', 'layla.alsabbah@example.com', '$2y$10$M8JN.cvcL47NcR4fiq4WpuVOBicKM2zAvcMosEdzadBEX3hzKz0ma', 'assets/images/profiles/w(3).jpg', 'Female', 'Hi, I’m Layla! As a civil engineering student, I seek quiet spots where I can focus. When I’m not studying, I love exploring new places and discovering unique spots in the city.', 'Karak, Jordan', 'Owner', '2025-03-15 09:24:35', 'public'),
+(9, 'Imad', 'Issa', 'imad.issa@example.com', '$2y$10$fH8Sw3rRwqe7pL9yi.WmROZvp/GPphyntNlx3kkA5qyzA9fyBAsuS', 'assets/images/profiles/m(3).jpg', 'Male', 'Imad here! I work in digital marketing and love exploring new places with a strong online presence. Whether it’s a café with great Wi-Fi or a tech hub, I’m always excited to discover new spots that help me grow in my career.', 'Irbid, Jordan', 'Owner', '2025-03-15 09:24:35', 'public'),
+(10, 'Huda', 'Al-hayck', 'huda.almajali@example.com', '$2y$10$ZTFmqlbBKKM.D6Sp8emsoeF49vFnYUjUiOeyiOtAtOjbueCU1R5xa', 'assets/images/profiles/68050b9dadb4d.jpg', 'Female', 'Hey, I’m Huda! Art and music are my passions. I love exploring places with a creative vibe—whether it’s an art gallery or a café with live music. Always looking for inspiration! and i hate how ppl look like from close .', '55 downtown, amman', 'Owner', '2025-03-15 09:24:35', 'private'),
+(11, 'Tarek', 'Al-Maghribi', 'tarek.almaghroubi@example.com', '$2y$10$Zqyx7C46.IUP08ixctQ0velvdbYDYpgUR/6qwnvOrY9zucgUJeTVS', NULL, 'Male', 'I’m Tarek! A web developer who enjoys exploring new techniques and trends. When I’m not working on projects, I love finding spots to grab a coffee, work on code, or relax.', 'Amman, Jordan', 'Owner', '2025-03-15 09:24:35', 'public'),
+(12, 'Shrouq', 'Al-Hamd', 'shrouq.alhamd@example.com', '$2y$10$cIFefbB1JV5Gc65aFUj4IeKWLCz3B5eevbyb3QUZoctt8rUeXoiOG', NULL, NULL, 'Hey, I’m Shrouq! As an engineering student, I’m always on the hunt for places to study and explore. Whether it’s a quiet library or a cozy café, I’m looking for the perfect environment to enhance my learning.', NULL, 'Owner', '2025-03-15 09:24:35', 'public'),
+(13, 'Bassam', 'Al-Zghoul', 'bassam.alzghoul@example.com', '$2y$10$ymRNsLk08nqrV7asVhvVbeNePZ6.X/YT3ZAAkZrv5oSin3pmZ7T9C', 'assets/images/profiles/m(4).jpg', 'Male', 'I’m Bassam! I’m passionate about programming and artificial intelligence, and I enjoy visiting tech hubs and innovative spaces. I love discovering places where I can both learn and relax at the same time.', 'Mafraq, Jordan', 'Owner', '2025-03-15 09:24:35', 'public'),
+(14, 'Mona', 'Al-Taha', 'mona.althaha@example.com', '$2y$10$CJefyyne6aT95n8FLPJLrOxD3QjJsJBN/Ut.ALzMBwkB3Xowito16', 'assets/images/profiles/w(4).jpg', 'Female', 'Hi! I’m Mona, passionate about design and technology. I love exploring places that inspire my creativity, whether it’s a design studio or a café with a modern vibe.', 'Salt, Jordan', 'Owner', '2025-03-15 09:24:35', 'public'),
+(15, 'Khaled', 'Al-Shehadeh', 'khaled.alshehadeh@example.com', '$2y$10$mC9z/KGQjiVL5dJ7r5TKouX3ptnXR1ZJCX2fimHcwdI2m.pf9aIN.', NULL, NULL, 'I’m Khaled! I create digital content and love finding new spaces to fuel my creativity. Whether it’s a trendy café or a digital hub, I’m always excited to discover new spots.', 'Amman, Jordan', 'Owner', '2025-03-15 09:24:35', 'public'),
+(16, 'Lina', 'Al-Sabbagh', 'lina.alsabbagh@example.com', '$2y$10$CTUKIb7RmEVvWdvaS/Q3.e5QI7VqeqSgs64rZQxM1t2H3UkLsHc1e', NULL, 'Female', 'Lina here! Passionate about project management and photography. I love finding peaceful spots to get inspired, whether it’s a scenic viewpoint or a calm park.', 'Zarqa, Jordan', 'Owner', '2025-03-15 09:24:35', 'public'),
+(17, 'Faisal', 'Al-Qudah', 'faisal.alqudah@example.com', '$2y$10$mEyOoCsg7ZgEXOchQJ7kI.FVD67L3Xp9OXFEGauVlkY9n.ZSggZwC', 'assets/images/profiles/m(5).jpg', 'Male', 'Hi! I’m Faisal, specializing in mobile app development. I enjoy discovering new spots that help me relax and focus. Whether it’s a coffee shop or a quiet park, I love finding new places to recharge and get creative.', 'Amman, Jordan', 'Owner', '2025-03-15 09:24:35', 'public'),
+(18, 'Nadine', 'Al-Fayez', 'nadine.alfayez@example.com', '$2y$10$gJg1KWHoy0AgrQKLb3myrOEZZrh/rK.xSGbgDHLtNZa5mAQrAKMv2', NULL, NULL, 'I’m Nadine! A designer who loves modern aesthetics. I enjoy finding new spots with a cool, artistic vibe where I can work or unwind. Always looking for something fresh!', 'Irbid, Jordan', 'Owner', '2025-03-15 09:24:35', 'public'),
+(19, 'Rami', 'Al-Khalil', 'rami.alkhalil@example.com', '$2y$10$QcDVNUX4VUQ90ZCBDObwP.B00SFvUbYF6rofe5sJPCyJX719cB9Im', 'assets/images/profiles/m(6).jpg', 'Male', 'Rami here! I love web development and learning new frameworks. I visit tech hubs to find creative places to code, work, and unwind. Got any hidden gems? Let me know!', 'Aqaba, Jordan', 'Owner', '2025-03-15 09:24:35', 'public'),
+(20, 'Dina', 'Al-Tal', 'dina.altar@example.com', '$2y$10$WvXlp6cO.IAZaLMNHiGYWuG8Hpl1forWxTq0UbaK6t.KcMqJdiRGu', 'assets/images/profiles/w(5).jpg', 'Female', 'I’m Dina! As a content creator and digital marketer, I enjoy finding new places that inspire me. Whether it’s a lively tech space or a café with great ambiance, I’m always on the lookout for fresh ideas.', 'Amman, Jordan', 'Owner', '2025-03-15 09:24:35', 'public'),
+(21, 'Omar', 'Al-Jamal', 'omar.aljamal@example.com', '$2y$10$S4sxX3dKNTBxtXZn62Y61uNenSI.uyw8LATheIbxvLd75RNdt1.0m', 'assets/images/profiles/m(7).jpg', 'Male', 'Hey, I’m Omar! A software engineer who loves solving complex problems. I find peace in quiet spots to code, brainstorm, and unwind. Whether it’s a café or park bench, I’m always looking for creative places to focus.', NULL, 'Owner', '2025-03-15 09:24:35', 'public'),
+(22, 'Salma', 'Al-Hadid', 'salma.alhadid@example.com', '$2y$10$sr8kEGGxLFvKcUtXVlwbGuBy7KbTJy7zb1HaZuw5q4rtQ6C4M5M8C', NULL, NULL, 'I’m Salma! Passionate about the environment and sustainability. I love discovering eco-friendly spots and businesses that align with my values. Whether it’s a green café or a sustainable store, I’m always finding places that make a positive impact.', 'Karak, Jordan', 'Owner', '2025-03-15 09:24:35', 'public'),
+(23, 'Ziad', 'Al-Najjar', 'ziad.alnajjar@example.com', '$2y$10$EISijJLKXYVkMtuJYzFWtuVMOcJkFbJHH55fKfEksOi65RKedyClK', NULL, 'Male', 'Ziad here! Passionate about sports and technology. I love finding new places to stay active, whether it’s a sports bar or a gym with a great vibe. When I’m not working, I’m usually exploring new spots to enjoy life.', 'Mafraq, Jordan', 'Owner', '2025-03-15 09:24:35', 'public'),
+(24, 'Nour', 'Al-Razaz', 'nour.alrazaz@example.com', '$2y$10$SF3geSyE9KZiTIjt6dKue.eUm5YuS4n4RM5uNcIjZ4vkMhChX7uqm', 'assets/images/profiles/w(6).jpg', 'Female', 'Hi, I’m Nour! I enjoy learning about new cultures and languages. I love discovering places that reflect the world’s diversity, whether it’s a multicultural café or a cultural center. I’m always looking for fresh experiences.', 'Amman, Jordan', 'Owner', '2025-03-15 09:24:35', 'public'),
+(25, 'Yara', 'Al-Masri', 'yara.almasri@example.com', '$2y$10$zWRed7H/X/qdkSHknZaKO.T1345yHkiEjberTd1lGq14gHNUcDFBa', 'assets/images/profiles/w(7).jpg', 'Female', 'Yara here! I’m a UX/UI designer who enjoys creative challenges. I love finding places that spark my creativity, whether it’s a design studio or a peaceful park. Always on the lookout for new spots to fuel my passion.', 'Irbid, Jordan', 'Owner', '2025-03-15 09:24:35', 'public'),
+(26, 'Tariq', 'Al-Qaisi', 'tariq.alqaisi@example.com', '$2y$10$Fj4WlXsdsIZAvgh6IZZ8y./chv41Rzb8E8Wc84MJxofKVWyXIW5Jm', 'assets/images/profiles/m(8).jpg', 'Male', 'I’m Tariq! A web developer who loves exploring new places that are both inspiring and productive. Whether it’s a coffee shop or a quiet corner to code, I’m always looking for the perfect spot to get creative.', 'Amman, Jordan', 'Owner', '2025-03-15 09:24:35', 'public'),
+(27, 'Maya', 'Al-Rashid', 'maya.alrashid@example.com', '$2y$10$VH2ird3eqp.P402I1wqqUeBYSkLJQ2EgczxF8WjYFVtP2qhfrOZ5a', 'assets/images/profiles/w(8).jpg', 'Female', 'Maya here! Passionate about graphic design and art, I love finding new places to explore my creative side. Whether it’s an art gallery, a museum, or a design studio, I’m always searching for fresh ideas and inspiration.', 'Zarqa, Jordan', 'Owner', '2025-03-15 09:24:35', 'public'),
+(28, 'Mazen', 'Al-Raqqad', 'mazen.alraqqad@example.com', '$2y$10$oe6OBBx.m.R8tLcmGj9mwufFMaeF30Pkeu2/oHgTs6CM8tz24QBsi', 'assets/images/profiles/m(9).jpg', 'Male', 'Mazen here! Specializing in system architecture and cloud computing, I enjoy finding spots to relax and recharge. Whether it’s a quiet café or a peaceful park, I love discovering places to clear my mind.', NULL, 'Owner', '2025-03-15 09:24:35', 'public'),
 (29, 'Jana', 'Al-Majali', 'jana.almajali@example.com', '$2y$10$/9P3S9k7TFLOFCHZLAjBheOPx3ABhNnARcep2y1USrHcEDKKRjBrO', 'assets/images/profiles/w(9).jpg', 'Female', 'Jana here! Studying economics and interested in data analysis. I love finding quiet places where I can study and work, whether it’s a library or a café with good Wi-Fi.', 'Amman, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
-(30, 'Bashir', 'Al-Sharif', 'bashir.alsharif@example.com', '$2y$10$TRAStttnsH02NdodloSEJespf9CCuQ/0CZntKxmnWaE2n25oKpWgq', 'assets/images/profiles/m(10).jpg', 'Male', 'I’m Bashir! A software engineer who loves solving complex problems. I enjoy visiting tech hubs and finding places that challenge my mind. Know any cool spots to work or unwind? Let me know!', 'Irbid, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
+(30, 'Bashir', 'Al-Sharif', 'bashir.alsharif@example.com', '$2y$10$TRAStttnsH02NdodloSEJespf9CCuQ/0CZntKxmnWaE2n25oKpWgq', 'assets/images/profiles/m(10).jpg', 'Male', 'I’m Bashir! A software engineer who loves solving complex problems. I enjoy visiting tech hubs and finding places that challenge my mind. Know any cool spots to work or unwind? Let me know!', 'Irbid, Jordan', 'Owner', '2025-03-15 09:24:35', 'public'),
 (31, 'Sana', 'Al-Mawajda', 'sana.almowajda@example.com', '$2y$10$8Q/0bJFcxcc2dEL./s55ouK4Rc4axhc28F.7xcR2b6gjCcL5Fhr1e', 'assets/images/profiles/w(10).jpg', 'Female', 'Hi, I’m Sana! I enjoy writing and digital marketing, always exploring new ways to connect with people online. When I’m not working, I’m brainstorming creative marketing ideas. If you’re into writing or marketing, let’s connect!', 'Mafraq, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
-(32, 'Zain', 'Al-Hamdan', 'zain.alhamdan@example.com', '$2y$10$03S9ykbEoFIU9WVCYcVNG.niioRYMcWmdMDHn3F8GGEX8YCP8.r2y', NULL, 'Male', 'Hi, I’m Zain! I love creating innovative tech solutions, always focused on building something new and impactful. When I’m not developing, I’m researching the latest advancements in tech. If you love innovation, let’s chat!', 'Amman, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
+(32, 'Zain', 'Al-Hamdan', 'zain.alhamdan@example.com', '$2y$10$03S9ykbEoFIU9WVCYcVNG.niioRYMcWmdMDHn3F8GGEX8YCP8.r2y', NULL, 'Male', 'Hi, I’m Zain! I love creating innovative tech solutions, always focused on building something new and impactful. When I’m not developing, I’m researching the latest advancements in tech. If you love innovation, let’s chat!', 'Amman, Jordan', 'Owner', '2025-03-15 09:24:35', 'public'),
 (33, 'Rania', 'Al-Jabari', 'rania.aljabari@example.com', '$2y$10$LJJi45SjrdHO0rDbM8otWeFKsGtFu61ruFgYIBZ25ktNdEh1Gyyv6', NULL, 'Female', 'Hi, I’m Rania! I’m passionate about education and technology, always looking for ways to combine these two fields. When I’m not learning, I’m teaching others and sharing my knowledge. Let’s connect if you share these interests!', 'Karak, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
 (57, 'omarss', 'shilbaya', 'omarkisng00013@gmail.com', '$2y$10$QieKpMuLjsaI2kCuRA0IOOGvMezC7YPPIsGTkw3KycoS3JW5bv6JK', NULL, NULL, NULL, NULL, 'Guest', '2025-04-10 07:49:57', 'public'),
 (58, 'omarsadsda', 'shilbaya', 'ali.dasdaghaddad@example.com', '$2y$10$W2P2ippscq0DIEGoQ2R6muOW.YkMW84DpPwmEh6Mon6rcZh5zgQHe', NULL, NULL, NULL, NULL, 'Guest', '2025-04-10 08:09:50', 'public'),
@@ -2169,7 +2198,8 @@ INSERT INTO `users` (`id`, `first_name`, `last_name`, `email`, `password`, `prof
 (74, 'omaracadsa', 'shilbaya', 'w@ssddagmail.com', '$2y$10$wpt.xldbbNR//4xIswxY6.yQaAxSm7jUwwbE4Cngma0NndnFDdgaG', NULL, NULL, NULL, NULL, 'Guest', '2025-04-12 10:36:30', 'public'),
 (75, 'omarsasd', 'shilbaya', 'ali.aaghaddad@example.com', '$2y$10$qeFesNjC8eaF18ttHH26u.SXS/CbhQhyBX.zK9O1PSq3U44Hh4p6W', NULL, NULL, NULL, NULL, 'Guest', '2025-04-12 10:42:24', 'public'),
 (76, 'omar', 'shilbaya', 'wm@gmail.com', '$2y$10$tZuKQjiQrZApU5urtlucaeOttRnHFuSrrrZuBZpUFmaqQystEHbwi', NULL, NULL, NULL, NULL, 'Guest', '2025-04-12 19:29:55', 'public'),
-(77, 'omarcxs', 'shilbaya', 'wcxs@gmail.com', '$2y$10$DEKRhSt3T827OIuI54vk/OdbLYmT79ko9yrds6vZhDh8vRpw3zGH6', 'assets/images/profiles/6810d619d1235.jpg', 'Male', 'i the king of this gungale', 'Downtown habeba sa', 'Guest', '2025-04-29 13:35:58', 'public');
+(77, 'omarcxs', 'shilbaya', 'wcxs@gmail.com', '$2y$10$DEKRhSt3T827OIuI54vk/OdbLYmT79ko9yrds6vZhDh8vRpw3zGH6', 'assets/images/profiles/6810d619d1235.jpg', 'Male', 'i the king of this gungale', 'Downtown habeba sa', 'Guest', '2025-04-29 13:35:58', 'public'),
+(78, 'omar', 'shilbaya', 'ali.ghaddaad@example.com', '$2y$10$ahJhiz0u6GwqOlqHWMqT5.zrwLgI.UYIyEBsQ7V38jqDEMvbuRC0e', NULL, NULL, NULL, NULL, 'Guest', '2025-05-14 16:25:58', 'public');
 
 --
 -- Indexes for dumped tables
@@ -2271,73 +2301,73 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `blogs`
 --
 ALTER TABLE `blogs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `faqs`
 --
 ALTER TABLE `faqs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=113;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=123;
 
 --
 -- AUTO_INCREMENT for table `menu_items`
 --
 ALTER TABLE `menu_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=79;
 
 --
 -- AUTO_INCREMENT for table `opening_hours`
 --
 ALTER TABLE `opening_hours`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1304;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1773;
 
 --
 -- AUTO_INCREMENT for table `places`
 --
 ALTER TABLE `places`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=166;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=179;
 
 --
 -- AUTO_INCREMENT for table `place_gallery`
 --
 ALTER TABLE `place_gallery`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=777;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=861;
 
 --
 -- AUTO_INCREMENT for table `reviews`
 --
 ALTER TABLE `reviews`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=424;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=427;
 
 --
 -- AUTO_INCREMENT for table `review_comments`
 --
 ALTER TABLE `review_comments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT for table `review_images`
 --
 ALTER TABLE `review_images`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=306;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=309;
 
 --
 -- AUTO_INCREMENT for table `review_likes`
 --
 ALTER TABLE `review_likes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=242;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=250;
 
 --
 -- AUTO_INCREMENT for table `saved_places`
 --
 ALTER TABLE `saved_places`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=173;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=182;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=78;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=87;
 
 --
 -- Constraints for dumped tables
