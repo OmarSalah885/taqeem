@@ -135,6 +135,7 @@ include 'header.php';
 <?php while ($user = $users->fetch_assoc()): ?>
                 <tr>
                     <td><?php echo $user['id']; ?></td>
+                    
                     <td>
                         <img
                             src="<?php echo htmlspecialchars($user['profile_image'] ?: 'assets/images/profiles/pro_null.png'); ?>"
@@ -163,6 +164,7 @@ include 'header.php';
                     </td>
                 </tr>
 <?php endwhile; ?>
+
             </tbody>
         </table>
     </div>

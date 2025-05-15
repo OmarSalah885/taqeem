@@ -3,73 +3,123 @@ require_once 'config.php';
 require_once 'db_connect.php';
 session_start();
 
-header('Content-Type: application/json');
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $review_id = $_POST['review_id'];
-
-    // Ensure the user is logged in
-    if (!isset($_SESSION['user_id'])) {
-        echo json_encode(['success' => false, 'error' => 'Not logged in']);
-        exit;
-    }
-
-    $user_id = $_SESSION['user_id'];
-
-    // Verify that the review belongs to the logged-in user
-    $stmt_check_owner = $conn->prepare("SELECT user_id FROM reviews WHERE id = ?");
-    $stmt_check_owner->bind_param("i", $review_id);
-    $stmt_check_owner->execute();
-    $stmt_check_owner->bind_result($owner_id);
-    $stmt_check_owner->fetch();
-    $stmt_check_owner->close();
-
-    if ($owner_id !== $user_id) {
-        echo json_encode(['success' => false, 'error' => 'Unauthorized deletion']);
-        exit;
-    }
-
-    // Get image paths
-    $stmt_images = $conn->prepare("SELECT image_url FROM review_images WHERE review_id = ?");
-    $stmt_images->bind_param("i", $review_id);
-    $stmt_images->execute();
-    $images_result = $stmt_images->get_result();
-    $image_paths = [];
-    while ($row = $images_result->fetch_assoc()) {
-        $image_paths[] = $row['image_url'];
-    }
-    $stmt_images->close();
-
-    // Delete files from server
-    foreach ($image_paths as $img_path) {
-        if (file_exists($img_path)) {
-            unlink($img_path);
+// Helper: delete files safely
+function deleteFiles(array $paths) {
+    foreach ($paths as $p) {
+        $full = __DIR__ . '/' . ltrim($p, '/');
+        if (file_exists($full)) {
+            @unlink($full);
         }
     }
-
-    // Delete from related tables
-    $conn->begin_transaction();
-
-    try {
-        $stmt_delete_images = $conn->prepare("DELETE FROM review_images WHERE review_id = ?");
-        $stmt_delete_images->bind_param("i", $review_id);
-        $stmt_delete_images->execute();
-        $stmt_delete_images->close();
-
-        $stmt_delete_comments = $conn->prepare("DELETE FROM review_comments WHERE review_id = ?");
-        $stmt_delete_comments->bind_param("i", $review_id);
-        $stmt_delete_comments->execute();
-        $stmt_delete_comments->close();
-
-        $stmt_delete_review = $conn->prepare("DELETE FROM reviews WHERE id = ?");
-        $stmt_delete_review->bind_param("i", $review_id);
-        $stmt_delete_review->execute();
-        $stmt_delete_review->close();
-
-        $conn->commit();
-        echo json_encode(['success' => true]);
-    } catch (Exception $e) {
-        $conn->rollback();
-        echo json_encode(['success' => false, 'error' => 'Deletion failed']);
-    }
 }
+
+// Determine review ID and mode
+$isAdmin = isset($_SESSION['role']) && strtolower($_SESSION['role']) === 'admin';
+$userId  = $_SESSION['user_id'] ?? null;
+
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && $isAdmin && isset($_GET['id'])) {
+    // Admin path: delete via GET?id=…
+    $reviewId = (int)$_GET['id'];
+    $jsonMode = false;
+}
+elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['review_id'])) {
+    // Owner or admin via POST
+    $reviewId = (int)$_POST['review_id'];
+    $jsonMode = true;
+}
+else {
+    // Invalid access
+    if (php_sapi_name() === 'cli' || headers_sent()) {
+        exit('Access denied');
+    }
+    header($_SERVER['SERVER_PROTOCOL'] . ' 403 Forbidden');
+    exit('Access denied');
+}
+
+// Fetch review owner
+$stmt = $conn->prepare("SELECT user_id FROM reviews WHERE id = ?");
+$stmt->bind_param("i", $reviewId);
+$stmt->execute();
+$stmt->bind_result($ownerId);
+if (!$stmt->fetch()) {
+    $stmt->close();
+    if ($jsonMode) {
+        header('Content-Type: application/json');
+        echo json_encode(['success'=>false,'error'=>'Review not found']);
+    } else {
+        header('Location: admin_reviews.php?error=notfound');
+    }
+    exit;
+}
+$stmt->close();
+
+// Authorization: admin can delete any, owner only their own
+if (!$isAdmin && $ownerId !== $userId) {
+    if ($jsonMode) {
+        header('Content-Type: application/json');
+        echo json_encode(['success'=>false,'error'=>'Unauthorized']);
+    } else {
+        header('Location: admin_reviews.php?error=unauthorized');
+    }
+    exit;
+}
+
+// 1) Gather image URLs
+$images = [];
+$stmt = $conn->prepare("
+    SELECT image_url
+      FROM review_images
+     WHERE review_id = ?
+");
+$stmt->bind_param("i", $reviewId);
+$stmt->execute();
+$res = $stmt->get_result();
+while ($row = $res->fetch_assoc()) {
+    $images[] = $row['image_url'];
+}
+$stmt->close();
+
+// 2) Delete from DB inside transaction
+$conn->begin_transaction();
+try {
+    // review_images
+    $d1 = $conn->prepare("DELETE FROM review_images WHERE review_id = ?");
+    $d1->bind_param("i", $reviewId);
+    $d1->execute();
+    $d1->close();
+
+    // review_comments (if exists)
+    $d2 = $conn->prepare("DELETE FROM review_comments WHERE review_id = ?");
+    $d2->bind_param("i", $reviewId);
+    $d2->execute();
+    $d2->close();
+
+    // reviews
+    $d3 = $conn->prepare("DELETE FROM reviews WHERE id = ?");
+    $d3->bind_param("i", $reviewId);
+    $d3->execute();
+    $d3->close();
+
+    $conn->commit();
+} catch (Exception $e) {
+    $conn->rollback();
+    if ($jsonMode) {
+        header('Content-Type: application/json');
+        echo json_encode(['success'=>false,'error'=>'DB error']);
+    } else {
+        header('Location: admin_reviews.php?error=db');
+    }
+    exit;
+}
+
+// 3) Delete image files
+deleteFiles($images);
+
+// 4) Respond or redirect
+if ($jsonMode) {
+    header('Content-Type: application/json');
+    echo json_encode(['success'=>true]);
+} else {
+    header('Location: admin_reviews.php?msg=deleted');
+}
+exit;

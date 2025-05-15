@@ -719,6 +719,23 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+document.addEventListener('DOMContentLoaded', () => {
+  // 1) read ?review_id= from URL
+  const params = new URLSearchParams(window.location.search);
+  const rid    = params.get('review_id');
+
+  if (rid) {
+    // 2) scroll into view (you already do this for hash, but ensure it)
+    const el = document.getElementById(`review_${rid}`);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+
+    // 3) open the inline edit form
+    // (you already have a showEditForm(id) helper)
+    if (typeof showEditForm === 'function') {
+      showEditForm(rid);
+    }
+  }
+});
 
 
 

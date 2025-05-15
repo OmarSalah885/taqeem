@@ -4,21 +4,113 @@ require_once 'db_connect.php';
 session_start();
 
 include 'header.php';
+
+$success = '';
+$error = '';
+
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $title   = trim($_POST['title'] ?? '');
+    $tags    = trim($_POST['tags'] ?? '');
+    $content = trim($_POST['code'] ?? '');
+
+    // Basic validation
+    if (empty($title) || empty($content)) {
+        $error = 'Title and content are required.';
+    } else {
+        // Normalize folder name
+        function normalizeFolderName($name) {
+            return strtolower(trim(preg_replace('/[^a-zA-Z0-9]+/', '_', $name)));
+        }
+
+        $folder_name = normalizeFolderName($title);
+        $base_folder = __DIR__ . "/assets/images/blogs/$folder_name";
+
+        if (!is_dir($base_folder)) {
+            mkdir($base_folder, 0755, true);
+        }
+
+        // Handle image upload
+        $image_path = null;
+        if (!empty($_FILES['image']['name'])) {
+            $allowed = ['jpg', 'jpeg', 'png', 'webp'];
+            $ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
+
+            if (in_array($ext, $allowed)) {
+                $image_name = uniqid('blog_', true) . '.' . $ext;
+                $target_path = "$base_folder/$image_name";
+
+                if (move_uploaded_file($_FILES['image']['tmp_name'], $target_path)) {
+                    // Store relative path
+                    $image_path = "assets/images/blogs/$folder_name/$image_name";
+                } else {
+                    $error = 'Failed to upload image.';
+                }
+            } else {
+                $error = 'Invalid image type.';
+            }
+        }
+
+        
+// … your existing code above …
+
+if (empty($error)) {
+    // Check if title already exists
+    $check = $conn->prepare("SELECT COUNT(*) FROM blogs WHERE title = ?");
+    $check->bind_param("s", $title);
+    $check->execute();
+    $check->bind_result($count);
+    $check->fetch();
+    $check->close();
+
+    if ($count > 0) {
+        $error = 'A blog with this exact title already exists. Please choose a unique title.';
+    } else {
+        // Insert blog into DB
+        $stmt = $conn->prepare("INSERT INTO blogs (title, image, tags, content) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("ssss", $title, $image_path, $tags, $content);
+        if ($stmt->execute()) {
+            // On success: grab new id and redirect
+            $newId = $stmt->insert_id;
+            $stmt->close();
+            header("Location: single_blog.php?blog_id=" . $newId);
+            exit;
+        } else {
+            $error = 'Failed to add blog.';
+            $stmt->close();
+        }
+    }
+}
+
+
+}}
 ?>
 
 <main class="add_blog-container">
-    <form action="">
-        <input type="text" placeholder="BLOG TITLE" required class="input">
-        <div class="add_blog-img">
-            <img src="assets/images/blogimg (2).jpg" alt="">
-            <h2>NO IMAGE WAS ADDED</h2>
-            <a href="#">X</a>
+    
+
+    <form action="add-blog.php" method="POST" enctype="multipart/form-data">
+        <?php if ($success): ?>
+        <div class="success-message"><?= htmlspecialchars($success) ?></div>
+    <?php elseif ($error): ?>
+        <div class="error-message"><?= htmlspecialchars($error) ?></div>
+    <?php endif; ?>
+        <input type="text" name="title" placeholder="BLOG TITLE" required class="input">
+
+        <!-- Static Preview Container with "No Image" Text -->
+        <div class="add_blog-img" id="image-container">
+            <img id="preview-img" src="" alt="">
+            <h2 id="no-image-text">NO IMAGE WAS ADDED</h2>
+            <a href="#" id="remove-image-btn" onclick="clearImage(); return false;" style="display:none;">X</a>
         </div>
+
         <label class="custom-file-upload">
-            <input type="file" id="image" name="image" class="img_input" />
+            <input type="file" id="image" name="image" class="img_input" accept="image/*" onchange="previewImage(event)">
             ADD BLOG IMAGE
         </label>
-        <input type="text" placeholder="BLOG TAGS" required class="input">
+
+        <input type="text" name="tags" placeholder="BLOG TAGS (comma separated)" required class="input">
+
         <div class="add_blog-f">
             <h3>Please write your blog code in this format:</h3>
             <p>
@@ -40,16 +132,39 @@ include 'header.php';
                 &lt;/div&gt;
             </p>
         </div>
+
         <textarea id="code" name="code">// write your blog code here</textarea>
         <button class="btn__red--l btn__red btn">ADD BLOG</button>
     </form>
 </main>
+
 <script>
-const editor = CodeMirror.fromTextArea(document.getElementById("code"), {
-    lineNumbers: true,
-    mode: "htmlmixed",
-    theme: "3024-day",
-    tabSize: 2
-});
+    const editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+        lineNumbers: true,
+        mode: "htmlmixed",
+        theme: "3024-day",
+        tabSize: 2
+    });
+
+    function previewImage(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('preview-img').src = e.target.result;
+            document.getElementById('no-image-text').style.display = 'none';
+            document.getElementById('remove-image-btn').style.display = 'inline';
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function clearImage() {
+        document.getElementById('image').value = '';
+        document.getElementById('preview-img').src = '';
+        document.getElementById('no-image-text').style.display = 'block';
+        document.getElementById('remove-image-btn').style.display = 'none';
+    }
 </script>
+
 <?php include 'footer.php'; ?>
