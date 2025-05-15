@@ -5,7 +5,7 @@ session_start();
 
 include 'header.php';
 ?>
-<main>
+<main class="admin_main">
     <h1>Blog Management</h1>
 
     <div class="search-container">

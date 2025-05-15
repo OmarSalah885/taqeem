@@ -5,7 +5,7 @@ session_start();
 
 include 'header.php';
 ?>
-<main class="profile">
+<main class="profile admin_main">
     <div class="profile_sidebar">
         <div class="profile_sidebar--img">
             <img src="assets/images/user.jpg" alt="#">

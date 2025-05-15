@@ -5,7 +5,7 @@ session_start();
 
 include 'header.php';
 ?>
-<main class="users">
+<main class="users admin_main">
     <h1>User Management</h1>
 
     <div class="search-container">

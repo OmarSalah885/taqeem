@@ -4411,6 +4411,10 @@ body p {
   background-color: #EA2F2F;
 }
 
+.admin_main {
+  min-height: 100vh;
+}
+
 .admin_card {
   width: 100%;
   height: 30rem;
