@@ -108,7 +108,8 @@ include 'header.php';
             <label for="profileInput" class="profile_sidebar--edit-btn" style="cursor:pointer;">
                 <i class="fa-solid fa-user"></i>Add photo
             </label>
-        </div>
+        </div>    
+        <a href="delete_account.php" class="btn__transparent--l btn__transparent btn" onclick="return confirm('Are you SURE you want to delete your account? This cannot be undone.');">DELETE ACCOUNT</a>
         <a href="logout.php" class="btn__transparent--l btn__transparent btn">LOGOUT</a>
         <?php endif; ?>
     </div>
