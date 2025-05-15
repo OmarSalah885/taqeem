@@ -51,6 +51,29 @@
                 left: 50%;
                 transform: translate(-50%, -50%);
             }
+
+            a {
+                position: absolute;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                color: $red-00;
+                font-size: $F-M;
+                text-decoration: none;
+                top: -1rem;
+                right: -1rem;
+                width: 4.8rem;
+                height: 4.8rem;
+                background-color: $red-500;
+                z-index: 1000;
+                border-radius: 50%;
+                transition: all .3s;
+
+                &:hover {
+                    font-weight: 600;
+                    background-color: $red-700;
+                }
+            }
         }
 
         .add_blog-f {

@@ -4356,6 +4356,27 @@ body p {
   left: 50%;
   transform: translate(-50%, -50%);
 }
+.add_blog-container form .add_blog-img a {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #FDE8E8;
+  font-size: 1.872rem;
+  text-decoration: none;
+  top: -1rem;
+  right: -1rem;
+  width: 4.8rem;
+  height: 4.8rem;
+  background-color: #D01515;
+  z-index: 1000;
+  border-radius: 50%;
+  transition: all 0.3s;
+}
+.add_blog-container form .add_blog-img a:hover {
+  font-weight: 600;
+  background-color: #740C0C;
+}
 .add_blog-container form .add_blog-f {
   margin-bottom: 3.6rem;
 }

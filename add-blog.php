@@ -12,6 +12,7 @@ include 'header.php';
         <div class="add_blog-img">
             <img src="assets/images/blogimg (2).jpg" alt="">
             <h2>NO IMAGE WAS ADDED</h2>
+            <a href="#">X</a>
         </div>
         <label class="custom-file-upload">
             <input type="file" id="image" name="image" class="img_input" />
