@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    include 'db_connect.php'; // Include database connection
+    
 
     // Check if the email exists
     $stmt = $conn->prepare("SELECT id, first_name, last_name, email, password, role, profile_image FROM users WHERE email = ?");
@@ -50,13 +50,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['email'] = $user['email'];
             $_SESSION['role'] = $user['role'];
 
-            // Set profile image in session, use default if not available
             $_SESSION['profile_image'] = !empty($user['profile_image']) ? $user['profile_image'] : 'assets/images/profiles/pro_null.png';
 
-            unset($_SESSION['login_errors']);
-            unset($_SESSION['login_data']);
-            header("Location: $redirect_url");
-            exit;
+// Clear temporary login form data
+unset($_SESSION['login_errors']);
+unset($_SESSION['login_data']);
+
+// ✅ Redirect based on role
+if (isset($user['role']) && trim(strtolower($user['role'])) === 'admin') {
+
+    header("Location: admin.php");
+} else {
+    header("Location: $redirect_url"); // or "index.php"
+}
+exit;
+
+
         } else {
             // Password is incorrect
             $_SESSION['login_errors']['password'] = 'Invalid password.';
@@ -68,12 +77,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Email not found
         $_SESSION['login_errors']['email'] = 'No account found with that email.';
         $_SESSION['login_data'] = $_POST;
+        $stmt->close();
+        $conn->close();
         header("Location: $redirect_url");
         exit;
     }
 
-    $stmt->close();
-    $conn->close();
 } else {
     header('Location: index.php');
     exit;

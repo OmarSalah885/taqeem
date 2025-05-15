@@ -1,6 +1,6 @@
 <?php
 require_once 'config.php';
-require_once 'db_connect.php';  // should define $conn as mysqli instance
+require_once 'db_connect.php';
 session_start();
 
 // 1. Make sure user is logged in
@@ -8,15 +8,30 @@ if (empty($_SESSION['user_id'])) {
     header('Location: login.php');
     exit;
 }
-$userId = $_SESSION['user_id'];
 
-// 2. Gather all file-paths to delete (profile + places + galleries + reviews + menu items)
+$currentUserId = $_SESSION['user_id'];
+$currentUserRole = strtolower($_SESSION['role'] ?? 'guest');
+
+// 2. Determine which user to delete
+if ($currentUserRole === 'admin' && isset($_GET['id']) && is_numeric($_GET['id'])) {
+    $userIdToDelete = (int)$_GET['id'];
+
+    // Optional: prevent admin from deleting themselves
+    if ($userIdToDelete === $currentUserId) {
+        die('You cannot delete your own account here.');
+    }
+} else {
+    // Normal user can only delete their own account
+    $userIdToDelete = $currentUserId;
+}
+
+// 3. Gather all file-paths to delete (profile + places + galleries + reviews + menu items)
 $filesToRemove = [];
 $placeFolders = [];
 
-// 2a. User’s profile image
+// 3a. User’s profile image
 $stmt = $conn->prepare("SELECT profile_image FROM users WHERE id = ?");
-$stmt->bind_param('i', $userId);
+$stmt->bind_param('i', $userIdToDelete);
 $stmt->execute();
 $stmt->bind_result($path);
 $stmt->fetch();
@@ -25,10 +40,10 @@ if (!empty($path)) {
     $filesToRemove[] = $path;
 }
 
-// 2b. Featured images of all their places
+// 3b. Featured images and place IDs
 $placeIds = [];
 $stmt = $conn->prepare("SELECT id, featured_image FROM places WHERE user_id = ?");
-$stmt->bind_param('i', $userId);
+$stmt->bind_param('i', $userIdToDelete);
 $stmt->execute();
 $stmt->bind_result($placeId, $featuredImage);
 while ($stmt->fetch()) {
@@ -39,13 +54,14 @@ while ($stmt->fetch()) {
 }
 $stmt->close();
 
+// 3b.5. Collect place folder paths (category and place names)
 $stmt = $conn->prepare("
     SELECT places.name, categories.name
     FROM places
     JOIN categories ON places.category_id = categories.id
     WHERE places.user_id = ?
 ");
-$stmt->bind_param('i', $userId);
+$stmt->bind_param('i', $userIdToDelete);
 $stmt->execute();
 $stmt->bind_result($placeName, $categoryName);
 while ($stmt->fetch()) {
@@ -56,8 +72,7 @@ while ($stmt->fetch()) {
 }
 $stmt->close();
 
-
-// 2c. Gallery images for those places
+// 3c. Gallery images
 if (!empty($placeIds)) {
     $stmt = $conn->prepare("SELECT image_url FROM place_gallery WHERE place_id = ?");
     foreach ($placeIds as $pid) {
@@ -71,10 +86,10 @@ if (!empty($placeIds)) {
     $stmt->close();
 }
 
-// 2d. Any review images they uploaded
+// 3d. Review IDs
 $reviewIds = [];
 $stmt = $conn->prepare("SELECT id FROM reviews WHERE user_id = ?");
-$stmt->bind_param('i', $userId);
+$stmt->bind_param('i', $userIdToDelete);
 $stmt->execute();
 $stmt->bind_result($rid);
 while ($stmt->fetch()) {
@@ -82,6 +97,7 @@ while ($stmt->fetch()) {
 }
 $stmt->close();
 
+// 3d. Review images
 if (!empty($reviewIds)) {
     $stmt = $conn->prepare("SELECT image_url FROM review_images WHERE review_id = ?");
     foreach ($reviewIds as $rid) {
@@ -95,7 +111,7 @@ if (!empty($reviewIds)) {
     $stmt->close();
 }
 
-// 2e. Menu item images for their places
+// 3e. Menu item images
 if (!empty($placeIds)) {
     $stmt = $conn->prepare("SELECT image FROM menu_items WHERE place_id = ?");
     foreach ($placeIds as $pid) {
@@ -111,23 +127,21 @@ if (!empty($placeIds)) {
     $stmt->close();
 }
 
-// 3. Delete the user — cascades to places, reviews, comments, likes, saved_places, etc.
+// 4. Delete the user (will cascade deletes to related tables if foreign keys set)
 $stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
-$stmt->bind_param('i', $userId);
+$stmt->bind_param('i', $userIdToDelete);
 $stmt->execute();
 $stmt->close();
 
-// 4. Now remove files from disk
+// 5. Delete files from disk
 foreach ($filesToRemove as $file) {
     $fullPath = __DIR__ . '/' . ltrim($file, '/');
     if (file_exists($fullPath)) {
-        if (!@unlink($fullPath)) {
-            error_log("Failed to delete file: $fullPath");
-        }
+        @unlink($fullPath);
     }
 }
 
-// 4b. Remove place folders (with subfolders inside)
+// 6. Recursively delete place folders
 function deleteFolderRecursively($folderPath) {
     if (!is_dir($folderPath)) return;
 
@@ -141,29 +155,24 @@ function deleteFolderRecursively($folderPath) {
         if ($item->isFile() || $item->isLink()) {
             @unlink($target);
         } elseif ($item->isDir()) {
-            // Try to delete subfolder
             @rmdir($target);
         }
     }
-    // Try multiple times to remove the main folder, with small delay
-    $maxAttempts = 3;
-    for ($i = 0; $i < $maxAttempts; $i++) {
-        if (@rmdir($folderPath)) {
-            break; // success
-        }
-        usleep(100000); // wait 0.1 seconds
-    }
+    @rmdir($folderPath);
 }
 
-
 foreach ($placeFolders as $folder) {
-    error_log("Trying to delete: $folder");
     deleteFolderRecursively($folder);
 }
 
-// 5. Destroy session and redirect
-session_unset();
-session_destroy();
-header('Location: index.php');
-exit;
-?>
+// 7. If user deleted their own account, log them out
+if ($userIdToDelete === $currentUserId) {
+    session_unset();
+    session_destroy();
+    header('Location: index.php');
+    exit;
+} else {
+    // If admin deleted another user, redirect back to user management
+    header('Location: admin_users.php');
+    exit;
+}

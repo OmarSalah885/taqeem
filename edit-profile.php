@@ -4,7 +4,15 @@ require_once 'db_connect.php';
 session_start();
 include 'header.php';
 
-$user_id = $_SESSION['user_id'] ?? 0;
+// Determine which user to edit
+$user_id = isset($_GET['user_id']) ? (int)$_GET['user_id'] : ($_SESSION['user_id'] ?? 0);
+
+// Security check: only admins can edit others
+if ($user_id !== ($_SESSION['user_id'] ?? 0)) {
+    if (empty($_SESSION['role']) || strtolower($_SESSION['role']) !== 'admin') {
+        die('Access denied.');
+    }
+}
 
 $stmt = $conn->prepare("SELECT profile_image, first_name, last_name, gender, visibility, about_me, location FROM users WHERE id = ?");
 $stmt->bind_param("i", $user_id);
@@ -12,6 +20,9 @@ $stmt->execute();
 $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 $stmt->close();
+
+// ... rest of your code ...
+
 ?>
 
 <main class="edit-profile">
