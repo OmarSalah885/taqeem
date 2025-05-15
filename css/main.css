@@ -4435,6 +4435,12 @@ body p {
 .admin_main {
   min-height: 55vh;
 }
+.admin_main h1 {
+  text-align: center;
+  font-size: 2.4rem;
+  margin-bottom: 1rem;
+  margin-top: 4.8rem;
+}
 
 .admin_card {
   width: 100%;
@@ -4483,13 +4489,6 @@ body p {
   .admin_container {
     grid-template-columns: 1fr;
   }
-}
-
-h1 {
-  text-align: center;
-  font-size: 2.4rem;
-  margin-bottom: 1rem;
-  margin-top: 4.8rem;
 }
 
 .search-container {
