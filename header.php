@@ -115,10 +115,44 @@ if (!isset($_SESSION['profile_image']) || !isset($_SESSION['first_name']) || !is
             <div class="navbar_mobile--logo">
                 <a href="index.php"><img src="assets/images/logo.png" alt="logo"></a>
             </div>
-            <div class="navbar_mobile--search">
-                <input type="text" placeholder="search">
-                <button><i class="fa-solid fa-magnifying-glass"></i></button>
-            </div>
+            <!-- your existing mobile wrapper, untouched class-wise -->
+
+  <!-- wrap in a form -->
+  <form class="navbar_mobile--search" id="mobile-search-form" method="GET">
+    <input
+      type="text"
+      name="search_term"
+      id="mobile-search-term"
+      placeholder="Search"
+    >
+    <button type="submit">
+      <i class="fa-solid fa-magnifying-glass"></i>
+    </button>
+  </form>
+  <script>
+document.addEventListener('DOMContentLoaded', function() {
+  const currentPage   = window.location.pathname;
+  const searchForm    = document.getElementById('mobile-search-form');
+  const searchInput   = document.getElementById('mobile-search-term');
+
+  // default go to listing.php
+  let formAction       = 'listing.php';
+  let placeholderText  = 'Search places or tags';
+
+  // if on any blog page, switch to blogs.php
+  if (currentPage.includes('blogs.php') || currentPage.includes('single-blog.php')) {
+    formAction      = 'blogs.php';
+    placeholderText = 'Search blogs or tags';
+  }
+
+  // apply them
+  searchForm.setAttribute('action', formAction);
+  searchInput.setAttribute('placeholder', placeholderText);
+});
+</script>
+
+
+
             <a class="navbar_mobile--menu" id="mobile_emnu-open" href="#"><i class="fa-solid fa-bars"></i></a>
         </nav>
 
