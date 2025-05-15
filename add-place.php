@@ -104,36 +104,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
-            // Featured image
-            if (isset($_FILES['featured_image']) && $_FILES['featured_image']['error'] === UPLOAD_ERR_OK) {
-                $tmp_name = $_FILES['featured_image']['tmp_name'];
-                $filename = uniqid('feat_', true) . '_' . basename($_FILES['featured_image']['name']);
-                $dest = $featured_dir . $filename;
-                move_uploaded_file($tmp_name, $dest);
+            // Featured image - only allow one image
+if (!empty($_FILES['featured_image']['name'])) {
+    if (is_array($_FILES['featured_image']['name'])) {
+        throw new Exception('Only one featured image is allowed.');
+    }
 
-                $path = "assets/images/places/{$category_name_safe}/{$place_name_safe}/featured/" . $filename;
-                $stmt = $conn->prepare("UPDATE places SET featured_image = ? WHERE id = ?");
-                $stmt->bind_param("si", $path, $place_id);
-                $stmt->execute();
-                $stmt->close();
-            }
+    if ($_FILES['featured_image']['error'] === UPLOAD_ERR_OK) {
+        $tmp_name = $_FILES['featured_image']['tmp_name'];
+        $filename = uniqid('feat_', true) . '_' . basename($_FILES['featured_image']['name']);
+        $dest = $featured_dir . $filename;
+        move_uploaded_file($tmp_name, $dest);
 
-            // Gallery images
-            if (!empty($_FILES['gallery_images']['name'][0])) {
-                foreach ($_FILES['gallery_images']['tmp_name'] as $index => $tmp_name) {
-                    if ($_FILES['gallery_images']['error'][$index] === UPLOAD_ERR_OK) {
-                        $filename = uniqid('gal_', true) . '_' . basename($_FILES['gallery_images']['name'][$index]);
-                        $dest = $gallery_dir . $filename;
-                        move_uploaded_file($tmp_name, $dest);
+        $path = "assets/images/places/{$category_name_safe}/{$place_name_safe}/featured/" . $filename;
+        $stmt = $conn->prepare("UPDATE places SET featured_image = ? WHERE id = ?");
+        $stmt->bind_param("si", $path, $place_id);
+        $stmt->execute();
+        $stmt->close();
+    }
+}
 
-                        $path = "assets/images/places/{$category_name_safe}/{$place_name_safe}/gallery/" . $filename;
-                        $stmt = $conn->prepare("INSERT INTO place_gallery (place_id, image_url) VALUES (?, ?)");
-                        $stmt->bind_param("is", $place_id, $path);
-                        $stmt->execute();
-                        $stmt->close();
-                    }
-                }
-            }
+
+            
+            // Gallery images (limit to 8 max)
+if (!empty($_FILES['gallery_images']['name'][0])) {
+    $galleryCount = count($_FILES['gallery_images']['name']);
+    if ($galleryCount > 8) {
+        throw new Exception('You can only upload up to 8 gallery images.');
+    }
+
+    foreach ($_FILES['gallery_images']['tmp_name'] as $index => $tmp_name) {
+        if ($_FILES['gallery_images']['error'][$index] === UPLOAD_ERR_OK) {
+            $filename = uniqid('gal_', true) . '_' . basename($_FILES['gallery_images']['name'][$index]);
+            $dest = $gallery_dir . $filename;
+            move_uploaded_file($tmp_name, $dest);
+
+            $path = "assets/images/places/{$category_name_safe}/{$place_name_safe}/gallery/" . $filename;
+            $stmt = $conn->prepare("INSERT INTO place_gallery (place_id, image_url) VALUES (?, ?)");
+            $stmt->bind_param("is", $place_id, $path);
+            $stmt->execute();
+            $stmt->close();
+        }
+    }
+}
+
 
             // Menu items
             $menu_items_json = $_POST['menu_items_data'] ?? '';
@@ -339,19 +353,27 @@ $category_names = [
                             <label for="fileInput1" class="browse-btn"></label>
                         </p>
                         <input type="file" id="fileInput1" name="featured_image" class="file-input" accept="image/*"  hidden>
-                        <div class="file-list"></div>
+                        
                     </div>
                 </div>
                 <div class="media-contanier_gallery">
                     <p class="media-contanier_title">GALLERY IMAGES</p>
-                    <div class="drop-area">
-                        <p><i class="fa-solid fa-arrow-up"></i> Drag &
-                            Drop files here
-                            <label for="fileInput2" class="browse-btn"></label>
-                        </p>
-                        <input type="file" id="fileInput2" name="gallery_images[]" class="file-input" accept="image/*" multiple hidden>
-                        <div class="file-list"></div>
-                    </div>
+                    <div class="drop-area gallery-drop-area">
+  <p><i class="fa-solid fa-arrow-up"></i> Drag & Drop files here
+    <label for="fileInput2" class="browse-btn"></label>
+  </p>
+  <input
+    type="file"
+    id="fileInput2"
+    name="gallery_images[]"
+    accept="image/*"
+    multiple
+    hidden
+  >
+</div>
+
+
+
                 </div>
             </div>
             <div class="media_added">
@@ -421,56 +443,114 @@ $category_names = [
 </main>
 <script>
 (() => {
-  // ---- FEATURED ----
-  const featInput = document.getElementById('fileInput1');
-  const featContainer = document.querySelector('.media_added--fetured_img');
 
-  featInput.addEventListener('change', () => {
-    featContainer.innerHTML = '';              // clear old preview
-    const file = featInput.files[0];
-    if (!file) return;
+  const dropArea = document.querySelector('.drop-area');
+const fileInput1 = document.getElementById('fileInput1');
+const previewContainer = document.querySelector('.media_added--fetured_img');
 
-    const reader = new FileReader();
-    reader.onload = e => {
-      const wrapper = document.createElement('div');
-      wrapper.innerHTML = `
-        <div class=media_added--fetured_img">
-        <img src="${e.target.result}" >
+
+function clearPreview() {
+  previewContainer.innerHTML = '';
+}
+
+function showPreview(file) {
+  console.log('showPreview called with file:', file);
+  clearPreview();
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    console.log('FileReader loaded, displaying image');
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = `
+      <div class="media_added--fetured_img">
+        <img src="${e.target.result}" alt="Featured Image Preview">
         <button type="button" class="remove-featured">X</button>
-        </div>
-      `;
-      featContainer.appendChild(wrapper);
+      </div>
+    `;
+    previewContainer.appendChild(wrapper);
 
-      wrapper.querySelector('.remove-featured').onclick = () => {
-        featInput.value = '';                   // clear the input
-        featContainer.innerHTML = '';           // remove preview
-      };
+    wrapper.querySelector('.remove-featured').onclick = () => {
+      fileInput1.value = '';
+      clearPreview();
     };
-    reader.readAsDataURL(file);
-  });
+  };
+  reader.readAsDataURL(file);
+}
 
 
-  // ---- GALLERY ----
-  const galInput = document.getElementById('fileInput2');
+// Unified handler for file input change (works for both click selection and programmatic file setting)
+fileInput1.addEventListener('change', () => {
+  if (fileInput1.files.length > 1) {
+    alert('Only one featured image is allowed.');
+    fileInput1.value = '';
+    clearPreview();
+    return;
+  }
+  if (fileInput1.files.length === 1) {
+    showPreview(fileInput1.files[0]);
+  } else {
+    clearPreview();
+  }
+});
+
+// Drag & drop handlers
+dropArea.addEventListener('dragover', e => {
+  e.preventDefault();
+  dropArea.classList.add('dragover');  // style for dragover state
+});
+dropArea.addEventListener('dragleave', e => {
+  e.preventDefault();
+  dropArea.classList.remove('dragover');
+});
+dropArea.addEventListener('drop', e => {
+  e.preventDefault();
+  dropArea.classList.remove('dragover');
+
+  const dtFiles = e.dataTransfer.files;
+  if (dtFiles.length > 1) {
+    alert('Only one featured image allowed.');
+    return;
+  }
+
+  if (dtFiles.length === 1) {
+    fileInput1.files = dtFiles;
+    showPreview(dtFiles[0]);           // manually invoke preview
+    // OR: fileInput1.dispatchEvent(new Event('change'));
+  }
+});
+
+
+// JS (place at bottom of <body> or wrap in DOMContentLoaded)
+document.addEventListener('DOMContentLoaded', () => {
+  const MAX_GALLERY_IMAGES = 8;
+  const galInput     = document.getElementById('fileInput2');
   const galContainer = document.querySelector('.media_added--gallery_grid');
-  let galleryFiles = [];  // will hold the current File objects
+  const galDropArea  = document.querySelector('.gallery-drop-area');
+  let galleryFiles   = [];
 
+  // File‐input change handler
   galInput.addEventListener('change', () => {
-    galleryFiles = Array.from(galInput.files);
+    const newFiles = Array.from(galInput.files);
+    if (galleryFiles.length + newFiles.length > MAX_GALLERY_IMAGES) {
+      alert(`You can only upload up to ${MAX_GALLERY_IMAGES} gallery images.`);
+      return;
+    }
+    galleryFiles = galleryFiles.concat(newFiles);
+    updateGalInputFiles();
     renderGalleryPreviews();
   });
 
+  // Render previews
   function renderGalleryPreviews() {
     galContainer.innerHTML = '';
     galleryFiles.forEach((file, idx) => {
       const reader = new FileReader();
       reader.onload = e => {
         const wrapper = document.createElement('div');
+        wrapper.className = 'media_added--gallery_grid_item';
         wrapper.innerHTML = `
-         <div class="media_added--gallery_grid_item">
-          <img src="${e.target.result}">
-          <button type="button" class="remove-gallery">X</button>
-        </div>
+          <img src="${e.target.result}" alt="Gallery Image">
+          <button type="button" class="remove-gallery" data-idx="${idx}">X</button>
         `;
         wrapper.querySelector('.remove-gallery').onclick = () => {
           galleryFiles.splice(idx, 1);
@@ -483,13 +563,41 @@ $category_names = [
     });
   }
 
+  // Sync the hidden input
   function updateGalInputFiles() {
     const dt = new DataTransfer();
     galleryFiles.forEach(f => dt.items.add(f));
     galInput.files = dt.files;
   }
 
+  // Drag & drop handlers
+  galDropArea.addEventListener('dragover', e => {
+    e.preventDefault();
+    galDropArea.classList.add('dragover');
+  });
+  galDropArea.addEventListener('dragleave', e => {
+    e.preventDefault();
+    galDropArea.classList.remove('dragover');
+  });
+  galDropArea.addEventListener('drop', e => {
+    e.preventDefault();
+    galDropArea.classList.remove('dragover');
+
+    const dropped = Array.from(e.dataTransfer.files);
+    if (galleryFiles.length + dropped.length > MAX_GALLERY_IMAGES) {
+      alert(`You can only upload up to ${MAX_GALLERY_IMAGES} gallery images.`);
+      return;
+    }
+    galleryFiles = galleryFiles.concat(dropped);
+    updateGalInputFiles();
+    renderGalleryPreviews();
+  });
+});
+
+  
 })();
+
+
 </script>
 <script>
 const addMenuItemBtn = document.getElementById('addMenuItemBtn');
