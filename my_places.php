@@ -6,10 +6,17 @@ session_start();
 include 'header.php';
 
 // Get the user ID from the URL or default to the logged-in user
-$user_id = isset($_GET['user_id']) && is_numeric($_GET['user_id']) ? (int)$_GET['user_id'] : $_SESSION['user_id'];
+$user_id = isset($_GET['user_id']) && is_numeric($_GET['user_id'])
+           ? (int)$_GET['user_id']
+           : $_SESSION['user_id'];
 
-// Check if the logged-in user is viewing their own places
-$is_owner = ($user_id === $_SESSION['user_id']);
+// Determine roles
+$is_owner = ($user_id === ($_SESSION['user_id'] ?? 0));
+$user_role = $_SESSION['role'] ?? '';
+$is_admin = ! empty($user_role) && strtolower($user_role) === 'admin';
+
+
+
 
 // Fetch the user's name
 $user_query = $conn->prepare("SELECT CONCAT(first_name, ' ', last_name) AS full_name FROM users WHERE id = ?");
@@ -74,7 +81,8 @@ $places_result = $places_query->get_result();
                         <i
                             class="<?php echo htmlspecialchars($place['category_icon'] ?? 'fa-solid fa-question'); ?>"></i>
                     </a>
-                    <?php if ($is_owner): ?>
+                    <?php if ($is_owner || $is_admin): ?>
+
                     <a href="edit_place.php?place_id=<?php echo $place['id']; ?>" class="edit_place--btn">EDIT PLACE</a>
                     <?php endif; ?>
 
