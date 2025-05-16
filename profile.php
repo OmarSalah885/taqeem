@@ -79,6 +79,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'
         }
     }
 }
+function fetchCount($conn, $table) {
+    $count = 0;
+    if ($stmt = $conn->prepare("SELECT COUNT(*) FROM $table")) {
+        $stmt->execute();
+        $stmt->bind_result($count);
+        $stmt->fetch();
+        $stmt->close();
+    }
+    return $count;
+}
+$userCount   = fetchCount($conn, 'users');
+$placeCount  = fetchCount($conn, 'places');
+$reviewCount = fetchCount($conn, 'reviews');
+$blogCount   = fetchCount($conn, 'blogs');
 
 
 include 'header.php';
@@ -134,6 +148,30 @@ include 'header.php';
     
         <!-- Show Profile Sections -->
         <div class="profile_main">
+            <?php if (isset($_SESSION['role']) && strtolower(trim($_SESSION['role'])) === 'admin'): ?>
+    <div class="profile_main_collection">
+        <h2 class="profile_title">Admin Dashboard</h2>
+        <div class="admin_container">
+            <div class="admin_card admin_users">
+                <h1>USERS <span><?php echo $userCount; ?></span></h1>
+                <a href="admin_users.php">View all users</a>
+            </div>
+            <div class="admin_card admin_places">
+                <h1>PLACES <span><?php echo $placeCount; ?></span></h1>
+                <a href="admin_places.php">View all places</a>
+            </div>
+            <div class="admin_card admin_reviews">
+                <h1>REVIEWS <span><?php echo $reviewCount; ?></span></h1>
+                <a href="admin_reviews.php">View all reviews</a>
+            </div>
+            <div class="admin_card admin_blogs">
+                <h1>BLOGS <span><?php echo $blogCount; ?></span></h1>
+                <a href="admin_blogs.php">View all blogs</a>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
         <?php if ($is_private): ?>
         <!-- Show "Profile is Private" Message -->
         <div class="profile_private_message">
