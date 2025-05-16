@@ -4,15 +4,17 @@ require_once 'db_connect.php';
 session_start();
 
 // Get the profile user ID from the query string
-$profile_user_id = isset($_GET['user_id']) ? (int)$_GET['user_id'] : 0;
+$profile_user_id   = isset($_GET['user_id'])   ? (int)$_GET['user_id']   : 0;
 
-// Get the logged-in user ID
+// Get the logged-in user ID and role
 $logged_in_user_id = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0;
+$user_role         = isset($_SESSION['role'])    ? $_SESSION['role']        : '';
 
-// Check if the logged-in user is viewing their own profile
+// Determine roles
 $is_owner = ($profile_user_id === $logged_in_user_id);
+$is_admin = !empty($user_role) && strtolower($user_role) === 'admin';
 
-// Fetch user data
+// Fetch profile user data
 $user_query = $conn->prepare("SELECT * FROM users WHERE id = ?");
 $user_query->bind_param("i", $profile_user_id);
 $user_query->execute();
@@ -23,51 +25,61 @@ if (!$user) {
     echo "<p>User not found.</p>";
     exit;
 }
-
-// Check profile visibility
-$is_private = ($user['visibility'] === 'private' && !$is_owner);
-
-// Handle image upload if it's the owner's profile
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_image']) && $is_owner) {
-    $image = $_FILES['profile_image'];
+$is_private = ($user['visibility'] === 'private' && !$is_owner && !$is_admin);
+// Check profile visibility (only owner or admin can bypass private)
+if ($user['visibility'] === 'private' && !$is_owner ) {
+    echo "<p>This profile is private.</p>";
+    exit;
+}
+// Handle image upload if it's the owner's profile or the admin is editing
+if ($_SERVER['REQUEST_METHOD'] === 'POST'
+    && isset($_FILES['profile_image'])
+    && ($is_owner || $is_admin)
+) {
+    $image        = $_FILES['profile_image'];
     $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-    $maxSize = 2 * 1024 * 1024; // 2MB
+    $maxSize      = 2 * 1024 * 1024; // 2MB
 
     if ($image['error'] === UPLOAD_ERR_OK) {
         $fileType = mime_content_type($image['tmp_name']);
         $fileSize = $image['size'];
 
         if (in_array($fileType, $allowedTypes) && $fileSize <= $maxSize) {
-            $tmpName = $image['tmp_name'];
-            $ext = pathinfo($image['name'], PATHINFO_EXTENSION);
-            $imageName = uniqid() . '.' . $ext;
-            $targetDir = 'assets/images/profiles/';
+            $ext        = pathinfo($image['name'], PATHINFO_EXTENSION);
+            $imageName  = uniqid() . '.' . $ext;
+            $targetDir  = 'assets/images/profiles/';
             $targetFile = $targetDir . $imageName;
 
-            if (move_uploaded_file($tmpName, $targetFile)) {
-                // Delete old image if it's not the default and exists
+            if (move_uploaded_file($image['tmp_name'], $targetFile)) {
+                // Delete old image if it's not the default placeholder
                 $oldImage = $user['profile_image'] ?? '';
-                if (!empty($oldImage) && $oldImage !== 'assets/images/profiles/pro_null.png' && file_exists($oldImage)) {
+                if ($oldImage
+                    && $oldImage !== 'assets/images/profiles/pro_null.png'
+                    && file_exists($oldImage)
+                ) {
                     unlink($oldImage);
                 }
 
-                // Update DB and update image path
+                // Update DB and session (only update session if it's the owner's profile)
                 $stmt = $conn->prepare("UPDATE users SET profile_image = ? WHERE id = ?");
-                $stmt->bind_param("si", $targetFile, $logged_in_user_id);
+                $stmt->bind_param("si", $targetFile, $user['id']);
                 $stmt->execute();
 
-                $user['profile_image'] = $targetFile;
-                $_SESSION['profile_image'] = $targetFile; // Update image for header session
+                if ($is_owner) {
+                    $_SESSION['profile_image'] = $targetFile;
+                }
 
-                // Refresh the page to reload updated image
                 header("Location: " . $_SERVER['REQUEST_URI']);
-                exit();
+                exit;
             }
         } else {
-            echo "<script>alert('Invalid file type or size too big. Only JPG, JPEG, PNG under 2MB are allowed.');</script>";
+            echo "<script>
+                    alert('Invalid file type or size too big. Only JPG, JPEG, PNG under 2MB allowed.');
+                  </script>";
         }
     }
 }
+
 
 include 'header.php';
 ?>
@@ -80,7 +92,7 @@ include 'header.php';
         </div>
 
         <!-- Hidden Upload Form -->
-        <?php if ($is_owner): ?>
+        <?php if ($is_owner || $is_admin): ?>
         <form id="uploadForm" method="POST" enctype="multipart/form-data" style="display: none;">
             <input type="file" name="profile_image" id="profileInput" accept="image/jpeg,image/jpg,image/png" onchange="document.getElementById('uploadForm').submit();">
         </form>
@@ -102,9 +114,13 @@ include 'header.php';
         </div>
 
         <!-- Edit Buttons (Only for Profile Owner) -->
-        <?php if ($is_owner): ?>
+        <?php if ($is_owner || $is_admin): ?>
+
         <div class="profile_sidebar--edit">
-            <a class="profile_sidebar--edit-btn" href="edit-profile.php"><i class="fa-solid fa-pen"></i>Edit profile</a>
+            <a class="profile_sidebar--edit-btn" href="edit-profile.php<?= $is_admin && !$is_owner ? '?user_id=' . $user['id'] : '' ?>">
+    <i class="fa-solid fa-pen"></i>Edit profile
+</a>
+
             <label for="profileInput" class="profile_sidebar--edit-btn" style="cursor:pointer;">
                 <i class="fa-solid fa-user"></i>Add photo
             </label>
@@ -177,7 +193,8 @@ include 'header.php';
                                     <a href="#" class="listing_grid--item-img_save" onclick="toggleSave(event, <?php echo $place['id']; ?>)">
                                         <i class="<?php echo $is_saved ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark'; ?>"></i>
                                     </a>
-                                    <?php if ($is_owner): ?>
+                                    <?php if ($is_owner || $is_admin): ?>
+
                                         <a href="edit_place.php?place_id=<?php echo $place['id']; ?>" class="edit_place--btn">EDIT PLACE</a>
                                     <?php endif; ?>
                                 </div>

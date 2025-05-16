@@ -42,6 +42,7 @@ if (isset($_SESSION['user_id'])) {
 }
 
 $is_owner = false;
+$is_admin = false;
 
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
@@ -57,7 +58,13 @@ if (isset($_SESSION['user_id'])) {
     }
 
     $owner_query->close();
+
+    // Check if user is an admin (case-insensitive match)
+    if (!empty($_SESSION['role']) && strtolower($_SESSION['role']) === 'admin') {
+        $is_admin = true;
+    }
 }
+
 ?>
 
 <main class="place">
@@ -87,7 +94,7 @@ if (isset($_SESSION['user_id'])) {
             ?>
         </div>
         <button class="gallery-btn right-btn">›</button>
-        <?php if ($is_owner): ?>
+        <?php if ($is_owner || $is_admin): ?>
 <!--<a href="add-place.php?id=<?= $place_id ?>" class="btn__red--l btn__red btn">EDIT PLACE</a>-->
 
 
@@ -517,17 +524,19 @@ $contact_query->close();
 
             <!-- Review Buttons -->
             <div class="review_btns">
-                <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $review['user_id']): ?>
-                    <button type="button" class="btn__red--s btn__red btn" onclick="showEditForm(<?= $review_id ?>)">edit my review</button>
-                    <button type="button" class="btn__red--s btn__red btn" onclick="deleteReview(<?= $review_id ?>)">delete my review</button>
-                <?php elseif ($is_owner): ?>
-                <button
+                 <?php if (isset($_SESSION['user_id']) && ($_SESSION['user_id'] == $review['user_id'] || $is_admin)): ?>
+        <button type="button" class="btn__red--s btn__red btn" onclick="showEditForm(<?= $review_id ?>)">edit review</button>
+        <button type="button" class="btn__red--s btn__red btn" onclick="deleteReview(<?= $review_id ?>)">delete review</button>
+    <?php endif; ?>
+
+    <?php if ($is_owner || $is_admin): ?>
+        <button
             type="button"
             class="btn__transparent--s btn__transparent btn"
             onclick="showCommentForm(<?= $review_id ?>)">
             comment on review
-          </button>
-                <?php endif; ?>
+        </button>
+    <?php endif; ?>
 
                 <button class="btn__transparent--s btn__transparent btn" onclick="toggleLike(event, <?= $review_id ?>)">
                     <i class="<?= in_array($review_id, $is_liked_reviews) ? 'fa-solid fa-heart' : 'fa-regular fa-heart' ?>"></i> Like
@@ -634,7 +643,7 @@ $contact_query->close();
             endif;
             $comments_query->close();
             ?>
-          <?php if ($is_owner): ?>
+          <?php if ($is_owner || $is_admin): ?>
           <form
             id="commentForm-<?= $review_id ?>"
             method="POST"

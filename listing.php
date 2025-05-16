@@ -5,7 +5,7 @@ session_start();
 
 include 'header.php';
 
-// Get filters & search (support both overlay & inline search)
+// Get filters & search
 $category_id = isset($_GET['category_id']) ? (int)$_GET['category_id'] : 0;
 
 // Overlay search uses `search_term`, inline uses `search`
@@ -15,6 +15,19 @@ if (!empty($_GET['search_term'])) {
     $search = trim($_GET['search']);
 } else {
     $search = '';
+}
+
+// If exact category name match, retrieve its ID
+$search_cat_id = 0;
+if ($search !== '') {
+    $cat_stmt = $conn->prepare("SELECT id FROM categories WHERE name = ?");
+    $cat_stmt->bind_param("s", $search);
+    $cat_stmt->execute();
+    $cat_res = $cat_stmt->get_result();
+    if ($cat_row = $cat_res->fetch_assoc()) {
+        $search_cat_id = (int)$cat_row['id'];
+    }
+    $cat_stmt->close();
 }
 
 $price = isset($_GET['price']) ? $_GET['price'] : '';
@@ -30,17 +43,22 @@ $offset = ($page - 1) * $items_per_page;
 $sql        = "SELECT * FROM places";
 $conditions = [];
 $params     = [];
-
-// Search by tags
+// Search by tags, name, or exact category match
 if ($search !== '') {
-    // Search both tags and place name
-    $conditions[] = "(tags LIKE ? OR name LIKE ?)";
-    $params[]     = "%$search%";
-    $params[]     = "%$search%";
+    // Combine search conditions
+    $cond = [];
+    $cond[] = "tags LIKE ?";
+    $params[] = "%{$search}%";
+    $cond[] = "name LIKE ?";
+    $params[] = "%{$search}%";
+    if ($search_cat_id) {
+        $cond[] = "category_id = ?";
+        $params[] = $search_cat_id;
+    }
+    $conditions[] = '(' . implode(' OR ', $cond) . ')';
 }
 
-
-// Category filter
+// Category filter dropdown
 if ($category_id > 0) {
     $conditions[] = "category_id = ?";
     $params[]     = $category_id;
@@ -52,7 +70,7 @@ if ($price !== '') {
     $params[]     = $price;
 }
 
-// Stars (average rating) filter
+// Stars filter
 if ($stars !== '') {
     $conditions[] = "id IN (
         SELECT place_id
@@ -63,7 +81,6 @@ if ($stars !== '') {
     $params[] = $stars;
 }
 
-// Combine WHERE clauses
 if (count($conditions) > 0) {
     $sql .= " WHERE " . implode(" AND ", $conditions);
 }

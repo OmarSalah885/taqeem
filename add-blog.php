@@ -3,7 +3,7 @@ require_once 'config.php';
 require_once 'db_connect.php';
 session_start();
 
-include 'header.php';
+
 
 $success = '';
 $error = '';
@@ -84,6 +84,7 @@ if (empty($error)) {
 
 
 }}
+include 'header.php';
 ?>
 
 <main class="add_blog-container">

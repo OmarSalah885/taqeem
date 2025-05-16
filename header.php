@@ -115,9 +115,7 @@ if (!isset($_SESSION['profile_image']) || !isset($_SESSION['first_name']) || !is
             <div class="navbar_mobile--logo">
                 <a href="index.php"><img src="assets/images/logo.png" alt="logo"></a>
             </div>
-            <!-- your existing mobile wrapper, untouched class-wise -->
-
-  <!-- wrap in a form -->
+            
   <form class="navbar_mobile--search" id="mobile-search-form" method="GET">
     <input
       type="text"
