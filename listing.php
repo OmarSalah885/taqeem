@@ -2,22 +2,22 @@
 require_once 'config.php';
 require_once 'db_connect.php';
 session_start();
-
 include 'header.php';
 
-// Get filters & search
 $category_id = isset($_GET['category_id']) ? (int)$_GET['category_id'] : 0;
+$price       = isset($_GET['price']) ? $_GET['price'] : '';
+$stars       = isset($_GET['stars']) ? (int)$_GET['stars'] : 0;
+$sort        = isset($_GET['sort']) ? $_GET['sort'] : '';
+$page        = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$search      = !empty($_GET['search_term']) ? trim($_GET['search_term']) : (!empty($_GET['search']) ? trim($_GET['search']) : '');
 
-// Overlay search uses `search_term`, inline uses `search`
-if (!empty($_GET['search_term'])) {
-    $search = trim($_GET['search_term']);
-} elseif (!empty($_GET['search'])) {
-    $search = trim($_GET['search']);
-} else {
-    $search = '';
-}
+$items_per_page = 12;
+$offset = ($page - 1) * $items_per_page;
 
-// If exact category name match, retrieve its ID
+$conditions = [];
+$params = [];
+$param_types = '';
+
 $search_cat_id = 0;
 if ($search !== '') {
     $cat_stmt = $conn->prepare("SELECT id FROM categories WHERE name = ?");
@@ -28,100 +28,84 @@ if ($search !== '') {
         $search_cat_id = (int)$cat_row['id'];
     }
     $cat_stmt->close();
-}
 
-$price = isset($_GET['price']) ? $_GET['price'] : '';
-$stars = isset($_GET['stars']) ? $_GET['stars'] : '';
-$sort  = isset($_GET['sort'])  ? $_GET['sort']  : '';
-$page  = isset($_GET['page'])  ? (int)$_GET['page'] : 1;
-
-// Pagination
-$items_per_page = 12;
-$offset = ($page - 1) * $items_per_page;
-
-// Build base SQL and parameters
-$sql        = "SELECT * FROM places";
-$conditions = [];
-$params     = [];
-// Search by tags, name, or exact category match
-if ($search !== '') {
-    // Combine search conditions
-    $cond = [];
-    $cond[] = "tags LIKE ?";
-    $params[] = "%{$search}%";
-    $cond[] = "name LIKE ?";
-    $params[] = "%{$search}%";
+    $conditions[] = "(places.name LIKE ? OR places.tags LIKE ?" . ($search_cat_id ? " OR places.category_id = ?" : "") . ")";
+    $params[] = "%$search%";
+    $param_types .= 's';
+    $params[] = "%$search%";
+    $param_types .= 's';
     if ($search_cat_id) {
-        $cond[] = "category_id = ?";
         $params[] = $search_cat_id;
+        $param_types .= 'i';
     }
-    $conditions[] = '(' . implode(' OR ', $cond) . ')';
 }
 
-// Category filter dropdown
 if ($category_id > 0) {
-    $conditions[] = "category_id = ?";
-    $params[]     = $category_id;
+    $conditions[] = "places.category_id = ?";
+    $params[] = $category_id;
+    $param_types .= 'i';
 }
 
-// Price filter
 if ($price !== '') {
-    $conditions[] = "price = ?";
-    $params[]     = $price;
+    $conditions[] = "places.price = ?";
+    $params[] = $price;
+    $param_types .= 's';
 }
 
-// Stars filter
-if ($stars !== '') {
-    $conditions[] = "id IN (
-        SELECT place_id
-        FROM reviews
-        GROUP BY place_id
-        HAVING AVG(rating) >= ?
+if ($stars > 0) {
+    $conditions[] = "places.id IN (
+        SELECT place_id FROM reviews GROUP BY place_id HAVING AVG(rating) >= ?
     )";
     $params[] = $stars;
+    $param_types .= 'i';
 }
 
-if (count($conditions) > 0) {
+// === COUNT Query for Pagination ===
+$count_sql = "SELECT COUNT(*) AS total FROM places";
+if ($conditions) {
+    $count_sql .= " WHERE " . implode(" AND ", $conditions);
+}
+$count_stmt = $conn->prepare($count_sql);
+if (!empty($params)) {
+    $count_stmt->bind_param($param_types, ...$params);
+}
+$count_stmt->execute();
+$count_result = $count_stmt->get_result();
+$total_items = $count_result->fetch_assoc()['total'] ?? 0;
+$count_stmt->close();
+
+$total_pages = ceil($total_items / $items_per_page);
+$current_page = max(1, min($total_pages, $page));
+
+// === Fetch Paginated Data with JOIN ===
+$sql = "SELECT places.*, categories.icon AS category_icon 
+        FROM places 
+        LEFT JOIN categories ON places.category_id = categories.id";
+if ($conditions) {
     $sql .= " WHERE " . implode(" AND ", $conditions);
 }
 
-// Sorting
-if (!empty($sort)) {
-    switch ($sort) {
-        case '1':
-            $sql .= " ORDER BY (SELECT AVG(rating) FROM reviews WHERE place_id = places.id) DESC";
-            break;
-        case '2':
-            $sql .= " ORDER BY created_at DESC";
-            break;
-        case '3':
-            $sql .= " ORDER BY price";
-            break;
-    }
-} else {
-    $sql .= " ORDER BY RAND()";
+switch ($sort) {
+    case '1':
+        $sql .= " ORDER BY (SELECT AVG(rating) FROM reviews WHERE place_id = places.id) DESC";
+        break;
+    case '2':
+        $sql .= " ORDER BY places.created_at DESC";
+        break;
+    case '3':
+        $sql .= " ORDER BY places.price";
+        break;
+    default:
+        $sql .= " ORDER BY RAND()";
 }
 
-// === Fetch total items for pagination ===
-$stmt = $conn->prepare($sql);
-if ($params) {
-    $types = str_repeat('s', count($params));
-    $stmt->bind_param($types, ...$params);
-}
-$stmt->execute();
-$result = $stmt->get_result();
-$total_items = $result->num_rows;
-$stmt->close();
-
-// === Fetch current page items ===
 $sql .= " LIMIT ?, ?";
 $params[] = $offset;
 $params[] = $items_per_page;
+$param_types .= 'ii';
 
 $stmt = $conn->prepare($sql);
-// Now last two params are integers
-$types = str_repeat('s', count($params) - 2) . 'ii';
-$stmt->bind_param($types, ...$params);
+$stmt->bind_param($param_types, ...$params);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -131,11 +115,7 @@ while ($row = $result->fetch_assoc()) {
 }
 $stmt->close();
 
-// Calculate pagination
-$total_pages  = (int)ceil($total_items / $items_per_page);
-$current_page = max(1, min($total_pages, $page));
-
-// Fetch saved places for logged-in user
+// === Get Saved Places if Logged In ===
 $saved_places = [];
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
@@ -148,6 +128,22 @@ if (isset($_SESSION['user_id'])) {
     }
     $q->close();
 }
+
+// === Category Name Mapping ===
+$category_names = [
+    'restaurants'     => 'RESTAURANTS',
+    'shopping'        => 'SHOPPING',
+    'active-life'     => 'ACTIVE LIFE',
+    'home services'   => 'HOME SERVICES',
+    'coffee'          => 'COFFEE',
+    'pets'            => 'PETS',
+    'plants'          => 'PLANTS SHOP',
+    'art'             => 'ART',
+    'hotel'           => 'HOTELS',
+    'edu'             => 'EDUCATION',
+    'health'          => 'HEALTH',
+    'workspace'       => 'WORKSPACE'
+];
 ?>
 
 
@@ -201,11 +197,12 @@ if (isset($_SESSION['user_id'])) {
 <div class="listing_filter">
     <div class="listing_filter-L">
         <select name="price" class="custom-select" onchange="filterChange()">
-            <option value="" disabled <?php echo empty($price) ? 'selected' : ''; ?>>Price</option>
-            <option value="$" <?php echo $price == '1' ? 'selected' : ''; ?>>$</option>
-            <option value="$$" <?php echo $price == '2' ? 'selected' : ''; ?>>$$</option>
-            <option value="$$$" <?php echo $price == '3' ? 'selected' : ''; ?>>$$$</option>
-        </select>
+    <option value="">All</option>
+    <option value="$" <?php echo $price == '$' ? 'selected' : ''; ?>>$</option>
+    <option value="$$" <?php echo $price == '$$' ? 'selected' : ''; ?>>$$</option>
+    <option value="$$$" <?php echo $price == '$$$' ? 'selected' : ''; ?>>$$$</option>
+</select>
+
         <select name="category_id" class="custom-select" onchange="filterChange()">
             <option value="" disabled <?php echo empty($category_id) ? 'selected' : ''; ?>>Categories</option>
             <option value="1" <?php echo $category_id == '1' ? 'selected' : ''; ?>>RESTAURANTS</option>
@@ -314,66 +311,104 @@ if (isset($_SESSION['user_id'])) {
 
         <!-- Pagination -->
         <div class="listing_indicator">
-            <ul class="listing_indicator">
-                <?php if ($current_page > 1): ?>
-                    <li class="indicator_item">
-                        <a href="?page=<?php echo $current_page - 1; ?>&category_id=<?php echo $category_id; ?>&search=<?php echo urlencode($search); ?>&price=<?php echo $price; ?>&stars=<?php echo $stars; ?>">
-                            <i class="fa-solid fa-chevron-left"></i>
-                        </a>
-                    </li>
-                <?php endif; ?>
+            <?php
+$range        = 2; // pages either side of current
+$jump         = 3; // pages to jump when clicking “…”
+$totalPages   = (int)ceil($total_items / $items_per_page);
+$currentPage  = $current_page;
 
-                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                    <li class="indicator_item <?php echo ($i === $current_page) ? 'active' : ''; ?>">
-                        <a href="?page=<?php echo $i; ?>&category_id=<?php echo $category_id; ?>&search=<?php echo urlencode($search); ?>&price=<?php echo $price; ?>&stars=<?php echo $stars; ?>">
-                            <?php echo $i; ?>
-                        </a>
-                    </li>
-                <?php endfor; ?>
+// helper to build the query string with all filters
+function buildQs($page, $category_id, $search, $price, $stars) {
+    $qs = '?page=' . $page;
+    if ($category_id) { $qs .= '&category_id=' . $category_id; }
+    if ($search    ) { $qs .= '&search='      . urlencode($search); }
+    if ($price     ) { $qs .= '&price='       . urlencode($price); }
+    if ($stars     ) { $qs .= '&stars='       . urlencode($stars); }
+    return $qs;
+}
 
-                <?php if ($current_page < $total_pages): ?>
-                    <li class="indicator_item">
-                        <a href="?page=<?php echo $current_page + 1; ?>&category_id=<?php echo $category_id; ?>&search=<?php echo urlencode($search); ?>&price=<?php echo $price; ?>&stars=<?php echo $stars; ?>">
-                            <i class="fa-solid fa-chevron-right"></i>
-                        </a>
-                    </li>
-                <?php endif; ?>
-            </ul>
+// helper to render ellipsis
+function renderEllipsis($targetPage, $category_id, $search, $price, $stars) {
+    echo '<li class="indicator_item ellipsis">';
+    echo    '<a href="' . buildQs($targetPage, $category_id, $search, $price, $stars) . '">…</a>';
+    echo '</li>';
+}
+?>
+<ul class="listing_indicator">
+  <!-- Prev -->
+  <?php if ($currentPage > 1): ?>
+    <li class="indicator_item">
+      <a href="<?= buildQs($currentPage - 1, $category_id, $search, $price, $stars) ?>">
+        <i class="fa-solid fa-chevron-left"></i>
+      </a>
+    </li>
+  <?php endif; ?>
+
+  <!-- First + leading ellipsis -->
+  <?php if ($currentPage > $range + 1): ?>
+    <li class="indicator_item">
+      <a href="<?= buildQs(1, $category_id, $search, $price, $stars) ?>">1</a>
+    </li>
+    <?php renderEllipsis(max(1, $currentPage - $jump), $category_id, $search, $price, $stars); ?>
+  <?php endif; ?>
+
+  <!-- Pages around current -->
+  <?php
+    $start = max(1, $currentPage - $range);
+    $end   = min($totalPages, $currentPage + $range);
+    for ($i = $start; $i <= $end; $i++): 
+  ?>
+    <li class="indicator_item <?= $i === $currentPage ? 'active' : '' ?>">
+      <?php if ($i === $currentPage): ?>
+        <a href="javascript:void(0)"><?= $i ?></a>
+      <?php else: ?>
+        <a href="<?= buildQs($i, $category_id, $search, $price, $stars) ?>"><?= $i ?></a>
+      <?php endif; ?>
+    </li>
+  <?php endfor; ?>
+
+  <!-- Trailing ellipsis + last -->
+  <?php if ($currentPage < $totalPages - $range): ?>
+    <?php renderEllipsis(min($totalPages, $currentPage + $jump), $category_id, $search, $price, $stars); ?>
+    <li class="indicator_item">
+      <a href="<?= buildQs($totalPages, $category_id, $search, $price, $stars) ?>">
+        <?= $totalPages ?>
+      </a>
+    </li>
+  <?php endif; ?>
+
+  <!-- Next -->
+  <?php if ($currentPage < $totalPages): ?>
+    <li class="indicator_item">
+      <a href="<?= buildQs($currentPage + 1, $category_id, $search, $price, $stars) ?>">
+        <i class="fa-solid fa-chevron-right"></i>
+      </a>
+    </li>
+  <?php endif; ?>
+</ul>
+
         </div>
 
     </div>
 </main>
 
 <script>
-    function filterChange() {
-    // Get the selected values from the filter dropdowns
-    const price = document.querySelector('select[name="price"]').value;
-    const category_id = document.querySelector('select[name="category_id"]').value;
-    const stars = document.querySelector('select[name="stars"]').value;
-    const sort = document.querySelector('select[name="sort"]').value; // Capture sort value
+function filterChange() {
+    const price = document.querySelector('select[name="price"]').value || '';
+    const category_id = document.querySelector('select[name="category_id"]').value || '';
+    const stars = document.querySelector('select[name="stars"]').value || '';
+    const sort = document.querySelector('select[name="sort"]').value || '';
 
-    // Build the new URL with updated query parameters
-    const url = new URL(window.location.href);
-    
-    // Set the updated query parameters
-    if (price) {
-        url.searchParams.set('price', price);
-    }
-    if (category_id) {
-        url.searchParams.set('category_id', category_id);
-    }
-    if (stars) {
-        url.searchParams.set('stars', stars);
-    }
-    if (sort) {  // Add sort parameter if it's selected
-        url.searchParams.set('sort', sort);
-    }
+    const params = new URLSearchParams();
+    if (price) params.append('price', price);
+    if (category_id) params.append('category_id', category_id);
+    if (stars) params.append('stars', stars);
+    if (sort) params.append('sort', sort);
 
-    // Reload the page with the new query parameters
-    window.location.href = url.toString();
+    window.location.href = 'listing.php?' + params.toString();
 }
-
 </script>
+
 
 
 <?php

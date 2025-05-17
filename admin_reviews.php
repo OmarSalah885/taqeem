@@ -4,47 +4,76 @@ require_once 'db_connect.php';
 session_start();
 
 // 1) Only admins
-if (empty($_SESSION['role']) || strtolower($_SESSION['role']) !== 'admin') {
+if (empty($_SESSION['role']) || strtolower(trim($_SESSION['role'])) !== 'admin') {
     header('Location: index.php');
     exit;
 }
 
 // 2) Search input
-$search      = trim($_GET['search'] ?? '');
-$searchParam = "%{$search}%";
+$search = trim($_GET['search'] ?? '');
+
+function isValidDate($date) {
+    $d = DateTime::createFromFormat('Y-m-d', $date);
+    return $d && $d->format('Y-m-d') === $date;
+}
+
+function isPartialDate($date) {
+    // Matches YYYY or YYYY-MM only (partial date)
+    return preg_match('/^\d{4}(-\d{2})?$/', $date);
+}
+
+// Prepare parameters
+$whereClauses = [];
+$params = [];
+$types = '';
+
+if ($search !== '') {
+    // Prepare the date search param for exact or partial date
+    if (isValidDate($search)) {
+        // Full exact date, no wildcard
+        $dateSearch = $search;
+    } elseif (isPartialDate($search)) {
+        // Partial date, add wildcard to match any day in that month or year
+        $dateSearch = $search . '%';
+    } else {
+        // Not a valid date or partial date, no match for date search
+        $dateSearch = null;
+    }
+
+    $whereClauses[] = "(" .
+        "CONCAT(u.first_name,' ',u.last_name) LIKE ? OR " .
+        "p.name LIKE ? OR " .
+        "r.rating = ? " .
+        ($dateSearch !== null ? "OR DATE_FORMAT(r.created_at, '%Y-%m-%d') LIKE ?" : "") .
+    ")";
+
+    // Bind name and place name
+    $params[] = "%$search%";
+    $params[] = "%$search%";
+    // Bind rating or -1 for no match if not numeric
+    $params[] = is_numeric($search) ? (int)$search : -1;
+
+    if ($dateSearch !== null) {
+        $params[] = $dateSearch;
+        $types = 'sssi';  // 3 strings + 1 int OR 2 strings + 1 int + 1 string for date
+    } else {
+        $types = 'ssi';  // no date param
+    }
+}
 
 // 3) Pagination setup
 $perPage = 25;
-$page    = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
+$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
 if ($page < 1) $page = 1;
 $offset = ($page - 1) * $perPage;
 
-// 4) Count total reviews (with optional search on user name, place name, rating, or date)
-$countSql     = "
+// 4) Count total reviews (with optional search)
+$countSql = "
     SELECT COUNT(*)
       FROM reviews r
       JOIN users u  ON r.user_id  = u.id
       JOIN places p ON r.place_id = p.id
 ";
-$whereClauses = [];
-$params       = [];
-$types        = '';
-
-if ($search !== '') {
-    $whereClauses[] = "(
-        CONCAT(u.first_name,' ',u.last_name) LIKE ? OR
-        p.name LIKE ? OR
-        r.rating = ? OR
-        DATE(r.created_at) LIKE ?
-    )";
-    // bind 4 params in the same order:
-    $params[] = $searchParam;               // user full name
-    $params[] = $searchParam;               // place name
-    $params[] = is_numeric($search) ? $search : 0; // rating exact (as integer)
-    $params[] = $searchParam;               // date partial
-
-    $types .= 'ssis'; // s, s, i, s
-}
 
 if (!empty($whereClauses)) {
     $countSql .= ' WHERE ' . implode(' AND ', $whereClauses);
@@ -64,7 +93,7 @@ $totalPages = (int)ceil($totalReviews / $perPage);
 // 5) Fetch page of reviews
 $baseSql = "
     SELECT r.id,
-           r.place_id,                   -- add this
+           r.place_id,
            u.profile_image,
            u.first_name, u.last_name,
            p.name AS place_name,
@@ -79,17 +108,29 @@ $baseSql = "
 if (!empty($whereClauses)) {
     $baseSql .= ' WHERE ' . implode(' AND ', $whereClauses);
 }
-$offsetInt  = (int)$offset;
-$perPageInt = (int)$perPage;
-$baseSql   .= " ORDER BY r.id ASC LIMIT {$offsetInt}, {$perPageInt}";
+$baseSql .= " ORDER BY r.id ASC LIMIT ?, ?";
 
 $stmt = $conn->prepare($baseSql);
+
 if (!empty($whereClauses)) {
-    $stmt->bind_param($types, ...$params);
+    // Merge search params with offset & perPage
+    $allParams = array_merge($params, [$offset, $perPage]);
+    $allTypes  = $types . 'ii';  // e.g. 'sssi' + 'ii' or 'ssi' + 'ii'
+
+    $stmt->bind_param($allTypes, ...$allParams);
+} else {
+    $stmt->bind_param('ii', $offset, $perPage);
 }
+
 $stmt->execute();
 $reviews = $stmt->get_result();
 $stmt->close();
+
+function renderEllipsis($target, $search) {
+    echo '<li class="indicator_item ellipsis">';
+    echo    '<a href="?page=' . $target . '&search=' . urlencode($search) . '">…</a>';
+    echo '</li>';
+}
 
 include 'header.php';
 ?>
@@ -103,7 +144,7 @@ include 'header.php';
           id="reviewSearch"
           name="search"
           placeholder="Search by user, place name, rating, or date..."
-          value="<?php echo htmlspecialchars($search); ?>"
+          value="<?= htmlspecialchars($search) ?>"
         >
         <button type="submit">Search</button>
     </form>
@@ -126,29 +167,23 @@ include 'header.php';
 <?php
 $rowNum = $offset + 1;
 while ($rev = $reviews->fetch_assoc()):
-    $userImg  = $rev['profile_image'] ?: 'assets/images/profiles/pro_null.png';
-    $userName = htmlspecialchars($rev['first_name'] . ' ' . $rev['last_name']);
-    $placeName= htmlspecialchars($rev['place_name']);
-    $text     = htmlspecialchars(mb_strimwidth($rev['review_text'],0,50,'…'));
-    $created  = substr($rev['created_at'],0,10);
+    $userImg   = $rev['profile_image'] ?: 'assets/images/profiles/pro_null.png';
+    $userName  = htmlspecialchars($rev['first_name'] . ' ' . $rev['last_name']);
+    $placeName = htmlspecialchars($rev['place_name']);
+    $text      = htmlspecialchars(mb_strimwidth($rev['review_text'], 0, 50, '…'));
+    $created   = substr($rev['created_at'], 0, 10);
 ?>
                 <tr>
-                    <td><?php echo $rowNum++; ?></td>
-                    <td><img src="<?php echo htmlspecialchars($userImg); ?>" alt="User" width="50" height="50"></td>
-                    <td><?php echo $userName; ?></td>
-                    <td><?php echo $placeName; ?></td>
-                    <td><?php echo (int)$rev['rating']; ?></td>
-                    <td><?php echo $text; ?></td>
-                    <td><?php echo $created; ?></td>
+                    <td><?= $rowNum++ ?></td>
+                    <td><img src="<?= htmlspecialchars($userImg) ?>" alt="User" width="50" height="50"></td>
+                    <td><?= $userName ?></td>
+                    <td><?= $placeName ?></td>
+                    <td><?= (int)$rev['rating'] ?></td>
+                    <td><?= $text ?></td>
+                    <td><?= $created ?></td>
                     <td class="actions">
-                        <a
-  href="single-place.php?place_id=<?php echo $rev['place_id']; ?>&review_id=<?php echo $rev['id']; ?>#review_<?php echo $rev['id']; ?>"
-  class="btn-edit"
->
-  Edit
-</a>
-
-                        <a href="delete_review.php?id=<?php echo $rev['id']; ?>" class="btn-delete" onclick="return confirm('Delete this review?');"> Delete</a>
+                        <a href="single-place.php?place_id=<?= $rev['place_id'] ?>&review_id=<?= $rev['id'] ?>#review_<?= $rev['id'] ?>" class="btn-edit">Edit</a>
+                        <a href="delete_review.php?id=<?= $rev['id'] ?>" class="btn-delete" onclick="return confirm('Delete this review?');">Delete</a>
                     </td>
                 </tr>
 <?php endwhile; ?>
@@ -159,25 +194,60 @@ while ($rev = $reviews->fetch_assoc()):
     <!-- Pagination -->
     <div class="listing_indicator">
         <ul class="listing_indicator">
-            <?php if ($page > 1): ?>
+            <?php
+            $range       = 2;
+            $jump        = 3;
+            $currentPage = $page;
+
+            // Previous arrow
+            if ($currentPage > 1): ?>
                 <li class="indicator_item">
-                    <a href="?page=<?php echo $page - 1; ?>&search=<?php echo urlencode($search); ?>">
+                    <a href="?page=<?= $currentPage - 1 ?>&search=<?= urlencode($search) ?>">
                         <i class="fa-solid fa-chevron-left"></i>
                     </a>
                 </li>
             <?php endif; ?>
 
-            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                <li class="indicator_item <?php echo ($i === $page) ? 'active' : ''; ?>">
-                    <a href="?page=<?php echo $i; ?>&search=<?php echo urlencode($search); ?>">
-                        <?php echo $i; ?>
-                    </a>
+            <?php
+            // Leading ellipsis (and first page)
+            if ($currentPage > $range + 1):
+                $leadTarget = max(1, $currentPage - $jump);
+            ?>
+                <li class="indicator_item">
+                    <a href="?page=1&search=<?= urlencode($search) ?>">1</a>
+                </li>
+                <?php renderEllipsis($leadTarget, $search); ?>
+            <?php endif; ?>
+
+            <?php
+            // Pages around current
+            $start = max(1, $currentPage - $range);
+            $end   = min($totalPages, $currentPage + $range);
+            for ($i = $start; $i <= $end; $i++): ?>
+                <li class="indicator_item <?= $i === $currentPage ? 'active' : '' ?>">
+                    <?php if ($i === $currentPage): ?>
+                        <a href="javascript:void(0)"><?= $i ?></a>
+                    <?php else: ?>
+                        <a href="?page=<?= $i ?>&search=<?= urlencode($search) ?>"><?= $i ?></a>
+                    <?php endif; ?>
                 </li>
             <?php endfor; ?>
 
-            <?php if ($page < $totalPages): ?>
+            <?php
+            // Trailing ellipsis (and last page)
+            if ($currentPage < $totalPages - $range):
+                $trailTarget = min($totalPages, $currentPage + $jump);
+            ?>
+                <?php renderEllipsis($trailTarget, $search); ?>
                 <li class="indicator_item">
-                    <a href="?page=<?php echo $page + 1; ?>&search=<?php echo urlencode($search); ?>">
+                    <a href="?page=<?= $totalPages ?>&search=<?= urlencode($search) ?>"><?= $totalPages ?></a>
+                </li>
+            <?php endif; ?>
+
+            <!-- Next arrow -->
+            <?php if ($currentPage < $totalPages): ?>
+                <li class="indicator_item">
+                    <a href="?page=<?= $currentPage + 1 ?>&search=<?= urlencode($search) ?>">
                         <i class="fa-solid fa-chevron-right"></i>
                     </a>
                 </li>

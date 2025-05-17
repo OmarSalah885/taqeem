@@ -59,7 +59,7 @@ unset($_SESSION['login_data']);
 // ✅ Redirect based on role
 if (isset($user['role']) && trim(strtolower($user['role'])) === 'admin') {
 
-    header("Location: admin.php");
+    header("Location: profile.php?user_id=".$_SESSION['user_id']); // Redirect to admin profile page
 } else {
     header("Location: $redirect_url"); // or "index.php"
 }

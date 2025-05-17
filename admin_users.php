@@ -171,29 +171,69 @@ include 'header.php';
 
     <!-- Pagination -->
     <div class="listing_indicator">
-        <ul class="listing_indicator">
-            <?php if ($page > 1): ?>
-                <li class="indicator_item">
-                    <a href="?page=<?php echo $page - 1; ?>&search=<?php echo urlencode($search); ?>">
-                        <i class="fa-solid fa-chevron-left"></i>
-                    </a>
-                </li>
-            <?php endif; ?>
+        <?php
+$range       = 2;   // pages to show either side of current
+$jump        = 3;   // pages to jump when clicking “…”
+$totalPages  = (int)ceil($totalPlaces / $perPage);
+$currentPage = $page;
 
-            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                <li class="indicator_item <?php echo ($i === $page) ? 'active' : ''; ?>">
-                    <a href="?page=<?php echo $i; ?>&search=<?php echo urlencode($search); ?>"><?php echo $i; ?></a>
-                </li>
-            <?php endfor; ?>
+// helper to render a clickable ellipsis
+function renderEllipsis($targetPage, $search) {
+    echo '<li class="indicator_item ellipsis">';
+    echo    '<a href="?page=' . $targetPage . '&search=' . urlencode($search) . '">…</a>';
+    echo '</li>';
+}
+?>
+<ul class="listing_indicator">
+  <!-- Previous arrow -->
+  <?php if ($currentPage > 1): ?>
+    <li class="indicator_item">
+      <a href="?page=<?= $currentPage - 1 ?>&search=<?= urlencode($search) ?>">
+        <i class="fa-solid fa-chevron-left"></i>
+      </a>
+    </li>
+  <?php endif; ?>
 
-            <?php if ($page < $totalPages): ?>
-                <li class="indicator_item">
-                    <a href="?page=<?php echo $page + 1; ?>&search=<?php echo urlencode($search); ?>">
-                        <i class="fa-solid fa-chevron-right"></i>
-                    </a>
-                </li>
-            <?php endif; ?>
-        </ul>
+  <!-- First page + leading ellipsis -->
+  <?php if ($currentPage > $range + 1): ?>
+    <li class="indicator_item">
+      <a href="?page=1&search=<?= urlencode($search) ?>">1</a>
+    </li>
+    <?php renderEllipsis(max(1, $currentPage - $jump), $search); ?>
+  <?php endif; ?>
+
+  <!-- Pages around current -->
+  <?php
+    $start = max(1, $currentPage - $range);
+    $end   = min($totalPages, $currentPage + $range);
+    for ($i = $start; $i <= $end; $i++): ?>
+      <li class="indicator_item <?= $i === $currentPage ? 'active' : '' ?>">
+        <?php if ($i === $currentPage): ?>
+          <a href="javascript:void(0)"><?= $i ?></a>
+        <?php else: ?>
+          <a href="?page=<?= $i ?>&search=<?= urlencode($search) ?>"><?= $i ?></a>
+        <?php endif; ?>
+      </li>
+  <?php endfor; ?>
+
+  <!-- Trailing ellipsis + last page -->
+  <?php if ($currentPage < $totalPages - $range): ?>
+    <?php renderEllipsis(min($totalPages, $currentPage + $jump), $search); ?>
+    <li class="indicator_item">
+      <a href="?page=<?= $totalPages ?>&search=<?= urlencode($search) ?>"><?= $totalPages ?></a>
+    </li>
+  <?php endif; ?>
+
+  <!-- Next arrow -->
+  <?php if ($currentPage < $totalPages): ?>
+    <li class="indicator_item">
+      <a href="?page=<?= $currentPage + 1 ?>&search=<?= urlencode($search) ?>">
+        <i class="fa-solid fa-chevron-right"></i>
+      </a>
+    </li>
+  <?php endif; ?>
+</ul>
+
     </div>
 </main>
 

@@ -2,7 +2,6 @@
 require_once 'config.php';
 require_once 'db_connect.php';
 session_start();
-
 include 'header.php';
 
 // Handle search
@@ -12,17 +11,13 @@ $search = isset($_GET['search_term']) ? trim($_GET['search_term']) : '';
 <main>
     <div class="pageinfo">
         <div class="pageinfo_content">
-            <!-- Dynamic Heading for Search -->
             <h2>
                 <?php 
-                    if (!empty($search)) {
-                        echo "Search results for: <strong>" . htmlspecialchars($search) . "</strong>";
-                    } else {
-                        echo "BLOGS";
-                    }
+                    echo !empty($search)
+                        ? "Search results for: <strong>" . htmlspecialchars($search) . "</strong>"
+                        : "BLOGS";
                 ?>
             </h2>
-            
         </div>
     </div>
 
@@ -34,25 +29,20 @@ $search = isset($_GET['search_term']) ? trim($_GET['search_term']) : '';
             $offset = ($page - 1) * $posts_per_page;
 
             if (!empty($search)) {
-                // Escape input to prevent SQL injection
                 $search_term = mysqli_real_escape_string($conn, $search);
-                
-                // Search query
+
                 $query = "SELECT id, image, title, tags, content FROM blogs 
                           WHERE title LIKE '%$search_term%' OR tags LIKE '%$search_term%' 
                           ORDER BY id DESC 
                           LIMIT $offset, $posts_per_page";
 
-                // For pagination count
                 $count_query = "SELECT COUNT(id) AS total FROM blogs 
                                 WHERE title LIKE '%$search_term%' OR tags LIKE '%$search_term%'";
             } else {
-                // Default blog query if no search term is provided
                 $query = "SELECT id, image, title, tags, content FROM blogs 
                           ORDER BY id DESC 
                           LIMIT $offset, $posts_per_page";
 
-                // Count query for pagination without search
                 $count_query = "SELECT COUNT(id) AS total FROM blogs";
             }
 
@@ -60,78 +50,108 @@ $search = isset($_GET['search_term']) ? trim($_GET['search_term']) : '';
 
             if (mysqli_num_rows($result) > 0) {
                 while ($row = mysqli_fetch_assoc($result)) {
-    // Extract data
-    $id = $row['id']; // Blog ID
-    $image = htmlspecialchars($row['image']); // Image from DB
-    $title = htmlspecialchars($row['title']);
-    $tags = explode(',', $row['tags']); // Assuming tags are comma-separated
-    $content = strip_tags($row['content']); // Remove HTML tags for truncation
-    
-    // Limit content to 200 characters
-    $shortContent = (strlen($content) > 200) ? substr($content, 0, 200) . '...' : $content;
+                    $id = $row['id'];
+                    $image = htmlspecialchars($row['image']);
+                    $title = htmlspecialchars($row['title']);
+                    $tags = explode(',', $row['tags']);
+                    $content = strip_tags($row['content']);
+                    $shortContent = (strlen($content) > 200) ? substr($content, 0, 200) . '...' : $content;
+                    ?>
 
-    echo '<div class="homeBlog_blogs--item">
-            <div class="homeBlog_blogs--item-img">
-                <a href="single-blog.php?id=' . $id . '" class="homeBlog_blogs--item-img_img" style="text-decoration: none;">
-                    <img src="' . $image . '" alt="Blog Image">
-                </a>
-                <div class="homeBlog_blogs--item-img_tags">';
-    
-    // Display tags dynamically
-    foreach ($tags as $tag) {
-        echo '<a href="?search_term=' . urlencode(trim($tag)) . '" style="text-decoration: none;">' . htmlspecialchars(trim($tag)) . '</a>';
-    }
-
-    echo '  </div>
-            </div>
-            <div class="homeBlog_blogs--item-text">
-                <a href="single-blog.php?id=' . $id . '" class="homeBlog_blogs--item-text_title" style="text-decoration: none;">' . $title . '</a>
-                <a href="single-blog.php?id=' . $id . '" style="text-decoration: none;">
-                    <p>' . htmlspecialchars($shortContent) . '</p> <!-- Truncated Content -->
-                </a>
-            </div>
-        </div>';
-}
+                    <div class="homeBlog_blogs--item">
+                        <div class="homeBlog_blogs--item-img">
+                            <a href="single-blog.php?id=<?= $id ?>" class="homeBlog_blogs--item-img_img" style="text-decoration: none;">
+                                <img src="<?= $image ?>" alt="Blog Image">
+                            </a>
+                            <div class="homeBlog_blogs--item-img_tags">
+                                <?php foreach ($tags as $tag): ?>
+                                    <a href="?search_term=<?= urlencode(trim($tag)) ?>" style="text-decoration: none;">
+                                        <?= htmlspecialchars(trim($tag)) ?>
+                                    </a>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                        <div class="homeBlog_blogs--item-text">
+                            <a href="single-blog.php?id=<?= $id ?>" class="homeBlog_blogs--item-text_title" style="text-decoration: none;">
+                                <?= $title ?>
+                            </a>
+                            <a href="single-blog.php?id=<?= $id ?>" style="text-decoration: none;">
+                                <p><?= htmlspecialchars($shortContent) ?></p>
+                            </a>
+                        </div>
+                    </div>
+                    <?php
+                }
             } else {
                 echo "<p>No blogs found.</p>";
             }
             ?>
         </div> <!-- End of blogs_grid -->
 
-        <!-- Pagination -->
+        <?php
+        // Pagination count
+        $result_count = $conn->query($count_query);
+        $row_count    = $result_count->fetch_assoc();
+        $total_posts  = (int)$row_count['total'];
+        ?>
+
+        <!-- Pagination Section -->
         <div class="listing_indicator">
+            <?php
+            $range       = 2;
+            $jump        = 3;
+            $totalPages  = (int)ceil($total_posts / $posts_per_page);
+            $currentPage = $page;
+
+            function renderEllipsis($targetPage, $search) {
+                $qs = '?page=' . $targetPage . ($search !== '' ? '&search_term=' . urlencode($search) : '');
+                echo '<li class="indicator_item ellipsis"><a href="' . $qs . '">…</a></li>';
+            }
+            ?>
             <ul class="listing_indicator">
-                <?php
-                // Get total number of posts for pagination
-                $result_count = $conn->query($count_query); // Use the count query with search term
-                $row_count = $result_count->fetch_assoc();
-                $total_posts = $row_count['total'];
-                $total_pages = ceil($total_posts / $posts_per_page);
-                
-                // Display previous button
-                if ($page > 1):
-                ?>
-                <li class="indicator_item">
-                    <a href="?page=<?php echo $page - 1; ?><?php if (!empty($search)) echo '&search_term=' . urlencode($search); ?>">
-                        <i class="fa-solid fa-chevron-left"></i>
-                    </a>
-                </li>
+                <?php if ($currentPage > 1): ?>
+                    <li class="indicator_item">
+                        <a href="?page=<?= $currentPage - 1 ?><?= $search !== '' ? '&search_term=' . urlencode($search) : '' ?>">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </a>
+                    </li>
                 <?php endif; ?>
 
-                <!-- Display page numbers -->
-                <?php for ($i = 1; $i <= $total_pages; $i++): 
-                    echo '<li class="indicator_item ' . (($i === (int)$page) ? 'active' : '') . '">
-                    <a href="?page=' . $i . (empty($search) ? '' : '&search_term=' . urlencode($search)) . '">' . $i . '</a>
-                    </li>';
-                    endfor; ?>
+                <?php if ($currentPage > $range + 1): ?>
+                    <li class="indicator_item">
+                        <a href="?page=1<?= $search !== '' ? '&search_term=' . urlencode($search) : '' ?>">1</a>
+                    </li>
+                    <?php renderEllipsis(max(1, $currentPage - $jump), $search); ?>
+                <?php endif; ?>
 
-                <!-- Display next button -->
-                <?php if ($page < $total_pages): ?>
-                <li class="indicator_item">
-                    <a href="?page=<?php echo $page + 1; ?><?php if (!empty($search)) echo '&search_term=' . urlencode($search); ?>">
-                        <i class="fa-solid fa-chevron-right"></i>
-                    </a>
-                </li>
+                <?php
+                $start = max(1, $currentPage - $range);
+                $end   = min($totalPages, $currentPage + $range);
+                for ($i = $start; $i <= $end; $i++): ?>
+                    <li class="indicator_item <?= $i === $currentPage ? 'active' : '' ?>">
+                        <?php if ($i === $currentPage): ?>
+                            <a href="javascript:void(0)"><?= $i ?></a>
+                        <?php else: ?>
+                            <a href="?page=<?= $i ?><?= $search !== '' ? '&search_term=' . urlencode($search) : '' ?>"><?= $i ?></a>
+                        <?php endif; ?>
+                    </li>
+                <?php endfor; ?>
+
+                <?php if ($currentPage < $totalPages - $range): ?>
+                    <?php renderEllipsis(min($totalPages, $currentPage + $jump), $search); ?>
+                    <li class="indicator_item">
+                        <a href="?page=<?= $totalPages ?><?= $search !== '' ? '&search_term=' . urlencode($search) : '' ?>">
+                            <?= $totalPages ?>
+                        </a>
+                    </li>
+                <?php endif; ?>
+
+                <?php if ($currentPage < $totalPages): ?>
+                    <li class="indicator_item">
+                        <a href="?page=<?= $currentPage + 1 ?><?= $search !== '' ? '&search_term=' . urlencode($search) : '' ?>">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                    </li>
                 <?php endif; ?>
             </ul>
         </div>

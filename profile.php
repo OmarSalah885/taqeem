@@ -26,11 +26,7 @@ if (!$user) {
     exit;
 }
 $is_private = ($user['visibility'] === 'private' && !$is_owner && !$is_admin);
-// Check profile visibility (only owner or admin can bypass private)
-if ($user['visibility'] === 'private' && !$is_owner ) {
-    echo "<p>This profile is private.</p>";
-    exit;
-}
+
 // Handle image upload if it's the owner's profile or the admin is editing
 if ($_SERVER['REQUEST_METHOD'] === 'POST'
     && isset($_FILES['profile_image'])

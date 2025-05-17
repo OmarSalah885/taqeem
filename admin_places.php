@@ -1,6 +1,7 @@
 <?php
 require_once 'config.php';
 require_once 'db_connect.php';
+
 session_start();
 
 // 1. Only admins
@@ -25,27 +26,38 @@ $whereClauses = [];
 $params       = [];
 $types        = '';
 
+// --- NEW partial date search detection
+$isDateSearch = false;
 if ($search !== '') {
-    $whereClauses[] = "(
-        name LIKE ? OR
-        tags LIKE ? OR
-        country LIKE ? OR
-        city LIKE ? OR
-        email LIKE ? OR
-        DATE(created_at) LIKE ?
-    )";
-
-    // bind 6 params in same order
-    array_push(
-      $params,
-      $searchParam, // name
-      $searchParam, // tags
-      $searchParam, // country
-      $searchParam, // city
-      $searchParam, // email
-      $searchParam  // created_at (YYYY-MM-DD)
-    );
-    $types .= str_repeat('s', 6);
+    // Full date exact match YYYY-MM-DD
+    if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $search)) {
+        $whereClauses[] = "DATE(created_at) = ?";
+        $params[] = $search;
+        $types .= 's';
+        $isDateSearch = true;
+    }
+    // Partial date match YYYY-MM or YYYY
+    else if (preg_match('/^\d{4}-\d{2}$/', $search) || preg_match('/^\d{4}$/', $search)) {
+        // Use LIKE on created_at string (created_at is datetime, so LIKE works)
+        $whereClauses[] = "created_at LIKE ?";
+        $params[] = $search . '%';
+        $types .= 's';
+        $isDateSearch = true;
+    }
+    else {
+        // General LIKE search on text fields
+        $whereClauses[] = "(
+            name LIKE ? OR
+            tags LIKE ? OR
+            country LIKE ? OR
+            city LIKE ? OR
+            email LIKE ?
+        )";
+        for ($i = 0; $i < 5; $i++) {
+            $params[] = $searchParam;
+        }
+        $types .= str_repeat('s', 5);
+    }
 }
 
 if (!empty($whereClauses)) {
@@ -69,9 +81,11 @@ $baseSql = "
            country, city, email, created_at
     FROM places
 ";
+
 if (!empty($whereClauses)) {
     $baseSql .= ' WHERE ' . implode(' AND ', $whereClauses);
 }
+
 // append order & limit
 $offsetInt  = (int)$offset;
 $perPageInt = (int)$perPage;
@@ -96,13 +110,16 @@ include 'header.php';
           type="text"
           id="placeSearch"
           name="search"
-          placeholder="Search by name, tags, country, city, email, or date..."
+          placeholder="Search by name, tags, country, city, email, or date (YYYY-MM-DD or partial)..."
           value="<?php echo htmlspecialchars($search); ?>"
         >
         <button type="submit">Search</button>
     </form>
 
     <div class="table-container">
+        <?php if ($totalPlaces === 0): ?>
+            <p>No results found.</p>
+        <?php else: ?>
         <table id="placeTable">
             <thead>
                 <tr>
@@ -127,7 +144,7 @@ while ($place = $places->fetch_assoc()): ?>
                     <td>
                         <img
                           src="<?php echo htmlspecialchars($place['featured_image'] ?: 'assets/images/places/placeholder.png'); ?>"
-                          alt="Featured"
+                          alt="<?php echo htmlspecialchars('Featured image of ' . $place['name']); ?>"
                           width="80"
                           height="50"
                         >
@@ -142,46 +159,85 @@ while ($place = $places->fetch_assoc()): ?>
                     <td class="actions">
                         <a href="edit_place.php?place_id=<?php echo $place['id']; ?>" class="btn-edit">Edit</a>
                         <form action="delete_place.php" method="POST" style="display:inline;" onsubmit="return confirm('Delete this place?');">
-    <input type="hidden" name="place_id" value="<?php echo $place['id']; ?>">
-    <input type="hidden" name="redirect_to" value="<?php echo htmlspecialchars($_SERVER['REQUEST_URI']); ?>">
-    <button type="submit" class="btn-delete">Delete</button>
-</form>
-
+                            <input type="hidden" name="place_id" value="<?php echo $place['id']; ?>">
+                            <input type="hidden" name="redirect_to" value="<?php echo htmlspecialchars($_SERVER['REQUEST_URI']); ?>">
+                            <button type="submit" class="btn-delete">Delete</button>
+                        </form>
                     </td>
                 </tr>
 <?php endwhile; ?>
             </tbody>
         </table>
+        <?php endif; ?>
     </div>
 
     <!-- Pagination -->
+    <?php if ($totalPages > 0): ?>
     <div class="listing_indicator">
+        <?php
+        $range       = 2;   // pages to show either side of current
+        $jump        = 3;   // pages to jump when clicking “…”
+        $currentPage = $page;
+
+        // helper to render a clickable ellipsis
+        function renderEllipsis($targetPage, $search) {
+            echo '<li class="indicator_item ellipsis">';
+            echo    '<a href="?page=' . $targetPage . '&search=' . urlencode($search) . '">…</a>';
+            echo '</li>';
+        }
+        ?>
         <ul class="listing_indicator">
-            <?php if ($page > 1): ?>
-                <li class="indicator_item">
-                    <a href="?page=<?php echo $page - 1; ?>&search=<?php echo urlencode($search); ?>">
-                        <i class="fa-solid fa-chevron-left"></i>
-                    </a>
-                </li>
-            <?php endif; ?>
+          <!-- Previous arrow -->
+          <?php if ($currentPage > 1): ?>
+            <li class="indicator_item">
+              <a href="?page=<?= $currentPage - 1 ?>&search=<?= urlencode($search) ?>">
+                <i class="fa-solid fa-chevron-left"></i>
+              </a>
+            </li>
+          <?php endif; ?>
 
-            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                <li class="indicator_item <?php echo ($i === $page) ? 'active' : ''; ?>">
-                    <a href="?page=<?php echo $i; ?>&search=<?php echo urlencode($search); ?>">
-                        <?php echo $i; ?>
-                    </a>
-                </li>
-            <?php endfor; ?>
+          <!-- First page + leading ellipsis -->
+          <?php if ($currentPage > $range + 1): ?>
+            <li class="indicator_item">
+              <a href="?page=1&search=<?= urlencode($search) ?>">1</a>
+            </li>
+            <?php renderEllipsis(max(1, $currentPage - $jump), $search); ?>
+          <?php endif; ?>
 
-            <?php if ($page < $totalPages): ?>
-                <li class="indicator_item">
-                    <a href="?page=<?php echo $page + 1; ?>&search=<?php echo urlencode($search); ?>">
-                        <i class="fa-solid fa-chevron-right"></i>
-                    </a>
-                </li>
-            <?php endif; ?>
+          <!-- Pages around current -->
+          <?php
+            $start = max(1, $currentPage - $range);
+            $end   = min($totalPages, $currentPage + $range);
+            for ($i = $start; $i <= $end; $i++): ?>
+              <li class="indicator_item <?= $i === $currentPage ? 'active' : '' ?>">
+                <?php if ($i === $currentPage): ?>
+                  <a href="javascript:void(0)"><?= $i ?></a>
+                <?php else: ?>
+                  <a href="?page=<?= $i ?>&search=<?= urlencode($search) ?>"><?= $i ?></a>
+                <?php endif; ?>
+              </li>
+          <?php endfor; ?>
+
+          <!-- Trailing ellipsis + last page -->
+          <?php if ($currentPage < $totalPages - $range): ?>
+            <?php renderEllipsis(min($totalPages, $currentPage + $jump), $search); ?>
+            <li class="indicator_item">
+              <a href="?page=<?= $totalPages ?>&search=<?= urlencode($search) ?>"><?= $totalPages ?></a>
+            </li>
+          <?php endif; ?>
+
+          <!-- Next arrow -->
+          <?php if ($currentPage < $totalPages): ?>
+            <li class="indicator_item">
+              <a href="?page=<?= $currentPage + 1 ?>&search=<?= urlencode($search) ?>">
+                <i class="fa-solid fa-chevron-right"></i>
+              </a>
+            </li>
+          <?php endif; ?>
         </ul>
     </div>
+    <?php endif; ?>
+
 </main>
 
 <?php include 'footer.php'; ?>
