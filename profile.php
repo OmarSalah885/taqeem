@@ -94,7 +94,6 @@ $placeCount  = fetchCount($conn, 'places');
 $reviewCount = fetchCount($conn, 'reviews');
 $blogCount   = fetchCount($conn, 'blogs');
 
-
 include 'header.php';
 ?>
 
@@ -115,12 +114,12 @@ include 'header.php';
         <!-- User Info -->
         <div class="profile_sidebar--info">
             <h3 class="name"><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></h3>
-            
+
             <?php if (!$is_private): ?>
                 <!-- Show email only if the profile is not private -->
                 <a href="mailto:<?php echo htmlspecialchars($user['email']); ?>"><?php echo htmlspecialchars($user['email']); ?></a>
             <?php endif; ?>
-            
+
             <?php if (!$is_private): ?>
                 <!-- Show location only if the profile is not private -->
                 <h2 class="location"><?php echo htmlspecialchars($user['location'] ?? 'Unknown Location'); ?></h2>
@@ -138,17 +137,21 @@ include 'header.php';
             <label for="profileInput" class="profile_sidebar--edit-btn" style="cursor:pointer;">
                 <i class="fa-solid fa-user"></i>Add photo
             </label>
-        </div>    
+        </div>
         <a href="delete_account.php" class="btn__transparent--l btn__transparent btn" onclick="return confirm('Are you SURE you want to delete your account? This cannot be undone.');">DELETE ACCOUNT</a>
         <a href="logout.php" class="btn__transparent--l btn__transparent btn">LOGOUT</a>
         <?php endif; ?>
     </div>
 
-    
-    
         <!-- Show Profile Sections -->
         <div class="profile_main">
-            <?php if (isset($_SESSION['role']) && strtolower(trim($_SESSION['role'])) === 'admin'): ?>
+            <?php if (
+    isset($_SESSION['role'], $_SESSION['user_id']) &&
+    strtolower(trim($_SESSION['role'])) === 'admin' &&
+    $profile_user_id === $logged_in_user_id
+
+): ?>
+    <!-- Admin Dashboard Section -->
     <div class="profile_main_collection">
         <h2 class="profile_title">Admin Dashboard</h2>
         <div class="admin_container">
@@ -172,6 +175,7 @@ include 'header.php';
     </div>
 <?php endif; ?>
 
+
         <?php if ($is_private): ?>
         <!-- Show "Profile is Private" Message -->
         <div class="profile_private_message">
@@ -185,10 +189,10 @@ include 'header.php';
                     <?php
                     // Fetch the newest 2 places and count total places
                     $places_query = $conn->prepare("
-                        SELECT 
-                            p.id, p.name, p.price, p.tags, p.city, p.featured_image, 
-                            c.id AS category_id, 
-                            c.icon AS category_icon, 
+                        SELECT
+                            p.id, p.name, p.price, p.tags, p.city, p.featured_image,
+                            c.id AS category_id,
+                            c.icon AS category_icon,
                             COALESCE(AVG(r.rating), 0) AS avg_rating
                         FROM places p
                         LEFT JOIN reviews r ON p.id = r.place_id
@@ -282,7 +286,6 @@ include 'header.php';
                         <?php endif; ?>
                     <?php endif; ?>
                 </div>
-            
 
             <!-- MY REVIEWS Section -->
             <div class="profile_main_myReviews">
@@ -291,19 +294,19 @@ include 'header.php';
                     <?php
                     // Fetch the newest 2 reviews and count total reviews
                     $reviews_query = $conn->prepare("
-                        SELECT 
-                            r.id AS review_id, 
-                            r.review_text, 
-                            r.rating, 
-                            r.created_at, 
-                            p.id AS place_id, 
-                            p.name AS place_name, 
-                            p.featured_image AS place_image, 
-                            c.id AS category_id, 
+                        SELECT
+                            r.id AS review_id,
+                            r.review_text,
+                            r.rating,
+                            r.created_at,
+                            p.id AS place_id,
+                            p.name AS place_name,
+                            p.featured_image AS place_image,
+                            c.id AS category_id,
                             c.icon AS category_icon,
-                            u.id AS user_id, 
-                            u.first_name, 
-                            u.last_name, 
+                            u.id AS user_id,
+                            u.first_name,
+                            u.last_name,
                             u.profile_image
                         FROM reviews r
                         INNER JOIN places p ON r.place_id = p.id
@@ -397,19 +400,19 @@ include 'header.php';
                     <?php
                     // Fetch the newest 2 liked reviews
                     $liked_reviews_query = $conn->prepare("
-                        SELECT 
-                            rl.review_id, 
-                            r.rating, 
-                            r.review_text, 
-                            r.created_at, 
-                            p.id AS place_id, 
-                            p.name AS place_name, 
-                            p.featured_image AS place_image, 
-                            c.id AS category_id, 
+                        SELECT
+                            rl.review_id,
+                            r.rating,
+                            r.review_text,
+                            r.created_at,
+                            p.id AS place_id,
+                            p.name AS place_name,
+                            p.featured_image AS place_image,
+                            c.id AS category_id,
                             c.icon AS category_icon,
-                            u.id AS user_id, 
-                            u.first_name, 
-                            u.last_name, 
+                            u.id AS user_id,
+                            u.first_name,
+                            u.last_name,
                             u.profile_image
                         FROM review_likes rl
                         INNER JOIN reviews r ON rl.review_id = r.id
@@ -500,10 +503,10 @@ include 'header.php';
                     <?php
                     // Fetch the newest 2 saved places and count total saved places
                     $saved_places_query = $conn->prepare("
-                        SELECT 
-                            sp.place_id, p.name, p.price, p.tags, p.city, p.featured_image, 
-                            c.id AS category_id, 
-                            c.icon AS category_icon, 
+                        SELECT
+                            sp.place_id, p.name, p.price, p.tags, p.city, p.featured_image,
+                            c.id AS category_id,
+                            c.icon AS category_icon,
                             COALESCE(AVG(r.rating), 0) AS avg_rating
                         FROM saved_places sp
                         INNER JOIN places p ON sp.place_id = p.id
@@ -626,7 +629,7 @@ include 'header.php';
             </div>
             <?php endif; ?>
         </div>
-    
+
 </main>
 
 <?php include 'footer.php'; ?>
