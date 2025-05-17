@@ -46,7 +46,6 @@ if ($countStmt === false) {
 }
 
 if (!empty($whereClauses)) {
-    // Bind parameters by reference — this is needed for PHP < 8.0
     $bindNames = [];
     $bindNames[] = & $types;
     for ($i = 0; $i < count($params); $i++) {
@@ -69,7 +68,7 @@ if (!empty($whereClauses)) {
 }
 $baseSql .= " ORDER BY id ASC LIMIT ?, ?";
 
-// Since LIMIT params cannot be bound as strings, bind as integers — but to avoid problems, we embed them directly here:
+// Bind params (replace LIMIT placeholders directly because LIMIT can't be parameterized)
 $stmt = $conn->prepare(str_replace('?, ?', (int)$offset . ', ' . (int)$perPage, $baseSql));
 if ($stmt === false) {
     die('Prepare failed: ' . htmlspecialchars($conn->error));
@@ -124,24 +123,31 @@ include 'header.php';
 $rowNum = $offset + 1;
 if ($blogs->num_rows > 0):
     while ($blog = $blogs->fetch_assoc()):
+        $blogId = (int)$blog['id'];
 ?>
                 <tr>
                     <td><?php echo $rowNum++; ?></td>
                     <td>
-                        <img
-                          src="<?php echo htmlspecialchars($blog['image'] ?: 'assets/images/blogs/placeholder.png', ENT_QUOTES); ?>"
-                          alt="Blog Image"
-                          width="80"
-                          height="50"
-                        >
+                        <a href="single-blog.php?id=<?php echo $blogId; ?>">
+                            <img
+                              src="<?php echo htmlspecialchars($blog['image'] ?: 'assets/images/blogs/placeholder.png', ENT_QUOTES); ?>"
+                              alt="Blog Image"
+                              width="80"
+                              height="50"
+                            >
+                        </a>
                     </td>
-                    <td><?php echo htmlspecialchars($blog['title'], ENT_QUOTES); ?></td>
+                    <td>
+                        <a href="single-blog.php?id=<?php echo $blogId; ?>">
+                            <?php echo htmlspecialchars($blog['title'], ENT_QUOTES); ?>
+                        </a>
+                    </td>
                     <td><?php echo htmlspecialchars($blog['tags'], ENT_QUOTES); ?></td>
                     <td><?php echo htmlspecialchars(mb_strimwidth(strip_tags($blog['content']), 0, 50, '…')); ?></td>
                     <td><?php echo htmlspecialchars(substr($blog['created_at'], 0, 10), ENT_QUOTES); ?></td>
                     <td class="actions">
-                        <a href="edit_blog.php?id=<?php echo $blog['id']; ?>" class="btn-edit">Edit</a>
-                        <a href="delete_blog.php?id=<?php echo $blog['id']; ?>" class="btn-delete" onclick="return confirm('Delete this blog?');">Delete</a>
+                        <a href="edit_blog.php?id=<?php echo $blogId; ?>" class="btn-edit">Edit</a>
+                        <a href="delete_blog.php?id=<?php echo $blogId; ?>" class="btn-delete" onclick="return confirm('Delete this blog?');">Delete</a>
                     </td>
                 </tr>
 <?php

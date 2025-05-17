@@ -142,20 +142,26 @@ while ($place = $places->fetch_assoc()): ?>
                 <tr>
                     <td><?php echo $rowNum++; ?></td>
                     <td>
-                        <img
-                          src="<?php echo htmlspecialchars($place['featured_image'] ?: 'assets/images/places/placeholder.png'); ?>"
-                          alt="<?php echo htmlspecialchars('Featured image of ' . $place['name']); ?>"
-                          width="80"
-                          height="50"
-                        >
+                        <a href="single-place.php?place_id=<?php echo $place['id']; ?>">
+                            <img
+                              src="<?php echo htmlspecialchars($place['featured_image'] ?: 'assets/images/places/placeholder.png'); ?>"
+                              alt="<?php echo htmlspecialchars('Featured image of ' . $place['name']); ?>"
+                              width="80"
+                              height="50"
+                            >
+                        </a>
                     </td>
-                    <td><?php echo htmlspecialchars($place['name']); ?></td>
+                    <td>
+                        <a href="single-place.php?place_id=<?php echo $place['id']; ?>">
+                            <?php echo htmlspecialchars($place['name']); ?>
+                        </a>
+                    </td>
                     <td><?php echo htmlspecialchars($place['tags']); ?></td>
-                    <td><?php echo htmlspecialchars(mb_strimwidth($place['description'],0,50,'…')); ?></td>
+                    <td><?php echo htmlspecialchars(mb_strimwidth($place['description'], 0, 50, '…')); ?></td>
                     <td><?php echo htmlspecialchars($place['country']); ?></td>
                     <td><?php echo htmlspecialchars($place['city']); ?></td>
                     <td><?php echo htmlspecialchars($place['email']); ?></td>
-                    <td><?php echo htmlspecialchars(substr($place['created_at'],0,10)); ?></td>
+                    <td><?php echo htmlspecialchars(substr($place['created_at'], 0, 10)); ?></td>
                     <td class="actions">
                         <a href="edit_place.php?place_id=<?php echo $place['id']; ?>" class="btn-edit">Edit</a>
                         <form action="delete_place.php" method="POST" style="display:inline;" onsubmit="return confirm('Delete this place?');">

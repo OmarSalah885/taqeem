@@ -94,6 +94,7 @@ $totalPages = (int)ceil($totalReviews / $perPage);
 $baseSql = "
     SELECT r.id,
            r.place_id,
+           r.user_id,
            u.profile_image,
            u.first_name, u.last_name,
            p.name AS place_name,
@@ -172,11 +173,18 @@ while ($rev = $reviews->fetch_assoc()):
     $placeName = htmlspecialchars($rev['place_name']);
     $text      = htmlspecialchars(mb_strimwidth($rev['review_text'], 0, 50, '…'));
     $created   = substr($rev['created_at'], 0, 10);
+    $userId    = $rev['user_id'];
 ?>
                 <tr>
                     <td><?= $rowNum++ ?></td>
-                    <td><img src="<?= htmlspecialchars($userImg) ?>" alt="User" width="50" height="50"></td>
-                    <td><?= $userName ?></td>
+                    <td>
+                        <a href="profile.php?user_id=<?= (int)$userId ?>">
+                            <img src="<?= htmlspecialchars($userImg) ?>" alt="User" width="50" height="50">
+                        </a>
+                    </td>
+                    <td>
+                        <a href="profile.php?user_id=<?= (int)$userId ?>"><?= $userName ?></a>
+                    </td>
                     <td><?= $placeName ?></td>
                     <td><?= (int)$rev['rating'] ?></td>
                     <td><?= $text ?></td>
@@ -244,8 +252,9 @@ while ($rev = $reviews->fetch_assoc()):
                 </li>
             <?php endif; ?>
 
-            <!-- Next arrow -->
-            <?php if ($currentPage < $totalPages): ?>
+            <?php
+            // Next arrow
+            if ($currentPage < $totalPages): ?>
                 <li class="indicator_item">
                     <a href="?page=<?= $currentPage + 1 ?>&search=<?= urlencode($search) ?>">
                         <i class="fa-solid fa-chevron-right"></i>
@@ -254,6 +263,7 @@ while ($rev = $reviews->fetch_assoc()):
             <?php endif; ?>
         </ul>
     </div>
+
 </main>
 
 <?php include 'footer.php'; ?>

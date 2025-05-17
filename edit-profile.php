@@ -55,31 +55,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Prepare update query
-    $stmt = $conn->prepare(
-        "UPDATE users SET first_name=?, last_name=?, about_me=?, gender=?, visibility=?, location=?, profile_image=? WHERE id=?"
-    );
-    $stmt->bind_param(
-        "sssssssi",
-        $first_name,
-        $last_name,
-        $about_me,
-        $gender,
-        $visibility,
-        $location,
-        $profile_image_path,
-        $user_id
-    );
-    $stmt->execute();
-    $stmt->close();
+$stmt = $conn->prepare(
+    "UPDATE users SET first_name=?, last_name=?, about_me=?, gender=?, visibility=?, location=?, profile_image=? WHERE id=?"
+);
+$stmt->bind_param(
+    "sssssssi",
+    $first_name,
+    $last_name,
+    $about_me,
+    $gender,
+    $visibility,
+    $location,
+    $profile_image_path,
+    $user_id
+);
+$stmt->execute();
+$stmt->close();
 
-    // *** Immediately update session so header shows new data ***
+// *** Immediately update session so header shows new data ***
+// Only update session if user edits their own profile (not admin editing others)
+if ($user_id === ($_SESSION['user_id'] ?? 0)) {
     $_SESSION['first_name']    = $first_name;
     $_SESSION['last_name']     = $last_name;
     $_SESSION['profile_image'] = $profile_image_path;
+}
 
-    // Redirect to avoid resubmission on refresh
-    header("Location: edit-profile.php?user_id=$user_id");
-    exit;
+// Redirect to avoid resubmission on refresh
+header("Location: edit-profile.php?user_id=$user_id");
+exit;
+
 }
 
 // Fetch user data for the form

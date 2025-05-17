@@ -51,8 +51,6 @@ if ($search !== '') {
     $types = str_repeat('s', 9);
 }
 
-
-
 if (!empty($whereClauses)) {
     $countSql .= ' WHERE ' . implode(' AND ', $whereClauses);
 }
@@ -68,7 +66,6 @@ $countStmt->close();
 
 // Calculate total pages
 $totalPages = (int)ceil($totalUsers / $perPage);
-// … earlier code unchanged …
 
 // Build base SQL with WHERE if needed
 $baseSql = "
@@ -80,21 +77,19 @@ if (!empty($whereClauses)) {
     $baseSql .= ' WHERE ' . implode(' AND ', $whereClauses);
 }
 
-// ** Append ORDER BY and LIMIT directly — no binding for LIMIT/offset **
+// Append ORDER BY and LIMIT
 $offsetInt  = (int)$offset;
 $perPageInt = (int)$perPage;
 $baseSql   .= " ORDER BY id ASC LIMIT {$offsetInt}, {$perPageInt}";
 
 $userStmt = $conn->prepare($baseSql);
 if (!empty($whereClauses)) {
-    // bind only the search parameters here
     $userStmt->bind_param($types, ...$params);
 }
 
 $userStmt->execute();
 $users = $userStmt->get_result();
 $userStmt->close();
-
 
 include 'header.php';
 ?>
@@ -137,15 +132,28 @@ include 'header.php';
                     <td><?php echo $user['id']; ?></td>
                     
                     <td>
-                        <img
-                            src="<?php echo htmlspecialchars($user['profile_image'] ?: 'assets/images/profiles/pro_null.png'); ?>"
-                            alt="User Image"
-                            width="50"
-                            height="50"
-                        >
+                        <a href="profile.php?user_id=<?php echo $user['id']; ?>">
+                            <img
+                                src="<?php echo htmlspecialchars($user['profile_image'] ?: 'assets/images/profiles/pro_null.png'); ?>"
+                                alt="User Image"
+                                width="50"
+                                height="50"
+                            >
+                        </a>
                     </td>
-                    <td><?php echo htmlspecialchars($user['first_name']); ?></td>
-                    <td><?php echo htmlspecialchars($user['last_name']); ?></td>
+                    
+                    <td>
+                        <a href="profile.php?user_id=<?php echo $user['id']; ?>">
+                            <?php echo htmlspecialchars($user['first_name']); ?>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="profile.php?user_id=<?php echo $user['id']; ?>">
+                            <?php echo htmlspecialchars($user['last_name']); ?>
+                        </a>
+                    </td>
+                    
                     <td><?php echo htmlspecialchars($user['email']); ?></td>
                     <td><?php echo htmlspecialchars($user['gender']); ?></td>
                     <td><?php echo htmlspecialchars($user['about_me']); ?></td>
@@ -160,11 +168,9 @@ include 'header.php';
                     <td class="actions">
                         <a href="edit-profile.php?user_id=<?php echo $user['id']; ?>" class="btn-edit">Edit</a>
                         <a href="delete_account.php?id=<?php echo $user['id']; ?>" class="btn-delete" onclick="return confirm('Are you sure you want to delete this user?');">Delete</a>
-
                     </td>
                 </tr>
 <?php endwhile; ?>
-
             </tbody>
         </table>
     </div>
@@ -172,68 +178,65 @@ include 'header.php';
     <!-- Pagination -->
     <div class="listing_indicator">
         <?php
-$range       = 2;   // pages to show either side of current
-$jump        = 3;   // pages to jump when clicking “…”
-$totalPages  = (int)ceil($totalPlaces / $perPage);
-$currentPage = $page;
+        $range       = 2;   // pages to show either side of current
+        $jump        = 3;   // pages to jump when clicking “…”
+        $currentPage = $page;
 
-// helper to render a clickable ellipsis
-function renderEllipsis($targetPage, $search) {
-    echo '<li class="indicator_item ellipsis">';
-    echo    '<a href="?page=' . $targetPage . '&search=' . urlencode($search) . '">…</a>';
-    echo '</li>';
-}
-?>
-<ul class="listing_indicator">
-  <!-- Previous arrow -->
-  <?php if ($currentPage > 1): ?>
-    <li class="indicator_item">
-      <a href="?page=<?= $currentPage - 1 ?>&search=<?= urlencode($search) ?>">
-        <i class="fa-solid fa-chevron-left"></i>
-      </a>
-    </li>
-  <?php endif; ?>
+        function renderEllipsis($targetPage, $search) {
+            echo '<li class="indicator_item ellipsis">';
+            echo    '<a href="?page=' . $targetPage . '&search=' . urlencode($search) . '">…</a>';
+            echo '</li>';
+        }
+        ?>
+        <ul class="listing_indicator">
+          <!-- Previous arrow -->
+          <?php if ($currentPage > 1): ?>
+            <li class="indicator_item">
+              <a href="?page=<?= $currentPage - 1 ?>&search=<?= urlencode($search) ?>">
+                <i class="fa-solid fa-chevron-left"></i>
+              </a>
+            </li>
+          <?php endif; ?>
 
-  <!-- First page + leading ellipsis -->
-  <?php if ($currentPage > $range + 1): ?>
-    <li class="indicator_item">
-      <a href="?page=1&search=<?= urlencode($search) ?>">1</a>
-    </li>
-    <?php renderEllipsis(max(1, $currentPage - $jump), $search); ?>
-  <?php endif; ?>
+          <!-- First page + leading ellipsis -->
+          <?php if ($currentPage > $range + 1): ?>
+            <li class="indicator_item">
+              <a href="?page=1&search=<?= urlencode($search) ?>">1</a>
+            </li>
+            <?php renderEllipsis(max(1, $currentPage - $jump), $search); ?>
+          <?php endif; ?>
 
-  <!-- Pages around current -->
-  <?php
-    $start = max(1, $currentPage - $range);
-    $end   = min($totalPages, $currentPage + $range);
-    for ($i = $start; $i <= $end; $i++): ?>
-      <li class="indicator_item <?= $i === $currentPage ? 'active' : '' ?>">
-        <?php if ($i === $currentPage): ?>
-          <a href="javascript:void(0)"><?= $i ?></a>
-        <?php else: ?>
-          <a href="?page=<?= $i ?>&search=<?= urlencode($search) ?>"><?= $i ?></a>
-        <?php endif; ?>
-      </li>
-  <?php endfor; ?>
+          <!-- Pages around current -->
+          <?php
+            $start = max(1, $currentPage - $range);
+            $end   = min($totalPages, $currentPage + $range);
+            for ($i = $start; $i <= $end; $i++): ?>
+              <li class="indicator_item <?= $i === $currentPage ? 'active' : '' ?>">
+                <?php if ($i === $currentPage): ?>
+                  <a href="javascript:void(0)"><?= $i ?></a>
+                <?php else: ?>
+                  <a href="?page=<?= $i ?>&search=<?= urlencode($search) ?>"><?= $i ?></a>
+                <?php endif; ?>
+              </li>
+          <?php endfor; ?>
 
-  <!-- Trailing ellipsis + last page -->
-  <?php if ($currentPage < $totalPages - $range): ?>
-    <?php renderEllipsis(min($totalPages, $currentPage + $jump), $search); ?>
-    <li class="indicator_item">
-      <a href="?page=<?= $totalPages ?>&search=<?= urlencode($search) ?>"><?= $totalPages ?></a>
-    </li>
-  <?php endif; ?>
+          <!-- Trailing ellipsis + last page -->
+          <?php if ($currentPage < $totalPages - $range): ?>
+            <?php renderEllipsis(min($totalPages, $currentPage + $jump), $search); ?>
+            <li class="indicator_item">
+              <a href="?page=<?= $totalPages ?>&search=<?= urlencode($search) ?>"><?= $totalPages ?></a>
+            </li>
+          <?php endif; ?>
 
-  <!-- Next arrow -->
-  <?php if ($currentPage < $totalPages): ?>
-    <li class="indicator_item">
-      <a href="?page=<?= $currentPage + 1 ?>&search=<?= urlencode($search) ?>">
-        <i class="fa-solid fa-chevron-right"></i>
-      </a>
-    </li>
-  <?php endif; ?>
-</ul>
-
+          <!-- Next arrow -->
+          <?php if ($currentPage < $totalPages): ?>
+            <li class="indicator_item">
+              <a href="?page=<?= $currentPage + 1 ?>&search=<?= urlencode($search) ?>">
+                <i class="fa-solid fa-chevron-right"></i>
+              </a>
+            </li>
+          <?php endif; ?>
+        </ul>
     </div>
 </main>
 
