@@ -163,19 +163,19 @@ include 'header.php';
             <h2 class="profile_title">Admin Dashboard</h2>
             <div class="admin_container">
                 <div class="admin_card admin_users">
-                    <h1>USERS <span><?php echo $userCount; ?></span></h1>
+                    <h1><span><?php echo $userCount; ?></span> USERS</h1>
                     <a href="admin_users.php">View all users</a>
                 </div>
                 <div class="admin_card admin_places">
-                    <h1>PLACES <span><?php echo $placeCount; ?></span></h1>
+                    <h1> <span><?php echo $placeCount; ?></span> PLACES</h1>
                     <a href="admin_places.php">View all places</a>
                 </div>
                 <div class="admin_card admin_reviews">
-                    <h1>REVIEWS <span><?php echo $reviewCount; ?></span></h1>
+                    <h1> <span><?php echo $reviewCount; ?></span> REVIEWS</h1>
                     <a href="admin_reviews.php">View all reviews</a>
                 </div>
                 <div class="admin_card admin_blogs">
-                    <h1>BLOGS <span><?php echo $blogCount; ?></span></h1>
+                    <h1><span><?php echo $blogCount; ?></span> BLOGS </h1>
                     <a href="admin_blogs.php">View all blogs</a>
                 </div>
             </div>

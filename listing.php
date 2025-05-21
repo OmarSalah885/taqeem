@@ -59,14 +59,33 @@ if ($stars > 0) {
     $params[] = $stars;
     $param_types .= 'i';
 }
+$category_names = [
+    'restaurants' => 'RESTAURANTS',
+    'shopping' => 'SHOPPING',
+    'active-life' => 'ACTIVE LIFE',
+    'home s' => 'HOME SERVICES', // Updated key
+    'coffee' => 'COFFEE',
+    'pets' => 'PETS',
+    'plants' => 'PLANTS SHOP',
+    'art' => 'ART',
+    'hotel' => 'HOTELS',
+    'edu' => 'EDUCATION',
+    'health' => 'HEALTH',
+    'workspace' => 'WORKSPACE'
+];
 
-// Fetch categories for dropdown
 $categories = [];
+$category_map = [];
 $cat_query = $conn->prepare("SELECT id, name FROM categories ORDER BY name");
 $cat_query->execute();
 $cat_result = $cat_query->get_result();
 while ($cat = $cat_result->fetch_assoc()) {
+    $cat_name = strtolower(trim($cat['name']));
     $categories[] = $cat;
+    $category_map[$cat['id']] = $category_names[$cat_name] ?? htmlspecialchars($cat['name']);
+    if (!isset($category_names[$cat_name])) {
+        error_log("Category name mismatch: '$cat_name' not found in category_names for ID: " . $cat['id']);
+    }
 }
 $cat_query->close();
 
@@ -140,6 +159,8 @@ if (isset($_SESSION['user_id'])) {
     }
     $q->close();
 }
+
+
 ?>
 
 <main>
@@ -151,14 +172,21 @@ if (isset($_SESSION['user_id'])) {
                     if (!empty($search)) {
                         echo "Search Results for: " . htmlspecialchars($search);
                     } elseif ($category_id > 0) {
-                        $sql = "SELECT name FROM categories WHERE id = ?";
-                        $stmt = $conn->prepare($sql);
-                        $stmt->bind_param("i", $category_id);
-                        $stmt->execute();
-                        $result = $stmt->get_result();
-                        $category = $result->fetch_assoc();
-                        echo $category ? htmlspecialchars($category['name']) : 'Unknown Category';
-                        $stmt->close();
+                        $category_names = [
+    'restaurants' => 'RESTAURANTS',
+    'shopping' => 'SHOPPING',
+    'active-life' => 'ACTIVE LIFE',
+    'home s' => 'HOME SERVICES',
+    'coffee' => 'COFFEE',
+    'pets' => 'PETS',
+    'plants' => 'PLANTS SHOP',
+    'art' => 'ART',
+    'hotal' => 'HOTELS',
+    'edu' => 'EDUCATION',
+    'health' => 'HEALTH',
+    'workspace' => 'WORKSPACE'
+];
+                        echo $category_map[$category_id] ?? 'Unknown Category';
                     } else {
                         echo "All Listings";
                     }
@@ -179,7 +207,10 @@ if (isset($_SESSION['user_id'])) {
                     <option value="" <?php echo empty($category_id) ? 'selected' : ''; ?>>Categories</option>
                     <?php foreach ($categories as $cat): ?>
                     <option value="<?php echo $cat['id']; ?>" <?php echo $category_id == $cat['id'] ? 'selected' : ''; ?>>
-                        <?php echo htmlspecialchars($cat['name']); ?>
+                        <?php
+                        $cat_name = strtolower(trim($cat['name']));
+                        echo $category_names[$cat_name] ?? htmlspecialchars($cat['name']);
+                        ?>
                     </option>
                     <?php endforeach; ?>
                 </select>
