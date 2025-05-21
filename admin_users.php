@@ -64,6 +64,13 @@ $countStmt->bind_result($totalUsers);
 $countStmt->fetch();
 $countStmt->close();
 
+// Count total admins
+$admin_count_query = $conn->prepare("SELECT COUNT(*) FROM users WHERE LOWER(role) = 'admin'");
+$admin_count_query->execute();
+$admin_count_query->bind_result($admin_count);
+$admin_count_query->fetch();
+$admin_count_query->close();
+
 // Calculate total pages
 $totalPages = (int)ceil($totalUsers / $perPage);
 
@@ -167,7 +174,9 @@ include 'header.php';
                     </td>
                     <td class="actions">
                         <a href="edit-profile.php?user_id=<?php echo $user['id']; ?>" class="btn-edit">Edit</a>
+                        <?php if (!(strtolower($user['role']) === 'admin' && $admin_count === 1)): ?>
                         <a href="delete_account.php?id=<?php echo $user['id']; ?>" class="btn-delete" onclick="return confirm('Are you sure you want to delete this user?');">Delete</a>
+                        <?php endif; ?>
                     </td>
                 </tr>
 <?php endwhile; ?>
@@ -179,7 +188,7 @@ include 'header.php';
     <div class="listing_indicator">
         <?php
         $range       = 2;   // pages to show either side of current
-        $jump        = 3;   // pages to jump when clicking “…”
+        $jump        = 3;   // pages to jump when clicking "…"
         $currentPage = $page;
 
         function renderEllipsis($targetPage, $search) {

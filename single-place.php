@@ -102,13 +102,14 @@ if (empty($_SESSION['csrf_token'])) {
     <div class="place_info">
         <div class="place_info-cont">
             <div class="place_info--tages">
-                <?php
-                $tags = !empty($place['tags']) ? explode(',', $place['tags']) : [];
-                foreach ($tags as $tag) {
-                    echo '<a href="#">' . htmlspecialchars(trim($tag)) . '</a>';
-                }
-                ?>
-            </div>
+    <?php
+    $tags = !empty($place['tags']) ? explode(',', $place['tags']) : [];
+    foreach ($tags as $tag) {
+        $trimmed_tag = htmlspecialchars(trim($tag));
+        echo '<a href="listing.php?search=' . urlencode($trimmed_tag) . '">' . $trimmed_tag . '</a>';
+    }
+    ?>
+</div>
             <h1 class="place_info--name"><?= htmlspecialchars($place['name']) ?></h1>
             <div class="place_info--extra">
                 <?php
@@ -159,13 +160,7 @@ if (empty($_SESSION['csrf_token'])) {
                 </a>
             </div>
         </div>
-        <div class="place_info--HIGHTLIGHTS">
-            <div class="place_info--HIGHTLIGHTS-item"><p>Air conditioner</p><i class="fa-solid fa-fan"></i></div>
-            <div class="place_info--HIGHTLIGHTS-item"><p>Free Wifi</p><i class="fa-solid fa-wifi"></i></div>
-            <div class="place_info--HIGHTLIGHTS-item"><p>Reservations</p><i class="fa-solid fa-book-open"></i></div>
-            <div class="place_info--HIGHTLIGHTS-item"><p>Car parking</p><i class="fa-solid fa-square-parking"></i></div>
-            <div class="place_info--HIGHTLIGHTS-item"><p>Outdoor seating</p><i class="fa-solid fa-chair"></i></div>
-        </div>
+        
     </div>
 
     <?php if (!empty($place['email']) || !empty($place['phone_1']) || !empty($place['phone_2']) || !empty($place['website']) || !empty($place['facebook_url']) || !empty($place['instagram_url']) || !empty($place['twitter_url'])): ?>
@@ -501,7 +496,7 @@ if (empty($_SESSION['csrf_token'])) {
 </main>
 
 <?php include 'footer.php'; ?>
-
+<!--
 <style>
 .extra_stars_container {
     display: flex;
@@ -514,7 +509,7 @@ if (empty($_SESSION['csrf_token'])) {
     color: #333;
 }
 </style>
-
+        -->
 <script>
 function showEditForm(reviewId) {
     const form = document.getElementById(`editForm-${reviewId}`);

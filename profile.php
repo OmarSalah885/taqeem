@@ -27,7 +27,19 @@ if (!$user) {
 }
 $is_private = ($user['visibility'] === 'private' && !$is_owner && !$is_admin);
 
+// Check if the logged-in user is the sole admin
+$show_delete_button = true;
+if ($is_admin) {
+    $admin_count_query = $conn->prepare("SELECT COUNT(*) FROM users WHERE LOWER(role) = 'admin'");
+    $admin_count_query->execute();
+    $admin_count_query->bind_result($admin_count);
+    $admin_count_query->fetch();
+    $admin_count_query->close();
+    $show_delete_button = $admin_count > 1;
+}
+
 // Handle image upload if it's the owner's profile or the admin is editing
+$error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST'
     && isset($_FILES['profile_image'])
     && ($is_owner || $is_admin)
@@ -68,14 +80,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'
 
                 header("Location: " . $_SERVER['REQUEST_URI']);
                 exit;
+            } else {
+                $error = 'Failed to upload image.';
             }
         } else {
-            echo "<script>
-                    alert('Invalid file type or size too big. Only JPG, JPEG, PNG under 2MB allowed.');
-                  </script>";
+            $error = 'Invalid file type or size too big. Only JPG, JPEG, PNG under 2MB allowed.';
         }
+    } else {
+        $error = 'Image upload error.';
     }
 }
+
+// Helper function to format numbers (e.g., 1500 -> "1.5K", 1500000 -> "1.5M")
+function formatNumber($number) {
+    if ($number >= 1000000) {
+        return number_format($number / 1000000, 1) . 'M';
+    } elseif ($number >= 1000) {
+        return number_format($number / 1000, 1) . 'K';
+    }
+    return (string)$number;
+}
+
+// Fetch counts for Admin Dashboard
 function fetchCount($conn, $table) {
     $count = 0;
     if ($stmt = $conn->prepare("SELECT COUNT(*) FROM $table")) {
@@ -108,6 +134,10 @@ include 'header.php';
 ?>
 
 <main class="profile">
+    <?php if ($error): ?>
+        <div class="error-message"><?= htmlspecialchars($error) ?></div>
+    <?php endif; ?>
+
     <div class="profile_sidebar">
         <!-- User Image -->
         <div class="profile_sidebar--img" style="cursor: pointer;" onclick="document.getElementById('profileInput').click();">
@@ -136,7 +166,7 @@ include 'header.php';
             <?php endif; ?>
         </div>
 
-        <!-- Edit Buttons (Only for Profile Owner) -->
+        <!-- Edit Buttons (Only for Profile Owner or Admin) -->
         <?php if ($is_owner || $is_admin): ?>
         <div class="profile_sidebar--edit">
             <a class="profile_sidebar--edit-btn" href="edit-profile.php<?= $is_admin && !$is_owner ? '?user_id=' . $user['id'] : '' ?>">
@@ -146,7 +176,9 @@ include 'header.php';
                 <i class="fa-solid fa-user"></i>Add photo
             </label>
         </div>
+        <?php if ($show_delete_button): ?>
         <a href="delete_account.php" class="btn__transparent--l btn__transparent btn" onclick="return confirm('Are you SURE you want to delete your account? This cannot be undone.');">DELETE ACCOUNT</a>
+        <?php endif; ?>
         <a href="logout.php" class="btn__transparent--l btn__transparent btn">LOGOUT</a>
         <?php endif; ?>
     </div>
@@ -163,19 +195,19 @@ include 'header.php';
             <h2 class="profile_title">Admin Dashboard</h2>
             <div class="admin_container">
                 <div class="admin_card admin_users">
-                    <h1><span><?php echo $userCount; ?></span> USERS</h1>
+                    <h1><span><?php echo formatNumber($userCount); ?></span> USERS</h1>
                     <a href="admin_users.php">View all users</a>
                 </div>
                 <div class="admin_card admin_places">
-                    <h1> <span><?php echo $placeCount; ?></span> PLACES</h1>
+                    <h1><span><?php echo formatNumber($placeCount); ?></span> PLACES</h1>
                     <a href="admin_places.php">View all places</a>
                 </div>
                 <div class="admin_card admin_reviews">
-                    <h1> <span><?php echo $reviewCount; ?></span> REVIEWS</h1>
+                    <h1><span><?php echo formatNumber($reviewCount); ?></span> REVIEWS</h1>
                     <a href="admin_reviews.php">View all reviews</a>
                 </div>
                 <div class="admin_card admin_blogs">
-                    <h1><span><?php echo $blogCount; ?></span> BLOGS </h1>
+                    <h1><span><?php echo formatNumber($blogCount); ?></span> BLOGS</h1>
                     <a href="admin_blogs.php">View all blogs</a>
                 </div>
             </div>

@@ -20,8 +20,10 @@ $param_types = '';
 
 $search_cat_id = 0;
 if ($search !== '') {
-    $cat_stmt = $conn->prepare("SELECT id FROM categories WHERE name = ?");
-    $cat_stmt->bind_param("s", $search);
+    // Check if the search term matches a category
+    $cat_stmt = $conn->prepare("SELECT id FROM categories WHERE name LIKE ?");
+    $cat_search = "%$search%";
+    $cat_stmt->bind_param("s", $cat_search);
     $cat_stmt->execute();
     $cat_res = $cat_stmt->get_result();
     if ($cat_row = $cat_res->fetch_assoc()) {
@@ -29,9 +31,17 @@ if ($search !== '') {
     }
     $cat_stmt->close();
 
-    $conditions[] = "(places.name LIKE ? OR places.tags LIKE ?" . ($search_cat_id ? " OR places.category_id = ?" : "") . ")";
-    $params[] = "%$search%";
-    $param_types .= 's';
+    // Split search term into individual words for tag matching
+    $search_terms = array_filter(array_map('trim', explode(' ', strtolower($search))));
+    $tag_conditions = [];
+    foreach ($search_terms as $term) {
+        $tag_conditions[] = "places.tags LIKE ?";
+        $params[] = "%$term%";
+        $param_types .= 's';
+    }
+
+    // Combine conditions for name, tags, and category
+    $conditions[] = "(places.name LIKE ?" . (!empty($tag_conditions) ? " OR (" . implode(" OR ", $tag_conditions) . ")" : "") . ($search_cat_id ? " OR places.category_id = ?" : "") . ")";
     $params[] = "%$search%";
     $param_types .= 's';
     if ($search_cat_id) {
@@ -59,21 +69,23 @@ if ($stars > 0) {
     $params[] = $stars;
     $param_types .= 'i';
 }
+
 $category_names = [
     'restaurants' => 'RESTAURANTS',
     'shopping' => 'SHOPPING',
     'active-life' => 'ACTIVE LIFE',
-    'home s' => 'HOME SERVICES', // Updated key
+    'home s' => 'HOME SERVICES',
     'coffee' => 'COFFEE',
     'pets' => 'PETS',
     'plants' => 'PLANTS SHOP',
     'art' => 'ART',
-    'hotel' => 'HOTELS',
+    'hotel' => 'HOTELS', // Fixed typo 'hotal' to 'hotel'
     'edu' => 'EDUCATION',
     'health' => 'HEALTH',
     'workspace' => 'WORKSPACE'
 ];
 
+// Rest of the category fetching and other logic remains unchanged
 $categories = [];
 $category_map = [];
 $cat_query = $conn->prepare("SELECT id, name FROM categories ORDER BY name");
@@ -159,10 +171,9 @@ if (isset($_SESSION['user_id'])) {
     }
     $q->close();
 }
-
-
 ?>
 
+<!-- The rest of the HTML and PHP display logic remains unchanged -->
 <main>
     <div class="listing">
         <div class="pageinfo">
@@ -172,20 +183,6 @@ if (isset($_SESSION['user_id'])) {
                     if (!empty($search)) {
                         echo "Search Results for: " . htmlspecialchars($search);
                     } elseif ($category_id > 0) {
-                        $category_names = [
-    'restaurants' => 'RESTAURANTS',
-    'shopping' => 'SHOPPING',
-    'active-life' => 'ACTIVE LIFE',
-    'home s' => 'HOME SERVICES',
-    'coffee' => 'COFFEE',
-    'pets' => 'PETS',
-    'plants' => 'PLANTS SHOP',
-    'art' => 'ART',
-    'hotal' => 'HOTELS',
-    'edu' => 'EDUCATION',
-    'health' => 'HEALTH',
-    'workspace' => 'WORKSPACE'
-];
                         echo $category_map[$category_id] ?? 'Unknown Category';
                     } else {
                         echo "All Listings";
