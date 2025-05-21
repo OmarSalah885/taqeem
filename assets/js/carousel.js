@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const prevBtn = document.querySelector(".prev");
 
     let currentIndex = 0;
+    let interval;
 
     function updateCarousel(index) {
         items.forEach((item, i) => {
@@ -21,20 +22,38 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    function startAutoLoop() {
+        interval = setInterval(() => {
+            currentIndex = (currentIndex + 1) % items.length;
+            updateCarousel(currentIndex);
+        }, 6000); // change every 4 seconds
+    }
+
+    function resetAutoLoop() {
+        clearInterval(interval);
+        startAutoLoop();
+    }
+
     nextBtn?.addEventListener("click", () => {
         currentIndex = (currentIndex + 1) % items.length;
         updateCarousel(currentIndex);
+        resetAutoLoop();
     });
 
     prevBtn?.addEventListener("click", () => {
         currentIndex = (currentIndex - 1 + items.length) % items.length;
         updateCarousel(currentIndex);
+        resetAutoLoop();
     });
 
     indicators.forEach((indicator, i) => {
         indicator.addEventListener("click", () => {
             currentIndex = i;
             updateCarousel(currentIndex);
+            resetAutoLoop();
         });
     });
+
+    // Start auto loop
+    startAutoLoop();
 });

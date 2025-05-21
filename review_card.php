@@ -27,17 +27,20 @@ if (isset($_SESSION['user_id'])) {
 <div class="activity_grid--item">
     <div class="activity_grid--item_img">
         <!-- Profile Image and Name Link -->
-        <a class="activity_grid--item_img_user" href="profile.php?user_id=<?php echo htmlspecialchars($row['user_id'] ?? ''); ?>">
+        <a class="activity_grid--item_img_user"
+            href="profile.php?user_id=<?php echo htmlspecialchars($row['user_id'] ?? ''); ?>">
             <?php
             $profile_image = $row['user_profile_image'] ?? 'assets/images/profiles/pro_null.png';
             ?>
             <img src="<?php echo htmlspecialchars($profile_image); ?>" alt="User Profile Image">
             <p><?php echo htmlspecialchars($row['user_name'] ?? 'Unknown User'); ?></p>
         </a>
-        
-        <a href="single-place.php?place_id=<?php echo $row['place_id']; ?>&review_id=<?php echo $row['review_id']; ?>#review_<?php echo $row['review_id']; ?>">
-    <img class="activity_grid--item_img_user-img" src="<?php echo htmlspecialchars($row['review_image']); ?>" alt="Review Image">
-</a>
+
+        <a
+            href="single-place.php?place_id=<?php echo $row['place_id']; ?>&review_id=<?php echo $row['review_id']; ?>#review_<?php echo $row['review_id']; ?>">
+            <img class="activity_grid--item_img_user-img" src="<?php echo htmlspecialchars($row['review_image']); ?>"
+                alt="Review Image">
+        </a>
 
 
 
@@ -49,13 +52,13 @@ if (isset($_SESSION['user_id'])) {
             <i class="<?php echo $is_liked ? 'fa-solid fa-heart' : 'fa-regular fa-heart'; ?>"></i>
         </a>
     </div>
-    
+
     <div class="activity_grid--item_content">
         <div class="activity_grid--item_content-info">
             <div class="activity_grid--item_content-info_name">
                 <a href="single-place.php?place_id=<?php echo $row['place_id']; ?>">
-    <h3><?php echo htmlspecialchars($row['place_name']); ?></h3>
-</a>
+                    <h3><?php echo htmlspecialchars($row['place_name']); ?></h3>
+                </a>
 
 
                 <div class="activity_stars">
@@ -70,16 +73,19 @@ if (isset($_SESSION['user_id'])) {
                     ?>
                 </div>
             </div>
-            <a class="activity_grid--item_content-info_link" href="listing.php?category_id=<?php echo htmlspecialchars($row['category_id']); ?>">
-    <i class="<?php echo htmlspecialchars($row['icon_class'] ?? 'fa-solid fa-question'); ?>"></i>
-</a>
+            <a class="activity_grid--item_content-info_link"
+                href="listing.php?category_id=<?php echo htmlspecialchars($row['category_id']); ?>">
+                <i class="<?php echo htmlspecialchars($row['icon_class'] ?? 'fa-solid fa-question'); ?>"></i>
+            </a>
 
         </div>
-        
+
         <p>
             <?php echo htmlspecialchars($short_review); ?>
             <?php if (strlen($full_review) > $max_length): ?>
-                <a class="read-more" href="single-place.php?place_id=<?php echo $row['place_id']; ?>&review_id=<?php echo $row['review_id']; ?>#review_<?php echo $row['review_id']; ?>">Read more</a>
+            <a class="read-more"
+                href="single-place.php?place_id=<?php echo $row['place_id']; ?>&review_id=<?php echo $row['review_id']; ?>#review_<?php echo $row['review_id']; ?>">Read
+                more</a>
             <?php endif; ?>
         </p>
     </div>

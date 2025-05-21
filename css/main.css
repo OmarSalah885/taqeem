@@ -826,7 +826,7 @@ body p {
   display: flex;
   width: 100%;
   height: 100%;
-  transition: transform 0.5s ease;
+  transition: transform 0.7s ease-in-out;
 }
 
 .carousel-item {
@@ -836,12 +836,21 @@ body p {
 .carousel-item_img {
   width: 100%;
   height: 100%;
+  position: relative;
 }
 .carousel-item_img img {
   width: 100%;
   height: 100%;
   -o-object-fit: cover;
      object-fit: cover;
+}
+.carousel-item_img .carousel-item-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.2);
 }
 .carousel-item_content {
   position: absolute;
