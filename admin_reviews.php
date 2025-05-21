@@ -190,7 +190,7 @@ while ($rev = $reviews->fetch_assoc()):
                     <td><?= $text ?></td>
                     <td><?= $created ?></td>
                     <td class="actions">
-                        <a href="single-place.php?place_id=<?= $rev['place_id'] ?>&review_id=<?= $rev['id'] ?>#review_<?= $rev['id'] ?>" class="btn-edit">Edit</a>
+                        <a href="single-place.php?place_id=<?= $rev['place_id'] ?>&review_id=<?= $rev['id'] ?>&action=edit#review_<?= $rev['id'] ?>" class="btn-edit">Edit</a>
                         <a href="delete_review.php?id=<?= $rev['id'] ?>" class="btn-delete" onclick="return confirm('Delete this review?');">Delete</a>
                     </td>
                 </tr>

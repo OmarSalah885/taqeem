@@ -50,5 +50,6 @@
 <script src="assets/js/auth.js"></script>
 <script src="assets/js/mobile-menu.js"></script>
 <script src="assets/js/carousel.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 </html>

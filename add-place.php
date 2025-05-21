@@ -3,7 +3,6 @@ require_once 'config.php';
 require_once 'db_connect.php';
 session_start();
 
-
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
@@ -30,13 +29,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $facebook_url  = trim($_POST['facebook_url'] ?? '');
     $instagram_url = trim($_POST['instagram_url'] ?? '');
     $twitter_url   = trim($_POST['twitter_url'] ?? '');
+    $country       = trim($_POST['country'] ?? '');
+    $city          = trim($_POST['city'] ?? '');
+    $address       = trim($_POST['address'] ?? '');
+    $latitude      = floatval($_POST['latitude'] ?? 0);
+    $longitude     = floatval($_POST['longitude'] ?? 0);
+    $google_map_location = trim($_POST['google_map_location'] ?? '');
     $open_times    = $_POST['open_time'] ?? [];
     $close_times   = $_POST['close_time'] ?? [];
 
     $errors = [];
-    if ($name === '')        $errors[] = "Place name is required.";
+    if ($name === '') $errors[] = "Place name is required.";
     if (!in_array($price, ['$', '$$', '$$$'], true)) $errors[] = "Please select a valid price.";
-    if ($category_id <= 0)   $errors[] = "Please select a category.";
+    if ($category_id <= 0) $errors[] = "Please select a category.";
+    if ($latitude < -90 || $latitude > 90 || $longitude < -180 || $longitude > 180) {
+        $errors[] = "Invalid coordinates.";
+    }
+    if (strlen($address) > 100) {
+        $errors[] = "Address is too long. Please use a shorter address (max 100 characters).";
+    }
 
     if (empty($errors)) {
         $conn->begin_transaction();
@@ -46,14 +57,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 INSERT INTO places
                   (user_id, category_id, name, price, tags, description,
                    email, phone_1, phone_2, website,
-                   facebook_url, instagram_url, twitter_url)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                   facebook_url, instagram_url, twitter_url,
+                   country, city, address, latitude, longitude, google_map_location)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
             $stmt->bind_param(
-                "iisssssssssss",
+                "iissssssssssssssdds",
                 $user_id, $category_id, $name, $price, $tags, $description,
                 $email, $phone1, $phone2, $website,
-                $facebook_url, $instagram_url, $twitter_url
+                $facebook_url, $instagram_url, $twitter_url,
+                $country, $city, $address, $latitude, $longitude, $google_map_location
             );
             $stmt->execute();
             $place_id = $stmt->insert_id;
@@ -89,10 +102,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             // Use the exact category name without normalization
-            $category_name_safe = $category['name'];  // No normalization for category name
-            $place_name_safe = normalizeName($name);  // Normalize the place name
+            $category_name_safe = $category['name'];
+            $place_name_safe = normalizeName($name);
 
-            // Create folder structure: assets/images/places/{category_name}/{place_name}/{featured,gallery,menu}
+            // Create folder structure
             $base_path = __DIR__ . "/assets/images/places/{$category_name_safe}/{$place_name_safe}";
             $featured_dir = "{$base_path}/featured/";
             $gallery_dir = "{$base_path}/gallery/";
@@ -104,50 +117,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
-            // Featured image - only allow one image
-if (!empty($_FILES['featured_image']['name'])) {
-    if (is_array($_FILES['featured_image']['name'])) {
-        throw new Exception('Only one featured image is allowed.');
-    }
+            // Featured image
+            if (!empty($_FILES['featured_image']['name'])) {
+                if (is_array($_FILES['featured_image']['name'])) {
+                    throw new Exception('Only one featured image is allowed.');
+                }
 
-    if ($_FILES['featured_image']['error'] === UPLOAD_ERR_OK) {
-        $tmp_name = $_FILES['featured_image']['tmp_name'];
-        $filename = uniqid('feat_', true) . '_' . basename($_FILES['featured_image']['name']);
-        $dest = $featured_dir . $filename;
-        move_uploaded_file($tmp_name, $dest);
+                if ($_FILES['featured_image']['error'] === UPLOAD_ERR_OK) {
+                    $tmp_name = $_FILES['featured_image']['tmp_name'];
+                    $filename = uniqid('feat_', true) . '_' . basename($_FILES['featured_image']['name']);
+                    $dest = $featured_dir . $filename;
+                    move_uploaded_file($tmp_name, $dest);
 
-        $path = "assets/images/places/{$category_name_safe}/{$place_name_safe}/featured/" . $filename;
-        $stmt = $conn->prepare("UPDATE places SET featured_image = ? WHERE id = ?");
-        $stmt->bind_param("si", $path, $place_id);
-        $stmt->execute();
-        $stmt->close();
-    }
-}
+                    $path = "assets/images/places/{$category_name_safe}/{$place_name_safe}/featured/" . $filename;
+                    $stmt = $conn->prepare("UPDATE places SET featured_image = ? WHERE id = ?");
+                    $stmt->bind_param("si", $path, $place_id);
+                    $stmt->execute();
+                    $stmt->close();
+                }
+            }
 
-
-            
             // Gallery images (limit to 8 max)
-if (!empty($_FILES['gallery_images']['name'][0])) {
-    $galleryCount = count($_FILES['gallery_images']['name']);
-    if ($galleryCount > 8) {
-        throw new Exception('You can only upload up to 8 gallery images.');
-    }
+            if (!empty($_FILES['gallery_images']['name'][0])) {
+                $galleryCount = count($_FILES['gallery_images']['name']);
+                if ($galleryCount > 8) {
+                    throw new Exception('You can only upload up to 8 gallery images.');
+                }
 
-    foreach ($_FILES['gallery_images']['tmp_name'] as $index => $tmp_name) {
-        if ($_FILES['gallery_images']['error'][$index] === UPLOAD_ERR_OK) {
-            $filename = uniqid('gal_', true) . '_' . basename($_FILES['gallery_images']['name'][$index]);
-            $dest = $gallery_dir . $filename;
-            move_uploaded_file($tmp_name, $dest);
+                foreach ($_FILES['gallery_images']['tmp_name'] as $index => $tmp_name) {
+                    if ($_FILES['gallery_images']['error'][$index] === UPLOAD_ERR_OK) {
+                        $filename = uniqid('gal_', true) . '_' . basename($_FILES['gallery_images']['name'][$index]);
+                        $dest = $gallery_dir . $filename;
+                        move_uploaded_file($tmp_name, $dest);
 
-            $path = "assets/images/places/{$category_name_safe}/{$place_name_safe}/gallery/" . $filename;
-            $stmt = $conn->prepare("INSERT INTO place_gallery (place_id, image_url) VALUES (?, ?)");
-            $stmt->bind_param("is", $place_id, $path);
-            $stmt->execute();
-            $stmt->close();
-        }
-    }
-}
-
+                        $path = "assets/images/places/{$category_name_safe}/{$place_name_safe}/gallery/" . $filename;
+                        $stmt = $conn->prepare("INSERT INTO place_gallery (place_id, image_url) VALUES (?, ?)");
+                        $stmt->bind_param("is", $place_id, $path);
+                        $stmt->execute();
+                        $stmt->close();
+                    }
+                }
+            }
 
             // Menu items
             $menu_items_json = $_POST['menu_items_data'] ?? '';
@@ -212,8 +222,6 @@ $cats = $conn->query("SELECT id, name FROM categories ORDER BY name ASC")->fetch
 include 'header.php';
 ?>
 
-
-
 <main class="add-place">
   <?php if (!empty($errors)): ?>
     <div class="errors">
@@ -227,7 +235,6 @@ include 'header.php';
 
   <div class="add-place_sidebar">
     <a href="#add-place-general">GENERAL</a>
-    <a href="#add-place-highlight">HIGHLIGHTS</a>
     <a href="#add-place-location">LOCATION</a>
     <a href="#add-place-contact">CONTACT INFO</a>
     <a href="#add-place-social">SOCIAL NETWORKS</a>
@@ -238,6 +245,7 @@ include 'header.php';
   </div>
 
   <form class="add-place_main" method="POST" action="add-place.php" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
 
     <!-- GENERAL SECTION -->
     <div id="add-place-general" class="add-place_main--item add-place_main--general">
@@ -274,7 +282,6 @@ $category_names = [
     'workspace' => 'WORKSPACE'
 ];
 ?>
-
 <select name="category_id" class="input--red" required>
     <option value="" disabled <?= empty($_POST['category_id']) ? 'selected' : '' ?>>CATEGORY</option>
     <?php foreach ($cats as $cat): ?>
@@ -288,9 +295,30 @@ $category_names = [
         </option>
     <?php endforeach; ?>
 </select>
-
       </div>
     </div>
+
+    <!-- LOCATION SECTION -->
+    <div class="add-place_main--item add-place_main--location" id="add-place-location">
+        <h2 class="add-place_title">LOCATION</h2>
+        <div class="side-by-side_inbut">
+            <input type="text" name="country" id="country" placeholder="COUNTRY"
+                   class="input--red" value="<?= htmlspecialchars($_POST['country'] ?? '') ?>">
+            <input type="text" name="city" id="city" placeholder="CITY"
+                   class="input--red" value="<?= htmlspecialchars($_POST['city'] ?? '') ?>">
+        </div>
+        <input type="text" name="google_map_location" id="google_map_location" placeholder="Use the map or add the Google Maps link of the place"
+               class="input--red" value="<?= htmlspecialchars($_POST['google_map_location'] ?? '') ?>">
+        <div class="location-map">
+            <h3 class="location-map_title">SET LOCATION ON MAP</h3>
+            <div id="map" style="height: 400px;"></div>
+            <p>Selected Coordinates: <span id="coordinates">31.9539, 35.9106</span></p>
+        </div>
+        <input type="hidden" name="address" id="address" value="<?= htmlspecialchars($_POST['address'] ?? '') ?>">
+        <input type="hidden" name="latitude" id="latitude" value="<?= htmlspecialchars($_POST['latitude'] ?? '31.9539') ?>">
+        <input type="hidden" name="longitude" id="longitude" value="<?= htmlspecialchars($_POST['longitude'] ?? '35.9106') ?>">
+    </div>
+
     <!-- CONTACT INFO SECTION -->
     <div id="add-place-contact" class="add-place_main--item add-place_main--contact">
       <h2 class="add-place_title">CONTACT INFO</h2>
@@ -307,6 +335,7 @@ $category_names = [
              class="input--red"
              value="<?= htmlspecialchars($_POST['website'] ?? '') ?>">
     </div>
+
     <!-- SOCIAL NETWORKS SECTION -->
     <div id="add-place-social" class="add-place_main--item add-place_main--social">
       <h2 class="add-place_title">SOCIAL NETWORKS</h2>
@@ -343,50 +372,50 @@ $category_names = [
       </div>
       <?php endforeach; ?>
     </div>
+
+    <!-- MEDIA SECTION -->
     <div class="add-place_main--item add-place_main--media" id="add-place-media">
-            <h2 class="add-place_title">MEDIA</h2>
-            <div class="media-contanier">
-                <div class="media-contanier_featured">
-                    <p class="media-contanier_title">FEATURED IMAGE</p>
-                    <div class="drop-area">
-                        <p><i class="fa-solid fa-arrow-up"></i>
-                            <label for="fileInput1" class="browse-btn"></label>
-                        </p>
-                        <input type="file" id="fileInput1" name="featured_image" class="file-input" accept="image/*"  hidden>
-                        
-                    </div>
-                </div>
-                <div class="media-contanier_gallery">
-                    <p class="media-contanier_title">GALLERY IMAGES</p>
-                    <div class="drop-area gallery-drop-area">
-  <p><i class="fa-solid fa-arrow-up"></i> Drag & Drop files here
-    <label for="fileInput2" class="browse-btn"></label>
-  </p>
-  <input
-    type="file"
-    id="fileInput2"
-    name="gallery_images[]"
-    accept="image/*"
-    multiple
-    hidden
-  >
-</div>
-
-
-
+        <h2 class="add-place_title">MEDIA</h2>
+        <div class="media-contanier">
+            <div class="media-contanier_featured">
+                <p class="media-contanier_title">FEATURED IMAGE</p>
+                <div class="drop-area">
+                    <p><i class="fa-solid fa-arrow-up"></i>
+                        <label for="fileInput1" class="browse-btn"></label>
+                    </p>
+                    <input type="file" id="fileInput1" name="featured_image" class="file-input" accept="image/*" hidden>
                 </div>
             </div>
-            <div class="media_added">
-                <div class="media_added--fetured">
-                    <h3 class="media_added--title">ADDED FETURED IMAGE</h3>
-                    <div class="media_added--fetured_img"></div>
-                </div>
-                <div class="media_added--gallery">
-                    <h3 class="media_added--title">ADDED IMAGES FOR GALLERY</h3>
-                    <div class="media_added--gallery_grid"></div>
+            <div class="media-contanier_gallery">
+                <p class="media-contanier_title">GALLERY IMAGES</p>
+                <div class="drop-area gallery-drop-area">
+                    <p><i class="fa-solid fa-arrow-up"></i> Drag & Drop files here
+                        <label for="fileInput2" class="browse-btn"></label>
+                    </p>
+                    <input
+                        type="file"
+                        id="fileInput2"
+                        name="gallery_images[]"
+                        accept="image/*"
+                        multiple
+                        hidden
+                    >
                 </div>
             </div>
+        </div>
+        <div class="media_added">
+            <div class=".media_added--fetured">
+                <h3 class="media_added--title">ADDED FEATURED IMAGE</h3>
+                <div class="media_added--fetured_img"></div>
+            </div>
+            <div class="media_added--gallery">
+                <h3 class="media_added--title">ADDED IMAGES FOR GALLERY</h3>
+                <div class="media_added--gallery_grid"></div>
+            </div>
+        </div>
     </div>
+
+    <!-- MENU SECTION -->
     <div class="add-place_main--item add-place_main--menu" id="add-place-menu">
             <h2 class="add-place_title">MENU</h2>
             <div class="add-menu_item">
@@ -411,247 +440,287 @@ $category_names = [
             <button type="button" id="addMenuItemBtn" class="btn__red--s btn__red btn">ADD ITEM</button>
             <div class="add-menu_added">
                 <h3>ADDED MENU ITEMS</h3>
-                <div class="add-menu_added-grid" id="menuItemsContainer">
-                    <!-- Dynamic items will be added here -->
-                </div>
+                <div class="add-menu_added-grid" id="menuItemsContainer"></div>
             </div>
-            <input type="hidden" name="menu_items_data" id="menuItemsInput">
+          <input type="hidden" name="menu_items_data" id="menuItemsInput">
+<input type="hidden" name="deleted_menu_items" id="deletedMenuItemsInput">
       </div>
+
+    <!-- FAQS SECTION -->
     <div class="add-place_main--item add-place_main--faqs" id="add-place-faqs">
-    <h2 class="add-place_title">FAQs</h2>
-    <input type="text" id="faq-question" placeholder="QUESTION" class="input--red">
-    <input type="text" id="faq-answer" placeholder="ANSWER" class="input--red">
-    <button type="button" class="btn__red--s btn__red btn" id="add-faq-btn">ADD QUESTION</button>
-
-    <div class="added-faqs">
-        <h3>ADDED FAQS</h3>
-        <div class="added-faqs-grid" id="faqs-container"></div>
+        <h2 class="add-place_title">FAQs</h2>
+        <input type="text" id="faq-question" placeholder="QUESTION" class="input--red">
+        <input type="text" id="faq-answer" placeholder="ANSWER" class="input--red">
+        <button type="button" class="btn__red--s btn__red btn" id="add-faq-btn">ADD QUESTION</button>
+        <div class="added-faqs">
+            <h3>ADDED FAQS</h3>
+            <div class="added-faqs-grid" id="faqs-container"></div>
+        </div>
     </div>
-      </div>
-        
-        
-
 
     <!-- CSRF Token -->
-    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
-
+    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
 
     <button type="submit" class="btn__red--l btn__red btn">ADD PLACE !</button>
-    
-
   </form>
 </main>
+
 <script>
 (() => {
-
   const dropArea = document.querySelector('.drop-area');
-const fileInput1 = document.getElementById('fileInput1');
-const previewContainer = document.querySelector('.media_added--fetured_img');
+  const fileInput1 = document.getElementById('fileInput1');
+  const previewContainer = document.querySelector('.media_added--fetured_img');
 
+  function clearPreview() {
+    previewContainer.innerHTML = '';
+  }
 
-function clearPreview() {
-  previewContainer.innerHTML = '';
-}
+  function showPreview(file) {
+    console.log('showPreview called with file:', file);
+    clearPreview();
 
-function showPreview(file) {
-  console.log('showPreview called with file:', file);
-  clearPreview();
+    const reader = new FileReader();
+    reader.onload = e => {
+      console.log('FileReader loaded, displaying image');
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = `
+        <div class="media_added--fetured_img">
+          <img src="${e.target.result}" alt="Featured Image Preview">
+          <button type="button" class="remove-featured">X</button>
+        </div>
+      `;
+      previewContainer.appendChild(wrapper);
 
-  const reader = new FileReader();
-  reader.onload = e => {
-    console.log('FileReader loaded, displaying image');
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = `
-      <div class="media_added--fetured_img">
-        <img src="${e.target.result}" alt="Featured Image Preview">
-        <button type="button" class="remove-featured">X</button>
-      </div>
-    `;
-    previewContainer.appendChild(wrapper);
+      wrapper.querySelector('.remove-featured').onclick = () => {
+        fileInput1.value = '';
+        clearPreview();
+      };
+    };
+    reader.readAsDataURL(file);
+  }
 
-    wrapper.querySelector('.remove-featured').onclick = () => {
+  fileInput1.addEventListener('change', () => {
+    if (fileInput1.files.length > 1) {
+      alert('Only one featured image is allowed.');
       fileInput1.value = '';
       clearPreview();
-    };
-  };
-  reader.readAsDataURL(file);
-}
-
-
-// Unified handler for file input change (works for both click selection and programmatic file setting)
-fileInput1.addEventListener('change', () => {
-  if (fileInput1.files.length > 1) {
-    alert('Only one featured image is allowed.');
-    fileInput1.value = '';
-    clearPreview();
-    return;
-  }
-  if (fileInput1.files.length === 1) {
-    showPreview(fileInput1.files[0]);
-  } else {
-    clearPreview();
-  }
-});
-
-// Drag & drop handlers
-dropArea.addEventListener('dragover', e => {
-  e.preventDefault();
-  dropArea.classList.add('dragover');  // style for dragover state
-});
-dropArea.addEventListener('dragleave', e => {
-  e.preventDefault();
-  dropArea.classList.remove('dragover');
-});
-dropArea.addEventListener('drop', e => {
-  e.preventDefault();
-  dropArea.classList.remove('dragover');
-
-  const dtFiles = e.dataTransfer.files;
-  if (dtFiles.length > 1) {
-    alert('Only one featured image allowed.');
-    return;
-  }
-
-  if (dtFiles.length === 1) {
-    fileInput1.files = dtFiles;
-    showPreview(dtFiles[0]);           // manually invoke preview
-    // OR: fileInput1.dispatchEvent(new Event('change'));
-  }
-});
-
-
-// JS (place at bottom of <body> or wrap in DOMContentLoaded)
-document.addEventListener('DOMContentLoaded', () => {
-  const MAX_GALLERY_IMAGES = 8;
-  const galInput     = document.getElementById('fileInput2');
-  const galContainer = document.querySelector('.media_added--gallery_grid');
-  const galDropArea  = document.querySelector('.gallery-drop-area');
-  let galleryFiles   = [];
-
-  // File‐input change handler
-  galInput.addEventListener('change', () => {
-    const newFiles = Array.from(galInput.files);
-    if (galleryFiles.length + newFiles.length > MAX_GALLERY_IMAGES) {
-      alert(`You can only upload up to ${MAX_GALLERY_IMAGES} gallery images.`);
       return;
     }
-    galleryFiles = galleryFiles.concat(newFiles);
-    updateGalInputFiles();
-    renderGalleryPreviews();
+    if (fileInput1.files.length === 1) {
+      showPreview(fileInput1.files[0]);
+    } else {
+      clearPreview();
+    }
   });
 
-  // Render previews
-  function renderGalleryPreviews() {
-    galContainer.innerHTML = '';
-    galleryFiles.forEach((file, idx) => {
-      const reader = new FileReader();
-      reader.onload = e => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'media_added--gallery_grid_item';
-        wrapper.innerHTML = `
-          <img src="${e.target.result}" alt="Gallery Image">
-          <button type="button" class="remove-gallery" data-idx="${idx}">X</button>
-        `;
-        wrapper.querySelector('.remove-gallery').onclick = () => {
-          galleryFiles.splice(idx, 1);
-          updateGalInputFiles();
-          renderGalleryPreviews();
-        };
-        galContainer.appendChild(wrapper);
-      };
-      reader.readAsDataURL(file);
+  dropArea.addEventListener('dragover', e => {
+    e.preventDefault();
+    dropArea.classList.add('dragover');
+  });
+  dropArea.addEventListener('dragleave', e => {
+    e.preventDefault();
+    dropArea.classList.remove('dragover');
+  });
+  dropArea.addEventListener('drop', e => {
+    e.preventDefault();
+    dropArea.classList.remove('dragover');
+
+    const dtFiles = e.dataTransfer.files;
+    if (dtFiles.length > 1) {
+      alert('Only one featured image allowed.');
+      return;
+    }
+
+    if (dtFiles.length === 1) {
+      fileInput1.files = dtFiles;
+      showPreview(dtFiles[0]);
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const MAX_GALLERY_IMAGES = 8;
+    const galInput     = document.getElementById('fileInput2');
+    const galContainer = document.querySelector('.media_added--gallery_grid');
+    const galDropArea  = document.querySelector('.gallery-drop-area');
+    let galleryFiles   = [];
+
+    galInput.addEventListener('change', () => {
+      const newFiles = Array.from(galInput.files);
+      if (galleryFiles.length + newFiles.length > MAX_GALLERY_IMAGES) {
+        alert(`You can only upload up to ${MAX_GALLERY_IMAGES} gallery images.`);
+        return;
+      }
+      galleryFiles = galleryFiles.concat(newFiles);
+      updateGalInputFiles();
+      renderGalleryPreviews();
     });
-  }
 
-  // Sync the hidden input
-  function updateGalInputFiles() {
-    const dt = new DataTransfer();
-    galleryFiles.forEach(f => dt.items.add(f));
-    galInput.files = dt.files;
-  }
-
-  // Drag & drop handlers
-  galDropArea.addEventListener('dragover', e => {
-    e.preventDefault();
-    galDropArea.classList.add('dragover');
-  });
-  galDropArea.addEventListener('dragleave', e => {
-    e.preventDefault();
-    galDropArea.classList.remove('dragover');
-  });
-  galDropArea.addEventListener('drop', e => {
-    e.preventDefault();
-    galDropArea.classList.remove('dragover');
-
-    const dropped = Array.from(e.dataTransfer.files);
-    if (galleryFiles.length + dropped.length > MAX_GALLERY_IMAGES) {
-      alert(`You can only upload up to ${MAX_GALLERY_IMAGES} gallery images.`);
-      return;
+    function renderGalleryPreviews() {
+      galContainer.innerHTML = '';
+      galleryFiles.forEach((file, idx) => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'media_added--gallery_grid_item';
+          wrapper.innerHTML = `
+            <img src="${e.target.result}" alt="Gallery Image">
+            <button type="button" class="remove-gallery" data-idx="${idx}">X</button>
+          `;
+          wrapper.querySelector('.remove-gallery').onclick = () => {
+            galleryFiles.splice(idx, 1);
+            updateGalInputFiles();
+            renderGalleryPreviews();
+          };
+          galContainer.appendChild(wrapper);
+        };
+        reader.readAsDataURL(file);
+      });
     }
-    galleryFiles = galleryFiles.concat(dropped);
-    updateGalInputFiles();
-    renderGalleryPreviews();
+
+    function updateGalInputFiles() {
+      const dt = new DataTransfer();
+      galleryFiles.forEach(f => dt.items.add(f));
+      galInput.files = dt.files;
+    }
+
+    galDropArea.addEventListener('dragover', e => {
+      e.preventDefault();
+      galDropArea.classList.add('dragover');
+    });
+    galDropArea.addEventListener('dragleave', e => {
+      e.preventDefault();
+      galDropArea.classList.remove('dragover');
+    });
+    galDropArea.addEventListener('drop', e => {
+      e.preventDefault();
+      galDropArea.classList.remove('dragover');
+
+      const dropped = Array.from(e.dataTransfer.files);
+      if (galleryFiles.length + dropped.length > MAX_GALLERY_IMAGES) {
+        alert(`You can only upload up to ${MAX_GALLERY_IMAGES} gallery images.`);
+        return;
+      }
+      galleryFiles = galleryFiles.concat(dropped);
+      updateGalInputFiles();
+      renderGalleryPreviews();
+    });
   });
-});
-
-  
 })();
-
-
 </script>
+
 <script>
 const addMenuItemBtn = document.getElementById('addMenuItemBtn');
 const menuItemsContainer = document.getElementById('menuItemsContainer');
 const menuItemsInput = document.getElementById('menuItemsInput');
+const deletedMenuItemsInput = document.getElementById('deletedMenuItemsInput');
 let menuItems = [];
+let deletedMenuItemIds = [];
+let editingIndex = null;
+
+// Load existing menu items from PHP
+<?php if (!empty($menu_items)): ?>
+menuItems = <?= json_encode($menu_items) ?>.map(item => ({
+    ...item,
+    image: item.image // For existing, use image URL
+}));
+renderMenuItems();
+<?php endif; ?>
 
 addMenuItemBtn.addEventListener('click', async () => {
     const name = document.getElementById('menuItemName').value.trim();
     const price = document.getElementById('menuItemPrice').value.trim();
     const description = document.getElementById('menuItemDescription').value.trim();
     const fileInput = document.getElementById('fileInput3');
-    const file = fileInput.files[0];
+    let base64 = null;
 
-    if (!name || !price || !description || !file) {
-        alert('Please fill all fields and select an image.');
+    if (!name || !price || !description) {
+        alert('Please fill all fields.');
         return;
     }
 
-    const base64 = await toBase64(file);
+    if (editingIndex !== null) {
+        // Edit mode
+        if (fileInput.files[0]) {
+            base64 = await toBase64(fileInput.files[0]);
+        } else {
+            base64 = menuItems[editingIndex].image;
+        }
+        menuItems[editingIndex] = {
+            ...menuItems[editingIndex],
+            name, price, description, image: base64
+        };
+        editingIndex = null;
+    } else {
+        // Add mode
+        if (!fileInput.files[0]) {
+            alert('Please select an image.');
+            return;
+        }
+        base64 = await toBase64(fileInput.files[0]);
+        menuItems.push({ name, price, description, image: base64 });
+    }
 
-    const item = { name, price, description, image: base64 };
-    menuItems.push(item);
-
-    const itemDiv = document.createElement('div');
-    itemDiv.className = 'add-menu_added-grid_item';
-    itemDiv.innerHTML = `
-        <img src="${base64}" alt="">
-        <div class="add-menu_added-grid_item--info">
-            <h4>${name}</h4>
-            <p>${description}</p>
-            <p>${price}</p>
-        </div>
-        <a href="#" class="delete-menu-item">X</a>
-    `;
-    menuItemsContainer.appendChild(itemDiv);
-
+    renderMenuItems();
     updateHiddenInput();
     clearInputs();
 });
 
 menuItemsContainer.addEventListener('click', (e) => {
+    // Delete
     if (e.target.classList.contains('delete-menu-item')) {
         e.preventDefault();
         const itemDiv = e.target.closest('.add-menu_added-grid_item');
         const index = Array.from(menuItemsContainer.children).indexOf(itemDiv);
+        // If existing, mark for deletion
+        if (menuItems[index].id) {
+            deletedMenuItemIds.push(menuItems[index].id);
+        }
         menuItems.splice(index, 1);
-        itemDiv.remove();
+        renderMenuItems();
         updateHiddenInput();
+    }
+    // Edit
+    if (e.target.classList.contains('edit-menu-item') || e.target.closest('.edit-menu-item')) {
+        e.preventDefault();
+        const itemDiv = e.target.closest('.add-menu_added-grid_item');
+        const index = Array.from(menuItemsContainer.children).indexOf(itemDiv);
+        const item = menuItems[index];
+        document.getElementById('menuItemName').value = item.name;
+        document.getElementById('menuItemPrice').value = item.price;
+        document.getElementById('menuItemDescription').value = item.description;
+        // Show image preview if needed
+        if (item.image && !item.image.startsWith('data:')) {
+            document.querySelector('.file-list').innerHTML = `<img src="${item.image}" style="max-width:60px;">`;
+        } else if (item.image) {
+            document.querySelector('.file-list').innerHTML = `<img src="${item.image}" style="max-width:60px;">`;
+        }
+        editingIndex = index;
     }
 });
 
+function renderMenuItems() {
+    menuItemsContainer.innerHTML = '';
+    menuItems.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'add-menu_added-grid_item';
+        div.innerHTML = `
+            <img src="${item.image}" alt="">
+            <div class="add-menu_added-grid_item--info">
+                <h4>${item.name}</h4>
+                <p>${item.description}</p>
+                <p>${item.price}</p>
+            </div>
+            <a href="#" class="delete-menu-item">X</a>
+            <a href="#" class="edit-menu-item"><i class="fa fa-edit"></i></a>
+        `;
+        menuItemsContainer.appendChild(div);
+    });
+    updateHiddenInput();
+}
+
 function updateHiddenInput() {
     menuItemsInput.value = JSON.stringify(menuItems);
+    deletedMenuItemsInput.value = JSON.stringify(deletedMenuItemIds);
 }
 
 function clearInputs() {
@@ -670,13 +739,36 @@ function toBase64(file) {
         reader.onerror = error => reject(error);
     });
 }
-</script>
+const fileInput = document.getElementById('fileInput3');
+const fileListPreview = document.querySelector('.file-list');
+
+// Show preview when selecting a new image (for both add and edit)
+fileInput.addEventListener('change', () => {
+    fileListPreview.innerHTML = '';
+    if (fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            fileListPreview.innerHTML = `<img src="${e.target.result}" style="max-width:60px;">`;
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+    }
+});
+</script>>
+
 <script>
+(() => {
     const faqQuestionInput = document.querySelector('#add-place-faqs input[placeholder="QUESTION"]');
     const faqAnswerInput = document.querySelector('#add-place-faqs input[placeholder="ANSWER"]');
     const addFaqBtn = document.querySelector('#add-place-faqs .btn');
     const addedFaqsContainer = document.querySelector('.added-faqs-grid');
     const faqs = [];
+
+    // Helper function to escape HTML characters
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
 
     function renderFaqs() {
         addedFaqsContainer.innerHTML = '';
@@ -684,11 +776,11 @@ function toBase64(file) {
             const div = document.createElement('div');
             div.className = 'added-faqs-grid_item';
             div.innerHTML = `
-                <h4>${faq.question}</h4>
-                <p>${faq.answer}</p>
+                <h4>${escapeHtml(faq.question)}</h4>
+                <p>${escapeHtml(faq.answer)}</p>
                 <button onclick="removeFaq(${index})">X</button>
-                <input type="hidden" name="faq_questions[]" value="${faq.question}">
-                <input type="hidden" name="faq_answers[]" value="${faq.answer}">
+                <input type="hidden" name="faq_questions[]" value="${escapeHtml(faq.question)}">
+                <input type="hidden" name="faq_answers[]" value="${escapeHtml(faq.answer)}">
             `;
             addedFaqsContainer.appendChild(div);
         });
@@ -711,8 +803,10 @@ function toBase64(file) {
         }
     });
 
-    window.removeFaq = removeFaq; // make it accessible from inline onclick
+    window.removeFaq = removeFaq;
+})();
 </script>
+
 
 
 <?php include 'footer.php'; ?>

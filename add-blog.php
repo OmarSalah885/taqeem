@@ -73,7 +73,7 @@ if (empty($error)) {
             // On success: grab new id and redirect
             $newId = $stmt->insert_id;
             $stmt->close();
-            header("Location: single_blog.php?blog_id=" . $newId);
+            header("Location: single-blog.php?id=" . $newId);
             exit;
         } else {
             $error = 'Failed to add blog.';
