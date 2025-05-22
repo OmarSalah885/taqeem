@@ -41,13 +41,6 @@ if (isset($_SESSION['user_id'])) {
             <img class="activity_grid--item_img_user-img" src="<?php echo htmlspecialchars($row['review_image']); ?>"
                 alt="Review Image">
         </a>
-
-
-
-
-
-
-
         <a class="activity_grid--item_img_like" href="#" onclick="toggleLike(event, <?php echo $row['review_id']; ?>)">
             <i class="<?php echo $is_liked ? 'fa-solid fa-heart' : 'fa-regular fa-heart'; ?>"></i>
         </a>
