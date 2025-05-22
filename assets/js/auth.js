@@ -28,6 +28,16 @@ document.addEventListener("DOMContentLoaded", function () {
         loginLinkOverlayDiv.classList.remove("active");
     }
 
+    // Check for login errors, signup errors, or session timeout on page load
+    const urlParams = new URLSearchParams(window.location.search);
+    if (typeof hasLoginErrors !== 'undefined' && hasLoginErrors) {
+        showLogin();
+    } else if (typeof hasSignupErrors !== 'undefined' && hasSignupErrors) {
+        showSignup();
+    } else if (urlParams.get('timeout') === 'true') {
+        showLogin();
+    }
+
     loginLinkNavbar?.addEventListener("click", (e) => {
         e.preventDefault();
         showLogin();
@@ -61,5 +71,16 @@ document.addEventListener("DOMContentLoaded", function () {
     LogCloseBtn?.addEventListener("click", (e) => {
         e.preventDefault();
         logOverlay.classList.remove("show");
+        // Clear both login and signup session errors when closing the overlay
+        fetch('clear_login_errors.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'clear_errors=true'
+        }).catch(error => console.error('Error clearing login session:', error));
+        fetch('clear_signup_errors.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'clear_errors=true'
+        }).catch(error => console.error('Error clearing signup session:', error));
     });
 });

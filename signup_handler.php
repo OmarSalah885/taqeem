@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Retrieve and sanitize inputs
     $first_name = trim($_POST['first_name']);
     $last_name = trim($_POST['last_name']);
-    $email = trim($_POST['email']);
+    $email = trim(strtolower($_POST['email'])); // Convert email to lowercase
     $password = trim($_POST['password']);
     $confirm_password = trim($_POST['confirm_password']);
 
@@ -33,6 +33,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($password)) {
         $errors['password'] = 'Password is required.';
+    } else {
+        // Password strength validation
+        if (strlen($password) < 8) {
+            $errors['password'] = 'Password must be at least 8 characters long.';
+        } elseif (!preg_match('/[A-Z]/', $password)) {
+            $errors['password'] = 'Password must contain at least one uppercase letter.';
+        } elseif (!preg_match('/[a-z]/', $password)) {
+            $errors['password'] = 'Password must contain at least one lowercase letter.';
+        } elseif (!preg_match('/[0-9]/', $password)) {
+            $errors['password'] = 'Password must contain at least one number.';
+        } elseif (!preg_match('/[!@#$%^&*(),.?":{}|<>]/', $password)) {
+            $errors['password'] = 'Password must contain at least one special character.';
+        }
     }
 
     if (empty($confirm_password)) {
@@ -45,22 +58,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!empty($errors)) {
         $_SESSION['signup_errors'] = $errors;
         $_SESSION['signup_data'] = $_POST;
-        header('Location: index.php');
+        header('Location: ' . ($_POST['redirect_url'] ?? 'index.php'));
         exit;
     }
 
-    
-
-    // Check if the email already exists
-    $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+    // Check if the email already exists (case-insensitive)
+    $stmt = $conn->prepare("SELECT id FROM users WHERE LOWER(email) = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $stmt->store_result();
     if ($stmt->num_rows > 0) {
-        $_SESSION['signup_errors']['email'] = 'This email is already registered.';
+        $_SESSION['signup_errors']['email'] = 'This email is already registered. Please use a different email or log in.';
         $_SESSION['signup_data'] = $_POST;
         $stmt->close();
-        header('Location: index.php');
+        $conn->close();
+        header('Location: ' . ($_POST['redirect_url'] ?? 'index.php'));
         exit;
     }
     $stmt->close();
@@ -79,19 +91,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['email'] = $email;
         $_SESSION['role'] = 'Guest';
         unset($_SESSION['signup_errors']);
-        unset($_SESSION['signup_data']);
-        header('Location: index.php');
+        header('Location: ' . ($_POST['redirect_url'] ?? 'index.php'));
+        $stmt->close();
+        $conn->close();
         exit;
     } else {
         $_SESSION['signup_errors']['general'] = 'Failed to register. Please try again.';
         $_SESSION['signup_errors']['mysql'] = $stmt->error;
         $_SESSION['signup_data'] = $_POST;
-        header('Location: index.php');
+        $stmt->close();
+        $conn->close();
+        header('Location: ' . ($_POST['redirect_url'] ?? 'index.php'));
         exit;
     }
-
-    $stmt->close();
-    $conn->close();
 } else {
     header('Location: index.php');
     exit;
