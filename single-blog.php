@@ -280,41 +280,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 </script>
-<!--
-<style>
-.comment_actions {
-    display: flex;
-    gap: 10px;
-}
-.comment_content--delete, .comment_content--edit {
-    color: #A21111;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: bold;
-}
-.comment_content--delete:hover, .comment_content--edit:hover {
-    text-decoration: underline;
-}
-.comment_content {
-    box-sizing: border-box;
-    width: 100%;
-    max-width: 100%;
-}
-.comment_content--text {
-    word-break: break-word;
-    overflow-wrap: break-word;
-    max-width: 100%;
-    margin: 0;
-    padding: 5px 0;
-    /* Optional: Add max-height and scrollbar for very long comments */
-    max-height: 200px;
-    overflow-y: auto;
-}
-.comments_container--single {
-    box-sizing: border-box;
-    width: 100%;
-    max-width: 100%;
-}
-</style>
--->
+
 <?php include 'footer.php'; ?>
