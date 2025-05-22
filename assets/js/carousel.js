@@ -7,7 +7,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let currentIndex = 0;
     let interval;
-
+    AOS.init({
+        // Global settings:
+        offset: 120, // offset (in px) from the original trigger point
+        delay: 0, // values from 0 to 3000, with step 50ms
+        duration: 400, // values from 0 to 3000, with step 50ms
+        easing: 'ease', // default easing for AOS animations
+        once: true, // whether animation should happen only once while scrolling down
+        mirror: false, // whether elements should animate out while scrolling past them
+    });
     function updateCarousel(index) {
         items.forEach((item, i) => {
             item.classList.toggle("active", i === index);
@@ -26,7 +34,8 @@ document.addEventListener("DOMContentLoaded", function () {
         interval = setInterval(() => {
             currentIndex = (currentIndex + 1) % items.length;
             updateCarousel(currentIndex);
-        }, 6000); // change every 4 seconds
+            AOS.refresh();  // <-- refresh AOS here too for auto loop
+        }, 6000); // change every 6 seconds
     }
 
     function resetAutoLoop() {
@@ -37,12 +46,14 @@ document.addEventListener("DOMContentLoaded", function () {
     nextBtn?.addEventListener("click", () => {
         currentIndex = (currentIndex + 1) % items.length;
         updateCarousel(currentIndex);
+        AOS.refresh(); // <-- refresh AOS after manual next click
         resetAutoLoop();
     });
 
     prevBtn?.addEventListener("click", () => {
         currentIndex = (currentIndex - 1 + items.length) % items.length;
         updateCarousel(currentIndex);
+        AOS.refresh(); // <-- refresh AOS after manual prev click
         resetAutoLoop();
     });
 
@@ -50,6 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
         indicator.addEventListener("click", () => {
             currentIndex = i;
             updateCarousel(currentIndex);
+            AOS.refresh(); // <-- refresh AOS after clicking indicator
             resetAutoLoop();
         });
     });

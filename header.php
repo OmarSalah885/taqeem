@@ -58,7 +58,7 @@ if (!isset($_SESSION['profile_image']) || !isset($_SESSION['first_name']) || !is
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
-
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet" />
     <!-- Optional theme -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/3024-day.min.css">
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -86,8 +86,9 @@ if (!isset($_SESSION['profile_image']) || !isset($_SESSION['first_name']) || !is
                     <a href="index.php"><img src="assets/images/logo.png" alt="logo"></a>
                 </div>
                 <div class="navbar_container--menu-R">
-                    <a class="btn__red--m btn__red btn" id="search-btn" href="#"><i class="fa-solid fa-magnifying-glass"></i></a>
-                    
+                    <a class="btn__red--m btn__red btn" id="search-btn" href="#"><i
+                            class="fa-solid fa-magnifying-glass"></i></a>
+
                     <?php if (isset($_SESSION['user_id'])): ?>
                     <!-- Show profile link when the user is logged in -->
                     <a href="profile.php?user_id=<?php echo htmlspecialchars($_SESSION['user_id']); ?>"
@@ -111,38 +112,33 @@ if (!isset($_SESSION['profile_image']) || !isset($_SESSION['first_name']) || !is
             <div class="navbar_mobile--logo">
                 <a href="index.php"><img src="assets/images/logo.png" alt="logo"></a>
             </div>
-            
+
             <form class="navbar_mobile--search" id="mobile-search-form" method="GET">
-                <input
-                    type="text"
-                    name="search_term"
-                    id="mobile-search-term"
-                    placeholder="Search"
-                >
+                <input type="text" name="search_term" id="mobile-search-term" placeholder="Search">
                 <button type="submit">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </button>
             </form>
             <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const currentPage   = window.location.pathname;
-  const searchForm    = document.getElementById('mobile-search-form');
-  const searchInput   = document.getElementById('mobile-search-term');
+            document.addEventListener('DOMContentLoaded', function() {
+                const currentPage = window.location.pathname;
+                const searchForm = document.getElementById('mobile-search-form');
+                const searchInput = document.getElementById('mobile-search-term');
 
-  // default go to listing.php
-  let formAction       = 'listing.php';
-  let placeholderText  = 'Search places or tags';
+                // default go to listing.php
+                let formAction = 'listing.php';
+                let placeholderText = 'Search places or tags';
 
-  // if on any blog page, switch to blogs.php
-  if (currentPage.includes('blogs.php') || currentPage.includes('single-blog.php')) {
-    formAction      = 'blogs.php';
-    placeholderText = 'Search blogs or tags';
-  }
+                // if on any blog page, switch to blogs.php
+                if (currentPage.includes('blogs.php') || currentPage.includes('single-blog.php')) {
+                    formAction = 'blogs.php';
+                    placeholderText = 'Search blogs or tags';
+                }
 
-  // apply them
-  searchForm.setAttribute('action', formAction);
-  searchInput.setAttribute('placeholder', placeholderText);
-});
+                // apply them
+                searchForm.setAttribute('action', formAction);
+                searchInput.setAttribute('placeholder', placeholderText);
+            });
             </script>
 
             <a class="navbar_mobile--menu" id="mobile_emnu-open" href="#"><i class="fa-solid fa-bars"></i></a>
@@ -151,38 +147,33 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="navbar_search--overlay" id="search-overlay">
             <a id="close-btn" href="#">X</a>
             <form class="navbar_search--overlay-content" method="GET">
-                <input
-                    type="text"
-                    name="search_term"
-                    id="search-term"
-                    placeholder="Search places or tags"
-                >
+                <input type="text" name="search_term" id="search-term" placeholder="Search places or tags">
                 <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
             </form>
         </div>
 
         <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const currentPage = window.location.pathname;
-  const searchForm  = document.querySelector('.navbar_search--overlay-content');
-  const searchInput = document.getElementById('search-term');
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPage = window.location.pathname;
+            const searchForm = document.querySelector('.navbar_search--overlay-content');
+            const searchInput = document.getElementById('search-term');
 
-  // Default to places search
-  let formAction     = 'listing.php';
-  let placeholderText = 'Search places or tags';
+            // Default to places search
+            let formAction = 'listing.php';
+            let placeholderText = 'Search places or tags';
 
-  // If we detect a blog page, switch to blog search
-  if (currentPage.includes('blogs.php') || currentPage.includes('single-blog.php')) {
-    formAction      = 'blogs.php';
-    placeholderText = 'Search blogs or tags';
-  }
+            // If we detect a blog page, switch to blog search
+            if (currentPage.includes('blogs.php') || currentPage.includes('single-blog.php')) {
+                formAction = 'blogs.php';
+                placeholderText = 'Search blogs or tags';
+            }
 
-  // Apply
-  searchForm.setAttribute('action', formAction);
-  searchInput.setAttribute('placeholder', placeholderText);
+            // Apply
+            searchForm.setAttribute('action', formAction);
+            searchInput.setAttribute('placeholder', placeholderText);
 
-  console.log('Search form ➞', formAction, '| placeholder ➞', placeholderText);
-});
+            console.log('Search form ➞', formAction, '| placeholder ➞', placeholderText);
+        });
         </script>
 
         <div class="LogOverlay">
@@ -297,7 +288,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // Clear login session errors after rendering
             fetch('clear_login_errors.php', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
                 body: 'clear_errors=true'
             }).catch(error => console.error('Error clearing login session:', error));
         }
@@ -305,7 +298,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // Clear signup session errors after rendering
             fetch('clear_signup_errors.php', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
                 body: 'clear_errors=true'
             }).catch(error => console.error('Error clearing signup session:', error));
         }
@@ -313,7 +308,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // Clear change password session errors after rendering
             fetch('clear_change_password_errors.php', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
                 body: 'clear_errors=true'
             }).catch(error => console.error('Error clearing change password session:', error));
         }
