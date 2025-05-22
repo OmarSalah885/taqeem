@@ -10,10 +10,11 @@ include 'header.php'; // Include the header
     <!-- Carousel Section -->
     <div class="carousel">
         <div class="carousel-inner">
-            <?php for ($i = 0; $i < 3; $i++): ?>
-            <div class="carousel-item<?= $i === 0 ? ' active' : '' ?>">
+
+            <div class="carousel-item active">
                 <div class="carousel-item_img">
                     <img src="assets/images/eugene-zhyvchik-vad__5nCLJ8-unsplash.jpg" alt="carousel image">
+                    <div class="carousel-item-overlay"></div>
                 </div>
                 <div class="carousel-item_content">
                     <div class="carousel-item_content-div">
@@ -22,7 +23,31 @@ include 'header.php'; // Include the header
                     </div>
                 </div>
             </div>
-            <?php endfor; ?>
+            <div class="carousel-item">
+                <div class="carousel-item_img">
+                    <img src="assets/images/carousel(1).jpg" alt="carousel image">
+                    <div class="carousel-item-overlay"></div>
+                </div>
+                <div class="carousel-item_content">
+                    <div class="carousel-item_content-div">
+                        <h1>Discover stunning artworks near you</h1>
+                        <a href="listing.php?category_id=8" class="btn__red--l btn__red btn">See More</a>
+                    </div>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <div class="carousel-item_img">
+                    <img src="assets/images/carousel(2).jpg" alt="carousel image">
+                    <div class="carousel-item-overlay"></div>
+                </div>
+                <div class="carousel-item_content">
+                    <div class="carousel-item_content-div">
+                        <h1>Looking for greenery? Let’s find the best plant stores!</h1>
+                        <a href="listing.php?category_id=7" class="btn__red--l btn__red btn">See More</a>
+                    </div>
+                </div>
+            </div>
+
         </div>
         <button class="carousel-control prev">❮</button>
         <button class="carousel-control next">❯</button>
@@ -120,7 +145,6 @@ include 'header.php'; // Include the header
                 excellence, transparency, and the spirit of exploration.
                 Together, let’s make every choice an informed one!
             </p>
-            <a href="#">Read more</a>
         </div>
         <div class="aboutUs_img">
             <img src="assets/images/aboutus.jpg" alt="About Us">
@@ -158,16 +182,16 @@ include 'header.php'; // Include the header
                         <div class="homeBlog_blogs--item-text">
                             <a href="single-blog.php?id=' . $id . '" class="homeBlog_blogs--item-text_title">' . $title . '</a>
                             <a href="single-blog.php?id='. $id.' ?>" style="text-decoration: none; color: inherit;">
-                                <p>' . htmlspecialchars($shortContent) . '</p>
-                            </a>
-                        </div>
-                    </div>';
-                }
-            } else {
-                echo "<p>No blogs found.</p>";
-            }
-            ?>
+            <p>' . htmlspecialchars($shortContent) . '</p>
+            </a>
         </div>
+    </div>';
+    }
+    } else {
+    echo "<p>No blogs found.</p>";
+    }
+    ?>
+    </div>
     </div>
 
 </main>

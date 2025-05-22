@@ -4,6 +4,15 @@ require_once 'db_connect.php';
 session_start();
 include 'header.php';
 
+function format_count($number) {
+    if ($number >= 1000000) {
+        return round($number / 1000000, 1) . 'M';
+    } elseif ($number >= 1000) {
+        return round($number / 1000, 1) . 'k';
+    }
+    return (string)$number;
+}
+
 $category_id = isset($_GET['category_id']) ? (int)$_GET['category_id'] : 0;
 $price       = isset($_GET['price']) ? $_GET['price'] : '';
 $stars       = isset($_GET['stars']) ? (int)$_GET['stars'] : 0;
@@ -119,7 +128,10 @@ $total_pages = ceil($total_items / $items_per_page);
 $current_page = max(1, min($total_pages, $page));
 
 // Fetch Paginated Data with JOIN
-$sql = "SELECT places.*, categories.icon AS category_icon, COALESCE(AVG(r.rating), 0) AS avg_rating 
+$sql = "SELECT places.*, 
+               categories.icon AS category_icon, 
+               COALESCE(AVG(r.rating), 0) AS avg_rating, 
+               COUNT(r.id) AS total_reviews 
         FROM places 
         LEFT JOIN categories ON places.category_id = categories.id
         LEFT JOIN reviews r ON places.id = r.place_id";
@@ -203,7 +215,8 @@ if (isset($_SESSION['user_id'])) {
                 <select name="category_id" class="custom-select" onchange="filterChange()">
                     <option value="" <?php echo empty($category_id) ? 'selected' : ''; ?>>Categories</option>
                     <?php foreach ($categories as $cat): ?>
-                    <option value="<?php echo $cat['id']; ?>" <?php echo $category_id == $cat['id'] ? 'selected' : ''; ?>>
+                    <option value="<?php echo $cat['id']; ?>"
+                        <?php echo $category_id == $cat['id'] ? 'selected' : ''; ?>>
                         <?php
                         $cat_name = strtolower(trim($cat['name']));
                         echo $category_names[$cat_name] ?? htmlspecialchars($cat['name']);
@@ -230,56 +243,73 @@ if (isset($_SESSION['user_id'])) {
         <!-- Display Places -->
         <div class="listing_grid">
             <?php if (!empty($places)): ?>
-                <?php foreach ($places as $place): ?>
-                    <div class="listing_grid--item">
-                        <div class="listing_grid--item-img">
-                            <a href="single-place.php?place_id=<?php echo $place['id']; ?>" class="listing_grid--item-img_img">
-                                <img src="<?php echo $place['featured_image']; ?>" alt="<?php echo $place['name']; ?>">
-                            </a>
-                            <a href="listing.php?category_id=<?php echo $place['category_id']; ?>" class="listing_grid--item-img_category">
-                                <i class="<?php echo htmlspecialchars($place['category_icon'] ?? 'fa-solid fa-question'); ?>"></i>
-                            </a>
-                            <!-- Save Icon -->
-                            <a href="#" class="listing_grid--item-img_save" onclick="toggleSave(event, <?php echo $place['id']; ?>)">
-                                <i class="<?php echo in_array($place['id'], $saved_places) ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark'; ?>"></i>
-                            </a>
-                        </div>
-                        <div class="listing_grid--item-content">
-                            <div class="listing_grid--item-content_tages">
-                                <?php 
+            <?php foreach ($places as $place): ?>
+            <div class="listing_grid--item">
+                <div class="listing_grid--item-img">
+                    <a href="single-place.php?place_id=<?php echo $place['id']; ?>" class="listing_grid--item-img_img">
+                        <img src="<?php echo $place['featured_image']; ?>" alt="<?php echo $place['name']; ?>">
+                    </a>
+                    <a href="listing.php?category_id=<?php echo $place['category_id']; ?>"
+                        class="listing_grid--item-img_category">
+                        <i
+                            class="<?php echo htmlspecialchars($place['category_icon'] ?? 'fa-solid fa-question'); ?>"></i>
+                    </a>
+                    <!-- Save Icon -->
+                    <a href="#" class="listing_grid--item-img_save"
+                        onclick="toggleSave(event, <?php echo $place['id']; ?>)">
+                        <i
+                            class="<?php echo in_array($place['id'], $saved_places) ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark'; ?>"></i>
+                    </a>
+                </div>
+                <div class="listing_grid--item-content">
+                    <div class="listing_grid--item-content_tages">
+                        <?php 
                                 $tags = explode(',', $place['tags']);
                                 foreach ($tags as $tag): ?>
-                                <a href="listing.php?search=<?php echo urlencode(trim($tag)); ?>">
-                                    <?php echo htmlspecialchars(trim($tag)); ?>
-                                </a>
-                                <?php endforeach; ?>
-                            </div>
-                            <a class="listing_grid--item-content_name" href="single-place.php?place_id=<?php echo $place['id']; ?>">
-                                <?php echo $place['name']; ?>
-                            </a>
-                            <a href="<?php echo htmlspecialchars($place['google_map_location']); ?>" class="listing_grid--item-content_location" target="_blank">
-                                <i class="fa-solid fa-location-dot"></i> <?php echo htmlspecialchars($place['address'] ?: $place['city']); ?>
-                            </a>
-                            <div class="listing_grid--item-content_stars">
-                                <?php
+                        <a href="listing.php?search=<?php echo urlencode(trim($tag)); ?>">
+                            <?php echo htmlspecialchars(trim($tag)); ?>
+                        </a>
+                        <?php endforeach; ?>
+                    </div>
+                    <a class="listing_grid--item-content_name"
+                        href="single-place.php?place_id=<?php echo $place['id']; ?>">
+                        <?php echo $place['name']; ?>
+                    </a>
+                    <a href="<?php echo htmlspecialchars($place['google_map_location']); ?>"
+                        class="listing_grid--item-content_location" target="_blank">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <?php echo htmlspecialchars($place['address'] ?: $place['city']); ?>
+                    </a>
+                    <div class="listing_grid--item-content_stars">
+                        <?php
                                 $rating = $place['avg_rating'];
                                 $percentage = ($rating / 5) * 100;
                                 ?>
-                                <div class="listing_grid--item-content_stars-stars" style="background: linear-gradient(90deg, #A21111 var(--rating, <?php echo $percentage; ?>%), #D0D0D0 var(--rating,<?php echo $percentage-100; ?>%)); display: inline-block; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-                                    <i class="fa-solid fa-star star-rating"></i>
-                                    <i class="fa-solid fa-star star-rating"></i>
-                                    <i class="fa-solid fa-star star-rating"></i>
-                                    <i class="fa-solid fa-star star-rating"></i>
-                                    <i class="fa-solid fa-star star-rating"></i>
-                                </div>
-                                <span class="rating-number"><?php echo number_format($rating, 1); ?></span>
-                                <h4 class="listing_grid--item-content_stars-price"><?php echo $place['price']; ?></h4>
+                        <div>
+                            <div class="listing_grid--item-content_stars-stars"
+                                style="background: linear-gradient(90deg, #A21111 var(--rating, <?php echo $percentage; ?>%), #D0D0D0 var(--rating,<?php echo $percentage-100; ?>%)); display: inline-block; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                                <i class="fa-solid fa-star star-rating"></i>
+                                <i class="fa-solid fa-star star-rating"></i>
+                                <i class="fa-solid fa-star star-rating"></i>
+                                <i class="fa-solid fa-star star-rating"></i>
+                                <i class="fa-solid fa-star star-rating"></i>
                             </div>
+                            <span class="rating-number">
+                                <?php 
+                                    echo number_format($place['avg_rating'], 1); 
+                                    $review_count = (int)$place['total_reviews'];
+                                    echo ' (' . format_count($review_count) . ' ' . ($review_count === 1 ? 'review' : 'reviews') . ')';
+                                ?>
+                            </span>
+
                         </div>
+                        <h4 class="listing_grid--item-content_stars-price"><?php echo $place['price']; ?></h4>
                     </div>
-                <?php endforeach; ?>
+                </div>
+            </div>
+            <?php endforeach; ?>
             <?php else: ?>
-                <p>No places found.</p>
+            <p>No places found.</p>
             <?php endif; ?>
         </div>
         <!-- Pagination -->

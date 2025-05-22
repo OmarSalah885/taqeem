@@ -147,14 +147,13 @@
                         }
 
                         &_img {
-                            width: 12.6rem;
-                            height: 12.6rem;
                             border-radius: 100%;
 
                             img {
-                                height: 100%;
-                                border-radius: 100%;
+                                width: 12.6rem;
+                                height: 12.6rem;
                                 object-fit: cover;
+                                border-radius: 100%;
                             }
 
                             @include respond(small) {
