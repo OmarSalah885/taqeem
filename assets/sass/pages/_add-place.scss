@@ -320,6 +320,8 @@
                 background-color: $red-600;
                 color: $red-00;
                 transition: all .3s;
+                cursor: pointer;
+                font-family: inherit;
 
                 &:hover {
                     width: 4rem;
@@ -397,7 +399,7 @@
                 object-fit: cover;
             }
 
-            a {
+            button {
                 position: absolute;
                 right: -1rem;
                 top: -1rem;
@@ -413,6 +415,9 @@
                 background-color: $red-600;
                 color: $red-00;
                 transition: all .3s;
+                outline: none;
+                cursor: pointer;
+                font-family: inherit;
 
                 &:hover {
                     width: 4rem;
@@ -476,8 +481,7 @@
 
             a {
                 position: absolute;
-                right: -1rem;
-                top: -1rem;
+
                 width: 3.6rem;
                 height: 3.6rem;
                 display: flex;
@@ -490,16 +494,34 @@
                 background-color: $red-600;
                 color: $red-00;
                 transition: all .3s;
-
-                &:hover {
-                    width: 4rem;
-                    height: 4rem;
-                    right: -1.4rem;
-                    top: -1.4rem;
-                    background-color: $red-700;
-                }
             }
         }
+    }
+}
+
+.delete-menu-item {
+    right: -1rem;
+    top: -1rem;
+
+    &:hover {
+        width: 4rem;
+        height: 4rem;
+        right: -1.4rem;
+        top: -1.4rem;
+        background-color: $red-700;
+    }
+}
+
+.edit-menu-item {
+    right: 3.6rem;
+    top: -1rem;
+
+    &:hover {
+        width: 4rem;
+        height: 4rem;
+        right: 3.2rem;
+        top: -1.4rem;
+        background-color: $red-700;
     }
 }
 
@@ -523,8 +545,6 @@
 
             a {
                 position: absolute;
-                right: -1rem;
-                top: -1rem;
                 width: 3.6rem;
                 height: 3.6rem;
                 display: flex;
@@ -537,15 +557,6 @@
                 background-color: $red-600;
                 color: $red-00;
                 transition: all .3s;
-
-
-                &:hover {
-                    width: 4rem;
-                    height: 4rem;
-                    right: -1.4rem;
-                    top: -1.4rem;
-                    background-color: $red-700;
-                }
             }
 
             h4 {
@@ -558,5 +569,31 @@
                 margin-bottom: 1.2rem;
             }
         }
+    }
+}
+
+.delete-faq {
+    right: -1rem;
+    top: -1rem;
+
+    &:hover {
+        width: 4rem;
+        height: 4rem;
+        right: -1.4rem;
+        top: -1.4rem;
+        background-color: $red-700;
+    }
+}
+
+.edit-faq {
+    right: 3.6rem;
+    top: -1rem;
+
+    &:hover {
+        width: 4rem;
+        height: 4rem;
+        right: 3.2rem;
+        top: -1.4rem;
+        background-color: $red-700;
     }
 }

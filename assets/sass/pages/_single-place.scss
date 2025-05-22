@@ -52,12 +52,14 @@
             }
         }
 
-        .btn {
+        .delete_edit-places--div {
             position: absolute;
             top: 90%;
             left: 50%;
             translate: -50% -50%;
             z-index: 200000;
+            display: flex;
+            gap: 1.2rem;
         }
     }
 
@@ -681,7 +683,8 @@
                     font-size: $F-S;
                     display: flex;
                     align-items: center;
-                    gap: 2.4rem;
+                    gap: 1.2rem;
+                    flex-wrap: wrap;
 
                     &--like {
                         background-color: $red-500;
@@ -936,4 +939,26 @@
             }
         }
     }
+}
+
+.edit-review-form {
+    .addReview_stars {
+        margin-bottom: 1.4rem;
+        display: block;
+    }
+
+    .btn {
+        margin-bottom: 1.4rem;
+        display: block;
+    }
+
+    .image-preview {
+        margin-bottom: 1.4rem;
+        display: flex;
+    }
+}
+
+.place--owner-comment-form {
+    flex-direction: column;
+    gap: 1.2rem;
 }

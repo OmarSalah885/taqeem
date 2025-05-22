@@ -24,7 +24,7 @@
         color: $red-500;
 
         &:hover {
-            outline: .3rem solid transparent;
+            outline: .3rem solid $red-500;
             background-color: $red-500;
             color: $red-00;
 

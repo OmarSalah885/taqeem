@@ -16,6 +16,7 @@
 
 .admin_main {
     min-height: 55vh;
+    text-align: center;
 
     h1 {
         text-align: center;
@@ -24,6 +25,10 @@
         margin-top: 4.8rem;
     }
 
+    .listing_indicator {
+        width: 100%;
+        text-align: center;
+    }
 }
 
 .admin_card {
@@ -203,7 +208,7 @@ td img {
     font-size: inherit;
     border: none;
     cursor: pointer;
-
+    display: block;
 }
 
 .actions a {
@@ -215,6 +220,7 @@ td img {
     border: none;
     cursor: pointer;
     text-decoration: none;
+    display: block;
 }
 
 .btn-edit {

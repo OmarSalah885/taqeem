@@ -28,6 +28,7 @@ html {
 body {
   box-sizing: border-box;
   background-color: white;
+  min-height: 55vh;
 }
 body p {
   font-size: 16px;
@@ -147,7 +148,7 @@ body p {
   color: #D01515;
 }
 .btn__transparent:hover {
-  outline: 0.3rem solid transparent;
+  outline: 0.3rem solid #D01515;
   background-color: #D01515;
   color: #FDE8E8;
 }
@@ -2415,12 +2416,14 @@ body p {
 .place_gallery .gallery-btn.right-btn {
   right: 10px;
 }
-.place_gallery .btn {
+.place_gallery .delete_edit-places--div {
   position: absolute;
   top: 90%;
   left: 50%;
   translate: -50% -50%;
   z-index: 200000;
+  display: flex;
+  gap: 1.2rem;
 }
 .place_info {
   width: 100%;
@@ -3210,7 +3213,8 @@ body p {
   font-size: 1.6rem;
   display: flex;
   align-items: center;
-  gap: 2.4rem;
+  gap: 1.2rem;
+  flex-wrap: wrap;
 }
 .place .reviews_container .review .review_btns--like {
   background-color: #D01515;
@@ -3448,6 +3452,24 @@ body p {
 }
 .image-preview .image-thumb .remove-image:hover {
   background-color: #D01515;
+}
+
+.edit-review-form .addReview_stars {
+  margin-bottom: 1.4rem;
+  display: block;
+}
+.edit-review-form .btn {
+  margin-bottom: 1.4rem;
+  display: block;
+}
+.edit-review-form .image-preview {
+  margin-bottom: 1.4rem;
+  display: flex;
+}
+
+.place--owner-comment-form {
+  flex-direction: column;
+  gap: 1.2rem;
 }
 
 .profile {
@@ -4125,6 +4147,8 @@ body p {
   background-color: #A21111;
   color: #FDE8E8;
   transition: all 0.3s;
+  cursor: pointer;
+  font-family: inherit;
 }
 .media_added--fetured_img button:hover {
   width: 4rem;
@@ -4191,7 +4215,7 @@ body p {
   -o-object-fit: cover;
      object-fit: cover;
 }
-.media_added--gallery_grid_item a {
+.media_added--gallery_grid_item button {
   position: absolute;
   right: -1rem;
   top: -1rem;
@@ -4207,8 +4231,11 @@ body p {
   background-color: #A21111;
   color: #FDE8E8;
   transition: all 0.3s;
+  outline: none;
+  cursor: pointer;
+  font-family: inherit;
 }
-.media_added--gallery_grid_item a:hover {
+.media_added--gallery_grid_item button:hover {
   width: 4rem;
   height: 4rem;
   right: -1.4rem;
@@ -4261,8 +4288,6 @@ body p {
 }
 .add-menu_added .add-menu_added-grid_item a {
   position: absolute;
-  right: -1rem;
-  top: -1rem;
   width: 3.6rem;
   height: 3.6rem;
   display: flex;
@@ -4276,10 +4301,27 @@ body p {
   color: #FDE8E8;
   transition: all 0.3s;
 }
-.add-menu_added .add-menu_added-grid_item a:hover {
+
+.delete-menu-item {
+  right: -1rem;
+  top: -1rem;
+}
+.delete-menu-item:hover {
   width: 4rem;
   height: 4rem;
   right: -1.4rem;
+  top: -1.4rem;
+  background-color: #740C0C;
+}
+
+.edit-menu-item {
+  right: 3.6rem;
+  top: -1rem;
+}
+.edit-menu-item:hover {
+  width: 4rem;
+  height: 4rem;
+  right: 3.2rem;
   top: -1.4rem;
   background-color: #740C0C;
 }
@@ -4302,8 +4344,6 @@ body p {
 }
 .added-faqs-grid_item a {
   position: absolute;
-  right: -1rem;
-  top: -1rem;
   width: 3.6rem;
   height: 3.6rem;
   display: flex;
@@ -4317,13 +4357,6 @@ body p {
   color: #FDE8E8;
   transition: all 0.3s;
 }
-.added-faqs-grid_item a:hover {
-  width: 4rem;
-  height: 4rem;
-  right: -1.4rem;
-  top: -1.4rem;
-  background-color: #740C0C;
-}
 .added-faqs-grid_item h4 {
   font-size: 1.328rem;
   margin-bottom: 1.2rem;
@@ -4331,6 +4364,30 @@ body p {
 .added-faqs-grid_item p {
   font-size: 1.072rem;
   margin-bottom: 1.2rem;
+}
+
+.delete-faq {
+  right: -1rem;
+  top: -1rem;
+}
+.delete-faq:hover {
+  width: 4rem;
+  height: 4rem;
+  right: -1.4rem;
+  top: -1.4rem;
+  background-color: #740C0C;
+}
+
+.edit-faq {
+  right: 3.6rem;
+  top: -1rem;
+}
+.edit-faq:hover {
+  width: 4rem;
+  height: 4rem;
+  right: 3.2rem;
+  top: -1.4rem;
+  background-color: #740C0C;
 }
 
 .add_blog-container {
@@ -4460,12 +4517,17 @@ body p {
 
 .admin_main {
   min-height: 55vh;
+  text-align: center;
 }
 .admin_main h1 {
   text-align: center;
   font-size: 2.4rem;
   margin-bottom: 1rem;
   margin-top: 4.8rem;
+}
+.admin_main .listing_indicator {
+  width: 100%;
+  text-align: center;
 }
 
 .admin_card {
@@ -4631,6 +4693,7 @@ td img {
   font-size: inherit;
   border: none;
   cursor: pointer;
+  display: block;
 }
 
 .actions a {
@@ -4642,6 +4705,7 @@ td img {
   border: none;
   cursor: pointer;
   text-decoration: none;
+  display: block;
 }
 
 .btn-edit {

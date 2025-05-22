@@ -147,7 +147,7 @@ include 'header.php';
                     </td>
 
                     <td>
-                        <a href="profile.php?user_id=<?php echo $user['id']; ?>">
+                        <a href="profile.php?user_id=<?php echo $user['id']; ?>" class="admins_links">
                             <?php echo htmlspecialchars($user['last_name']); ?>
                         </a>
                     </td>

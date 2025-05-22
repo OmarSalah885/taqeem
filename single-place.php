@@ -90,27 +90,31 @@ if (empty($_SESSION['csrf_token'])) {
         </div>
         <button class="gallery-btn right-btn">›</button>
         <?php if ($is_owner || $is_admin): ?>
+        <div class="delete_edit-places--div">
             <a href="edit_place.php?place_id=<?php echo $place['id']; ?>" class="btn__red btn__red--l btn">Edit</a>
-            <form action="delete_place.php" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this place? This action cannot be undone.');">
+            <form action="delete_place.php" method="POST" style="display:inline;"
+                onsubmit="return confirm('Are you sure you want to delete this place? This action cannot be undone.');">
                 <input type="hidden" name="place_id" value="<?= htmlspecialchars($place['id']) ?>">
                 <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-                <input type="hidden" name="redirect_to" value="<?= htmlspecialchars($_SERVER['HTTP_REFERER'] ?? 'index.php') ?>">
-                <button type="submit" class="btn__red btn__red--l btn">DELETE PLACE</button>
+                <input type="hidden" name="redirect_to"
+                    value="<?= htmlspecialchars($_SERVER['HTTP_REFERER'] ?? 'index.php') ?>">
+                <button type="submit" class="btn__dark btn__dark--l btn">DELETE PLACE</button>
             </form>
+        </div>
         <?php endif; ?>
     </div>
 
     <div class="place_info">
         <div class="place_info-cont">
             <div class="place_info--tages">
-    <?php
+                <?php
     $tags = !empty($place['tags']) ? explode(',', $place['tags']) : [];
     foreach ($tags as $tag) {
         $trimmed_tag = htmlspecialchars(trim($tag));
         echo '<a href="listing.php?search=' . urlencode($trimmed_tag) . '">' . $trimmed_tag . '</a>';
     }
     ?>
-</div>
+            </div>
             <h1 class="place_info--name"><?= htmlspecialchars($place['name']) ?></h1>
             <div class="place_info--extra">
                 <?php
@@ -125,9 +129,10 @@ if (empty($_SESSION['csrf_token'])) {
                 $rating_query->close();
                 ?>
                 <div class="extra_stars_container">
-                    <div class="extra_stars" style="background: linear-gradient(90deg, #A21111 <?= $percentage ?>%, #D0D0D0 <?= $percentage ?>%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                    <div class="extra_stars"
+                        style="background: linear-gradient(90deg, #A21111 <?= $percentage ?>%, #D0D0D0 <?= $percentage ?>%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
                         <?php for ($i = 0; $i < 5; $i++): ?>
-                            <i class="fa-solid fa-star star-rating"></i>
+                        <i class="fa-solid fa-star star-rating"></i>
                         <?php endfor; ?>
                     </div>
                     <span class="extra_rating"><?= number_format($avg_rating, 1) ?></span>
@@ -161,14 +166,14 @@ if (empty($_SESSION['csrf_token'])) {
                 </a>
             </div>
         </div>
-        
+
     </div>
 
     <?php if (!empty($place['email']) || !empty($place['phone_1']) || !empty($place['phone_2']) || !empty($place['website']) || !empty($place['facebook_url']) || !empty($place['instagram_url']) || !empty($place['twitter_url'])): ?>
-        <div class="place_CONTACT">
-            <h2 class="place-title">CONTACT INFO</h2>
-            <div class="place_CONTACT--info">
-                <?php
+    <div class="place_CONTACT">
+        <h2 class="place-title">CONTACT INFO</h2>
+        <div class="place_CONTACT--info">
+            <?php
                 if (!empty($place['email'])) {
                     echo '<div class="place_CONTACT--info-item">EMAIL: <a href="mailto:' . htmlspecialchars($place['email']) . '">' . htmlspecialchars($place['email']) . '</a></div>';
                 }
@@ -182,9 +187,9 @@ if (empty($_SESSION['csrf_token'])) {
                     echo '<div class="place_CONTACT--info-item">PHONE(2): <a href="tel:' . htmlspecialchars($place['phone_2']) . '">' . htmlspecialchars($place['phone_2']) . '</a></div>';
                 }
                 ?>
-            </div>
-            <div class="place_CONTACT--social">
-                <?php
+        </div>
+        <div class="place_CONTACT--social">
+            <?php
                 if (!empty($place['facebook_url'])) {
                     echo '<a href="' . htmlspecialchars($place['facebook_url']) . '" target="_blank"><i class="fa-brands fa-square-facebook"></i></a>';
                 }
@@ -195,8 +200,8 @@ if (empty($_SESSION['csrf_token'])) {
                     echo '<a href="' . htmlspecialchars($place['twitter_url']) . '" target="_blank"><i class="fa-brands fa-square-x-twitter"></i></a>';
                 }
                 ?>
-            </div>
         </div>
+    </div>
     <?php endif; ?>
 
     <?php
@@ -206,35 +211,36 @@ if (empty($_SESSION['csrf_token'])) {
     $menu_result = $menu_query->get_result();
     if ($menu_result->num_rows > 0):
     ?>
-        <div class="place_menu">
-            <h2 class="place-title">MENU</h2>
-            <div class="place_menu--grid">
-                <?php while ($menu_item = $menu_result->fetch_assoc()): ?>
-                    <div class="place_menu--item">
-                        <div class="menu_item--img">
-                            <img src="<?= htmlspecialchars($menu_item['image'] ?: 'assets/images/default_menu.jpg') ?>" alt="<?= htmlspecialchars($menu_item['name']) ?>">
-                        </div>
-                        <div class="menu_item--info">
-                            <div class="menu_item--info-name">
-                                <h3><?= htmlspecialchars($menu_item['name']) ?></h3>
-                                <h3>$<?= htmlspecialchars(number_format($menu_item['price'], 2)) ?></h3>
-                            </div>
-                            <p class="menu_item--info-text"><?= htmlspecialchars($menu_item['description']) ?></p>
-                        </div>
+    <div class="place_menu">
+        <h2 class="place-title">MENU</h2>
+        <div class="place_menu--grid">
+            <?php while ($menu_item = $menu_result->fetch_assoc()): ?>
+            <div class="place_menu--item">
+                <div class="menu_item--img">
+                    <img src="<?= htmlspecialchars($menu_item['image'] ?: 'assets/images/default_menu.jpg') ?>"
+                        alt="<?= htmlspecialchars($menu_item['name']) ?>">
+                </div>
+                <div class="menu_item--info">
+                    <div class="menu_item--info-name">
+                        <h3><?= htmlspecialchars($menu_item['name']) ?></h3>
+                        <h3>$<?= htmlspecialchars(number_format($menu_item['price'], 2)) ?></h3>
                     </div>
-                <?php endwhile; ?>
+                    <p class="menu_item--info-text"><?= htmlspecialchars($menu_item['description']) ?></p>
+                </div>
             </div>
+            <?php endwhile; ?>
         </div>
+    </div>
     <?php
     endif;
     $menu_query->close();
     ?>
 
     <?php if (!empty($place['description'])): ?>
-        <div class="place_description">
-            <h2 class="place-title">DESCRIPTION</h2>
-            <p class="place_description--text"><?= htmlspecialchars($place['description']) ?></p>
-        </div>
+    <div class="place_description">
+        <h2 class="place-title">DESCRIPTION</h2>
+        <p class="place_description--text"><?= htmlspecialchars($place['description']) ?></p>
+    </div>
     <?php endif; ?>
 
     <?php
@@ -244,19 +250,19 @@ if (empty($_SESSION['csrf_token'])) {
     $hours_result = $hours_query->get_result();
     if ($hours_result->num_rows > 0):
     ?>
-        <div class="place_time">
-            <h2 class="place-title">OPENING HOURS</h2>
-            <table class="place_time--table">
-                <?php while ($hours = $hours_result->fetch_assoc()): ?>
-                    <tr>
-                        <td class="place_time--table-day"><?= htmlspecialchars($hours['day']) ?>:</td>
-                        <td class="place_time--table-hour">
-                            <?= $hours['open_time'] && $hours['close_time'] ? htmlspecialchars($hours['open_time'] . ' - ' . $hours['close_time']) : 'Closed' ?>
-                        </td>
-                    </tr>
-                <?php endwhile; ?>
-            </table>
-        </div>
+    <div class="place_time">
+        <h2 class="place-title">OPENING HOURS</h2>
+        <table class="place_time--table">
+            <?php while ($hours = $hours_result->fetch_assoc()): ?>
+            <tr>
+                <td class="place_time--table-day"><?= htmlspecialchars($hours['day']) ?>:</td>
+                <td class="place_time--table-hour">
+                    <?= $hours['open_time'] && $hours['close_time'] ? htmlspecialchars($hours['open_time'] . ' - ' . $hours['close_time']) : 'Closed' ?>
+                </td>
+            </tr>
+            <?php endwhile; ?>
+        </table>
+    </div>
     <?php
     endif;
     $hours_query->close();
@@ -269,19 +275,19 @@ if (empty($_SESSION['csrf_token'])) {
     $faq_result = $faq_query->get_result();
     if ($faq_result->num_rows > 0):
     ?>
-        <div class="faq">
-            <h2 class="place-title">FAQ's</h2>
-            <div class="faq-container">
-                <?php while ($faq = $faq_result->fetch_assoc()): ?>
-                    <div class="faq-item">
-                        <button class="faq-question"><?= htmlspecialchars($faq['question']) ?></button>
-                        <div class="faq-answer" style="display: none;">
-                            <p><?= htmlspecialchars($faq['answer']) ?></p>
-                        </div>
-                    </div>
-                <?php endwhile; ?>
+    <div class="faq">
+        <h2 class="place-title">FAQ's</h2>
+        <div class="faq-container">
+            <?php while ($faq = $faq_result->fetch_assoc()): ?>
+            <div class="faq-item">
+                <button class="faq-question"><?= htmlspecialchars($faq['question']) ?></button>
+                <div class="faq-answer" style="display: none;">
+                    <p><?= htmlspecialchars($faq['answer']) ?></p>
+                </div>
             </div>
+            <?php endwhile; ?>
         </div>
+    </div>
     <?php
     endif;
     $faq_query->close();
@@ -292,9 +298,10 @@ if (empty($_SESSION['csrf_token'])) {
         <div class="reviews_overall">
             <div class="reviews_overall--L">
                 <h2>Overall rating</h2>
-                <div class="overall_stars" style="background: linear-gradient(90deg, #A21111 <?= $percentage ?>%, #D0D0D0 <?= $percentage ?>%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                <div class="overall_stars"
+                    style="background: linear-gradient(90deg, #A21111 <?= $percentage ?>%, #D0D0D0 <?= $percentage ?>%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
                     <?php for ($i = 0; $i < 5; $i++): ?>
-                        <i class="fa-solid fa-star star-rating"></i>
+                    <i class="fa-solid fa-star star-rating"></i>
                     <?php endfor; ?>
                 </div>
                 <p><?= number_format($avg_rating, 1) ?> out of 5</p>
@@ -314,12 +321,12 @@ if (empty($_SESSION['csrf_token'])) {
                 foreach (array_reverse(range(1, 5)) as $i):
                     $percent = $total_reviews > 0 ? ($ratings_counts[$i] / $total_reviews) * 100 : 0;
                 ?>
-                    <div class="stars_p">
-                        <p><?= $i ?> STARS</p>
-                        <div class="stars_p--<?= $i ?>">
-                            <div class="stars_p--color" style="width: <?= $percent ?>%;"></div>
-                        </div>
+                <div class="stars_p">
+                    <p><?= $i ?> STARS</p>
+                    <div class="stars_p--<?= $i ?>">
+                        <div class="stars_p--color" style="width: <?= $percent ?>%;"></div>
                     </div>
+                </div>
                 <?php endforeach; ?>
             </div>
         </div>
@@ -344,68 +351,80 @@ if (empty($_SESSION['csrf_token'])) {
                     $profile_image = $review['profile_image'] ?: 'assets/images/profiles/pro_null.png';
                     $can_edit = (isset($_SESSION['user_id']) && ($_SESSION['user_id'] == $review['user_id'] || $is_admin));
             ?>
-                <div class="review" id="review_<?= $review_id ?>">
-                    <div class="review_profile">
-                        <a href="profile.php?user_id=<?= urlencode($review['user_id']) ?>" class="review_profile--img">
-                            <img src="<?= htmlspecialchars($profile_image) ?>" alt="User Profile">
+            <div class="review" id="review_<?= $review_id ?>">
+                <div class="review_profile">
+                    <a href="profile.php?user_id=<?= urlencode($review['user_id']) ?>" class="review_profile--img">
+                        <img src="<?= htmlspecialchars($profile_image) ?>" alt="User Profile">
+                    </a>
+                    <div class="review_profile--info">
+                        <a href="profile.php?user_id=<?= urlencode($review['user_id']) ?>"
+                            class="review_profile--info-name">
+                            <?= htmlspecialchars($review['user_name']) ?>
                         </a>
-                        <div class="review_profile--info">
-                            <a href="profile.php?user_id=<?= urlencode($review['user_id']) ?>" class="review_profile--info-name">
-                                <?= htmlspecialchars($review['user_name']) ?>
-                            </a>
-                            <div class="review_profile--info-stars">
-                                <div class="review_stars" style="background: linear-gradient(90deg, #A21111 <?= $percentage ?>%, #D0D0D0 <?= $percentage ?>%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-                                    <?php for ($i = 0; $i < 5; $i++): ?>
-                                        <i class="fa-solid fa-star star-rating"></i>
-                                    <?php endfor; ?>
-                                </div>
-                                <p class="review-date"><?= $created_at ?></p>
+                        <div class="review_profile--info-stars">
+                            <div class="review_stars"
+                                style="background: linear-gradient(90deg, #A21111 <?= $percentage ?>%, #D0D0D0 <?= $percentage ?>%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                                <?php for ($i = 0; $i < 5; $i++): ?>
+                                <i class="fa-solid fa-star star-rating"></i>
+                                <?php endfor; ?>
                             </div>
+                            <p class="review-date"><?= $created_at ?></p>
                         </div>
                     </div>
-                    <div class="review_text">
-                        <p><?= htmlspecialchars($review['review_text']) ?></p>
-                    </div>
-                    <div class="review_gallery">
-                        <?php
+                </div>
+                <div class="review_text">
+                    <p><?= htmlspecialchars($review['review_text']) ?></p>
+                </div>
+                <div class="review_gallery">
+                    <?php
                         $gallery_query = $conn->prepare("SELECT image_url FROM review_images WHERE review_id = ?");
                         $gallery_query->bind_param("i", $review_id);
                         $gallery_query->execute();
                         $gallery_result = $gallery_query->get_result();
                         while ($image = $gallery_result->fetch_assoc()):
                         ?>
-                            <a href="<?= htmlspecialchars($image['image_url']) ?>" class="review_gallery-img" target="_blank">
-                                <img src="<?= htmlspecialchars($image['image_url']) ?>" alt="Review Image">
-                            </a>
-                        <?php endwhile; $gallery_query->close(); ?>
-                    </div>
-                    <div class="review_btns">
-                        <?php if ($can_edit): ?>
-                            <button type="button" class="btn__red--s btn__red btn" onclick="showEditForm(<?= $review_id ?>)">edit review</button>
-                            <button type="button" class="btn__red--s btn__red btn" onclick="deleteReview(<?= $review_id ?>)">delete review</button>
-                        <?php endif; ?>
-                        <?php if ($is_owner || $is_admin): ?>
-                            <button type="button" class="btn__transparent--s btn__transparent btn" onclick="showCommentForm(<?= $review_id ?>)">comment on review</button>
-                        <?php endif; ?>
-                        <button class="btn__transparent--s btn__transparent btn" onclick="toggleLike(event, <?= $review_id ?>)">
-                            <i class="<?= in_array($review_id, $is_liked_reviews) ? 'fa-solid fa-heart' : 'fa-regular fa-heart' ?>"></i> Like
-                        </button>
-                    </div>
+                    <a href="<?= htmlspecialchars($image['image_url']) ?>" class="review_gallery-img" target="_blank">
+                        <img src="<?= htmlspecialchars($image['image_url']) ?>" alt="Review Image">
+                    </a>
+                    <?php endwhile; $gallery_query->close(); ?>
+                </div>
+                <div class="review_btns">
+                    <button class="btn__transparent--s btn__transparent btn"
+                        onclick="toggleLike(event, <?= $review_id ?>)">
+                        <i
+                            class="<?= in_array($review_id, $is_liked_reviews) ? 'fa-solid fa-heart' : 'fa-regular fa-heart' ?>"></i>
+                        Like
+                    </button>
                     <?php if ($can_edit): ?>
-                        <form id="editForm-<?= $review_id ?>" method="POST" action="edit_review.php" enctype="multipart/form-data" style="display: none;" class="edit-review-form">
-                            <input type="hidden" name="review_id" value="<?= $review_id ?>">
-                            <input type="hidden" name="place_id" value="<?= $place_id ?>">
-                            <input type="hidden" name="rating" id="rating-<?= $review_id ?>" value="<?= $rating ?>">
-                            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-                            <div class="addReview_stars" data-review-id="<?= $review_id ?>">
-                                <?php for ($i = 1; $i <= 5; $i++): ?>
-                                    <i class="fa-solid fa-star <?= $i <= $rating ? 'selected' : '' ?>" data-value="<?= $i ?>"></i>
-                                <?php endfor; ?>
-                            </div>
-                            <a class="btn__transparent--s btn__transparent btn" href="#" onclick="document.getElementById('imageInput-<?= $review_id ?>').click(); return false;">add photos</a>
-                            <input type="file" name="review_images[]" id="imageInput-<?= $review_id ?>" multiple accept="image/*" style="display: none;">
-                            <div class="image-preview" id="imagePreview-<?= $review_id ?>">
-                                <?php
+                    <button type="button" class="btn__red--s btn__red btn"
+                        onclick="showEditForm(<?= $review_id ?>)">edit review</button>
+                    <button type="button" class="btn__red--s btn__red btn"
+                        onclick="deleteReview(<?= $review_id ?>)">delete review</button>
+                    <?php endif; ?>
+                    <?php if ($is_owner || $is_admin): ?>
+                    <button type="button" class="btn__transparent--s btn__transparent btn"
+                        onclick="showCommentForm(<?= $review_id ?>)">comment on review</button>
+                    <?php endif; ?>
+                </div>
+                <?php if ($can_edit): ?>
+                <form id="editForm-<?= $review_id ?>" method="POST" action="edit_review.php"
+                    enctype="multipart/form-data" style="display: none;" class="edit-review-form">
+                    <input type="hidden" name="review_id" value="<?= $review_id ?>">
+                    <input type="hidden" name="place_id" value="<?= $place_id ?>">
+                    <input type="hidden" name="rating" id="rating-<?= $review_id ?>" value="<?= $rating ?>">
+                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                    <div class="addReview_stars" data-review-id="<?= $review_id ?>">
+                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                        <i class="fa-solid fa-star <?= $i <= $rating ? 'selected' : '' ?>" data-value="<?= $i ?>"></i>
+                        <?php endfor; ?>
+                    </div>
+                    <a class="btn__transparent--s btn__transparent btn" href="#"
+                        onclick="document.getElementById('imageInput-<?= $review_id ?>').click(); return false;">add
+                        photos</a>
+                    <input type="file" name="review_images[]" id="imageInput-<?= $review_id ?>" multiple
+                        accept="image/*" style="display: none;">
+                    <div class="image-preview" id="imagePreview-<?= $review_id ?>">
+                        <?php
                                 $img_q = $conn->prepare("SELECT id, image_url FROM review_images WHERE review_id = ?");
                                 $img_q->bind_param("i", $review_id);
                                 $img_q->execute();
@@ -414,17 +433,17 @@ if (empty($_SESSION['csrf_token'])) {
                                     $img_id = (int)$img['id'];
                                     $img_url = htmlspecialchars($img['image_url']);
                                 ?>
-                                    <div class="image-thumb" data-img-id="<?= $img_id ?>">
-                                        <img src="<?= $img_url ?>" alt="">
-                                        <span class="remove-image existing">×</span>
-                                    </div>
-                                <?php endwhile; $img_q->close(); ?>
-                            </div>
-                            <textarea name="review_text" required><?= htmlspecialchars($review['review_text']) ?></textarea>
-                            <button type="submit" name="edit_review" class="btn__red--s btn__red btn">Save Changes</button>
-                        </form>
-                    <?php endif; ?>
-                    <?php
+                        <div class="image-thumb" data-img-id="<?= $img_id ?>">
+                            <img src="<?= $img_url ?>" alt="">
+                            <span class="remove-image existing">×</span>
+                        </div>
+                        <?php endwhile; $img_q->close(); ?>
+                    </div>
+                    <textarea name="review_text" required><?= htmlspecialchars($review['review_text']) ?></textarea>
+                    <button type="submit" name="edit_review" class="btn__red--s btn__red btn">Save Changes</button>
+                </form>
+                <?php endif; ?>
+                <?php
                     $comments_query = $conn->prepare("SELECT id, user_id, comment, created_at FROM review_comments WHERE review_id = ?");
                     $comments_query->bind_param("i", $review_id);
                     $comments_query->execute();
@@ -454,18 +473,19 @@ if (empty($_SESSION['csrf_token'])) {
                     endif;
                     $comments_query->close();
                     ?>
-                    <?php if ($is_owner || $is_admin): ?>
-                        <form id="commentForm-<?= $review_id ?>" method="POST" action="submit_owner_comment.php" style="display: none;">
-                            <input type="hidden" name="review_id" value="<?= $review_id ?>">
-                            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-                            <textarea name="comment" placeholder="add comment on review" required></textarea>
-                            <button type="submit" class="btn__transparent--s btn__transparent btn">submit comment</button>
-                        </form>
-                    <?php endif; ?>
-                </div>
+                <?php if ($is_owner || $is_admin): ?>
+                <form id="commentForm-<?= $review_id ?>" method="POST" action="submit_owner_comment.php"
+                    style="display: none;" class="place--owner-comment-form">
+                    <input type="hidden" name="review_id" value="<?= $review_id ?>">
+                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                    <textarea name="comment" placeholder="add comment on review" required></textarea>
+                    <button type="submit" class="btn__transparent--s btn__transparent btn">submit comment</button>
+                </form>
+                <?php endif; ?>
+            </div>
             <?php endwhile; ?>
             <?php else: ?>
-                <p>No reviews available.</p>
+            <p>No reviews available.</p>
             <?php endif; $reviews_query->close(); ?>
         </div>
     </div>
@@ -473,25 +493,27 @@ if (empty($_SESSION['csrf_token'])) {
     <div class="addReview">
         <h2 class="place-title">WRITE A REVIEW</h2>
         <?php if (isset($_SESSION['user_id'])): ?>
-            <form method="POST" action="add_review.php" id="reviewForm" enctype="multipart/form-data">
-                <div class="addReview_container">
-                    <div class="addReview_stars">
-                        <input type="hidden" name="rating" id="rating" value="0">
-                        <?php for ($i = 1; $i <= 5; $i++): ?>
-                            <i class="fa-solid fa-star" data-value="<?= $i ?>"></i>
-                        <?php endfor; ?>
-                    </div>
-                    <input type="hidden" name="place_id" value="<?= $place_id ?>">
-                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-                    <a class="btn__transparent--s btn__transparent btn" href="#" onclick="document.getElementById('imageInput').click(); return false;">add photos</a>
-                    <input type="file" name="images[]" id="imageInput" multiple style="display: none;" accept="image/*">
-                    <div id="imagePreview" class="image-preview"></div>
-                    <textarea name="review_text" id="review_text" placeholder="Your review" required></textarea>
-                    <button type="submit" name="submit_review" class="btn__red--l btn__red btn" id="submitButton">ADD REVIEW</button>
+        <form method="POST" action="add_review.php" id="reviewForm" enctype="multipart/form-data">
+            <div class="addReview_container">
+                <div class="addReview_stars">
+                    <input type="hidden" name="rating" id="rating" value="0">
+                    <?php for ($i = 1; $i <= 5; $i++): ?>
+                    <i class="fa-solid fa-star" data-value="<?= $i ?>"></i>
+                    <?php endfor; ?>
                 </div>
-            </form>
+                <input type="hidden" name="place_id" value="<?= $place_id ?>">
+                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                <a class="btn__transparent--s btn__transparent btn" href="#"
+                    onclick="document.getElementById('imageInput').click(); return false;">add photos</a>
+                <input type="file" name="images[]" id="imageInput" multiple style="display: none;" accept="image/*">
+                <div id="imagePreview" class="image-preview"></div>
+                <textarea name="review_text" id="review_text" placeholder="Your review" required></textarea>
+                <button type="submit" name="submit_review" class="btn__red--l btn__red btn" id="submitButton">ADD
+                    REVIEW</button>
+            </div>
+        </form>
         <?php else: ?>
-            <p>You must be logged in to write a review.</p>
+        <p>You must be logged in to write a review.</p>
         <?php endif; ?>
     </div>
 </main>
@@ -548,7 +570,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const ratingInput = form.querySelector('input[name="rating"]');
             ratingInput.value = rating;
             form.querySelectorAll('.addReview_stars i').forEach(s => {
-                s.style.color = s.getAttribute('data-value') <= rating ? '#A21111' : '#D0D0D0';
+                s.style.color = s.getAttribute('data-value') <= rating ? '#A21111' :
+                    '#D0D0D0';
             });
         });
     });
@@ -566,7 +589,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const el = document.getElementById(`review_${rid}`);
         if (el) {
             console.log(`Scrolling to review_${rid}`);
-            el.scrollIntoView({ behavior: 'smooth' });
+            el.scrollIntoView({
+                behavior: 'smooth'
+            });
         } else {
             console.warn(`Review element review_${rid} not found`);
         }
@@ -574,7 +599,9 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log(`User can edit review ${rid}, calling showEditForm`);
             showEditForm(rid);
         } else {
-            console.log(`Edit form not shown for review ${rid}: action=${action}, canEdit=${canEditReview(rid, currentUserId, reviewOwners, isAdmin)}`);
+            console.log(
+                `Edit form not shown for review ${rid}: action=${action}, canEdit=${canEditReview(rid, currentUserId, reviewOwners, isAdmin)}`
+            );
         }
     } else {
         console.log('No review_id in URL');
@@ -627,28 +654,30 @@ function updateFileList() {
 function deleteReview(reviewId) {
     if (!confirm("Are you sure you want to delete your review?")) return;
     fetch('delete_review.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `review_id=${reviewId}&csrf_token=<?= urlencode($_SESSION['csrf_token']) ?>`
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const reviewElem = document.querySelector(`#review_${reviewId}`);
-            if (reviewElem) reviewElem.remove();
-        } else {
-            alert("Failed to delete review: " + (data.error || 'Unknown error'));
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert("An error occurred while deleting the review.");
-    });
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `review_id=${reviewId}&csrf_token=<?= urlencode($_SESSION['csrf_token']) ?>`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const reviewElem = document.querySelector(`#review_${reviewId}`);
+                if (reviewElem) reviewElem.remove();
+            } else {
+                alert("Failed to delete review: " + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert("An error occurred while deleting the review.");
+        });
 }
 
 function showCommentForm(reviewId) {
     const form = document.getElementById(`commentForm-${reviewId}`);
-    if (form) form.style.display = 'block';
+    if (form) form.style.display = 'flex';
 }
 
 function editComment(commentId) {
@@ -676,7 +705,9 @@ function saveComment(commentId) {
             alert('Error saving the comment.');
         }
     };
-    xhr.send(`comment_id=${commentId}&comment_text=${encodeURIComponent(commentText)}&csrf_token=<?= urlencode($_SESSION['csrf_token']) ?>`);
+    xhr.send(
+        `comment_id=${commentId}&comment_text=${encodeURIComponent(commentText)}&csrf_token=<?= urlencode($_SESSION['csrf_token']) ?>`
+    );
 }
 
 function deleteComment(commentId) {
@@ -732,7 +763,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 reader.onload = ev => {
                     const thumb = document.createElement('div');
                     thumb.className = 'image-thumb';
-                    thumb.innerHTML = `<img src="${ev.target.result}"><span class="remove-image new">×</span>`;
+                    thumb.innerHTML =
+                        `<img src="${ev.target.result}"><span class="remove-image new">×</span>`;
                     thumb.querySelector('.remove-image.new').onclick = () => {
                         thumb.remove();
                         newFiles = newFiles.filter(f => f !== file);
@@ -745,6 +777,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             syncFiles();
         });
+
         function syncFiles() {
             const dt = new DataTransfer();
             newFiles.forEach(f => dt.items.add(f));
