@@ -67,6 +67,7 @@ if (!isset($_SESSION['profile_image']) || !isset($_SESSION['first_name']) || !is
     const isLoggedIn = <?php echo isset($_SESSION['user_id']) ? 'true' : 'false'; ?>;
     const hasLoginErrors = <?php echo !empty($_SESSION['login_errors']) ? 'true' : 'false'; ?>;
     const hasSignupErrors = <?php echo !empty($_SESSION['signup_errors']) ? 'true' : 'false'; ?>;
+    const hasChangePasswordErrors = <?php echo !empty($_SESSION['change_password_errors']) ? 'true' : 'false'; ?>;
     </script>
 </head>
 
@@ -307,6 +308,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: 'clear_errors=true'
             }).catch(error => console.error('Error clearing signup session:', error));
+        }
+        if (hasChangePasswordErrors) {
+            // Clear change password session errors after rendering
+            fetch('clear_change_password_errors.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'clear_errors=true'
+            }).catch(error => console.error('Error clearing change password session:', error));
         }
     });
     </script>

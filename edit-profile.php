@@ -14,7 +14,7 @@ if ($user_id !== ($_SESSION['user_id'] ?? 0)) {
 }
 
 // Handle form submission for profile update
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['first_name'])) {
     // Collect POST data safely
     $first_name = $_POST['first_name'] ?? '';
     $last_name  = $_POST['last_name'] ?? '';
@@ -55,35 +55,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Prepare update query
-$stmt = $conn->prepare(
-    "UPDATE users SET first_name=?, last_name=?, about_me=?, gender=?, visibility=?, location=?, profile_image=? WHERE id=?"
-);
-$stmt->bind_param(
-    "sssssssi",
-    $first_name,
-    $last_name,
-    $about_me,
-    $gender,
-    $visibility,
-    $location,
-    $profile_image_path,
-    $user_id
-);
-$stmt->execute();
-$stmt->close();
+    $stmt = $conn->prepare(
+        "UPDATE users SET first_name=?, last_name=?, about_me=?, gender=?, visibility=?, location=?, profile_image=? WHERE id=?"
+    );
+    $stmt->bind_param(
+        "sssssssi",
+        $first_name,
+        $last_name,
+        $about_me,
+        $gender,
+        $visibility,
+        $location,
+        $profile_image_path,
+        $user_id
+    );
+    $stmt->execute();
+    $stmt->close();
 
-// *** Immediately update session so header shows new data ***
-// Only update session if user edits their own profile (not admin editing others)
-if ($user_id === ($_SESSION['user_id'] ?? 0)) {
-    $_SESSION['first_name']    = $first_name;
-    $_SESSION['last_name']     = $last_name;
-    $_SESSION['profile_image'] = $profile_image_path;
-}
+    // Update session if user edits their own profile
+    if ($user_id === ($_SESSION['user_id'] ?? 0)) {
+        $_SESSION['first_name']    = $first_name;
+        $_SESSION['last_name']     = $last_name;
+        $_SESSION['profile_image'] = $profile_image_path;
+    }
 
-// Redirect to avoid resubmission on refresh
-header("Location: edit-profile.php?user_id=$user_id");
-exit;
-
+    // Redirect to avoid resubmission
+    header("Location: edit-profile.php?user_id=$user_id");
+    exit;
 }
 
 // Fetch user data for the form
@@ -136,18 +134,42 @@ include 'header.php';
     </form>
 
     <form action="change_password.php" method="POST" class="edit-profile_password">
-        <?php if (isset($_SESSION['error'])): ?>
-            <div class="error-message"><?= $_SESSION['error']; unset($_SESSION['error']); ?></div>
-        <?php endif; ?>
-
-        <?php if (isset($_SESSION['success'])): ?>
-            <div class="success-message"><?= $_SESSION['success']; unset($_SESSION['success']); ?></div>
-        <?php endif; ?>
+        <?php
+        $change_password_errors = $_SESSION['change_password_errors'] ?? [];
+        $change_password_data = $_SESSION['change_password_data'] ?? [];
+        ?>
 
         <h2 class="edit-profile_title">UPDATE YOUR PASSWORD</h2>
-        <input type="password" name="current_password" placeholder="CURRENT PASSWORD" class="edit-profile_input" required>
-        <input type="password" name="new_password" placeholder="NEW PASSWORD" class="edit-profile_input" required>
-        <input type="password" name="confirm_password" placeholder="VERIFY NEW PASSWORD" class="edit-profile_input" required>
+
+        <?php if (isset($_SESSION['success'])): ?>
+            <p class="success"><?php echo htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?></p>
+        <?php endif; ?>
+
+        <div class="form-group">
+            <input type="password" name="current_password" placeholder="CURRENT PASSWORD" class="edit-profile_input" required>
+            <?php if (isset($change_password_errors['current_password'])): ?>
+                <p class="error"><?php echo htmlspecialchars($change_password_errors['current_password']); ?></p>
+            <?php endif; ?>
+        </div>
+
+        <div class="form-group">
+            <input type="password" name="new_password" placeholder="NEW PASSWORD" class="edit-profile_input" required>
+            <?php if (isset($change_password_errors['new_password'])): ?>
+                <p class="error"><?php echo htmlspecialchars($change_password_errors['new_password']); ?></p>
+            <?php endif; ?>
+        </div>
+
+        <div class="form-group">
+            <input type="password" name="confirm_password" placeholder="VERIFY NEW PASSWORD" class="edit-profile_input" required>
+            <?php if (isset($change_password_errors['confirm_password'])): ?>
+                <p class="error"><?php echo htmlspecialchars($change_password_errors['confirm_password']); ?></p>
+            <?php endif; ?>
+        </div>
+
+        <?php if (isset($change_password_errors['general'])): ?>
+            <p class="error"><?php echo htmlspecialchars($change_password_errors['general']); ?></p>
+        <?php endif; ?>
+
         <button class="btn__red--l btn__red btn" type="submit">CHANGE PASSWORD</button>
     </form>
 </main>
@@ -169,13 +191,23 @@ include 'header.php';
         }
     });
 
-    // Validate radio selections
+    // Validate radio selections for profile form
     document.querySelector('.edit-profile_info').addEventListener('submit', function(e) {
         const genderChecked = document.querySelector('input[name="gender"]:checked');
         const visibilityChecked = document.querySelector('input[name="visibility"]:checked');
         if (!genderChecked || !visibilityChecked) {
             e.preventDefault();
             alert('Please select your gender and visibility preference.');
+        }
+    });
+
+    // Scroll to password form on error
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof hasChangePasswordErrors !== 'undefined' && hasChangePasswordErrors) {
+            const passwordForm = document.querySelector('.edit-profile_password');
+            if (passwordForm) {
+                passwordForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         }
     });
 </script>
