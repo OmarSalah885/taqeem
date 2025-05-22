@@ -134,27 +134,36 @@ include 'header.php';
             <tbody>
                 <?php 
 $rowNum = $offset + 1;
-while ($place = $places->fetch_assoc()): ?>
+while ($place = $places->fetch_assoc()): 
+    $image = $place['featured_image'] ?: 'assets/images/places/placeholder.png';
+    $name = $place['name'] ?: 'Unnamed';
+    $tags = $place['tags'] ?: 'None';
+    $description = $place['description'] ? mb_strimwidth($place['description'], 0, 50, '…') : 'No description';
+    $country = $place['country'] ?: 'Unknown';
+    $city = $place['city'] ?: 'Unknown';
+    $email = $place['email'] ?: 'No email';
+    $created_at = $place['created_at'] ? substr($place['created_at'], 0, 10) : 'Unknown';
+?>
                 <tr>
                     <td><?php echo $rowNum++; ?></td>
                     <td>
                         <a href="single-place.php?place_id=<?php echo $place['id']; ?>">
-                            <img src="<?php echo htmlspecialchars($place['featured_image'] ?: 'assets/images/places/placeholder.png'); ?>"
-                                alt="<?php echo htmlspecialchars('Featured image of ' . $place['name']); ?>" width="80"
+                            <img src="<?php echo htmlspecialchars($image); ?>"
+                                alt="<?php echo htmlspecialchars('Featured image of ' . $name); ?>" width="80"
                                 height="50">
                         </a>
                     </td>
                     <td>
                         <a href="single-place.php?place_id=<?php echo $place['id']; ?>" class="admins_links">
-                            <?php echo htmlspecialchars($place['name']); ?>
+                            <?php echo htmlspecialchars($name); ?>
                         </a>
                     </td>
-                    <td><?php echo htmlspecialchars($place['tags']); ?></td>
-                    <td><?php echo htmlspecialchars(mb_strimwidth($place['description'], 0, 50, '…')); ?></td>
-                    <td><?php echo htmlspecialchars($place['country']); ?></td>
-                    <td><?php echo htmlspecialchars($place['city']); ?></td>
-                    <td><?php echo htmlspecialchars($place['email']); ?></td>
-                    <td><?php echo htmlspecialchars(substr($place['created_at'], 0, 10)); ?></td>
+                    <td><?php echo htmlspecialchars($tags); ?></td>
+                    <td><?php echo htmlspecialchars($description); ?></td>
+                    <td><?php echo htmlspecialchars($country); ?></td>
+                    <td><?php echo htmlspecialchars($city); ?></td>
+                    <td><?php echo htmlspecialchars($email); ?></td>
+                    <td><?php echo htmlspecialchars($created_at); ?></td>
                     <td class="actions">
                         <a href="edit_place.php?place_id=<?php echo $place['id']; ?>" class="btn-edit">Edit</a>
                         <form action="delete_place.php" method="POST" style="display:inline;"
@@ -177,7 +186,7 @@ while ($place = $places->fetch_assoc()): ?>
     <div class="listing_indicator">
         <?php
         $range       = 2;   // pages to show either side of current
-        $jump        = 3;   // pages to jump when clicking “…”
+        $jump        = 3;   // pages to jump when clicking "…"
         $currentPage = $page;
 
         // helper to render a clickable ellipsis

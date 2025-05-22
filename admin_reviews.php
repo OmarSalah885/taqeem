@@ -164,10 +164,11 @@ include 'header.php';
 $rowNum = $offset + 1;
 while ($rev = $reviews->fetch_assoc()):
     $userImg   = $rev['profile_image'] ?: 'assets/images/profiles/pro_null.png';
-    $userName  = htmlspecialchars($rev['first_name'] . ' ' . $rev['last_name']);
-    $placeName = htmlspecialchars($rev['place_name']);
-    $text      = htmlspecialchars(mb_strimwidth($rev['review_text'], 0, 50, '…'));
-    $created   = substr($rev['created_at'], 0, 10);
+    $userName  = ($rev['first_name'] || $rev['last_name']) ? htmlspecialchars($rev['first_name'] . ' ' . $rev['last_name']) : 'Unknown User';
+    $placeName = $rev['place_name'] ?: 'Unknown Place';
+    $rating = $rev['rating'] !== null ? (int)$rev['rating'] : 0;
+    $text      = $rev['review_text'] ? htmlspecialchars(mb_strimwidth($rev['review_text'], 0, 50, '…')) : 'No review';
+    $created   = $rev['created_at'] ? substr($rev['created_at'], 0, 10) : 'Unknown';
     $userId    = $rev['user_id'];
 ?>
                 <tr>
@@ -180,10 +181,10 @@ while ($rev = $reviews->fetch_assoc()):
                     <td>
                         <a href="profile.php?user_id=<?= (int)$userId ?>" class="admins_links"><?= $userName ?></a>
                     </td>
-                    <td><?= $placeName ?></td>
-                    <td><?= (int)$rev['rating'] ?></td>
+                    <td><?= htmlspecialchars($placeName) ?></td>
+                    <td><?= $rating ?></td>
                     <td><?= $text ?></td>
-                    <td><?= $created ?></td>
+                    <td><?= htmlspecialchars($created) ?></td>
                     <td class="actions">
                         <a href="single-place.php?place_id=<?= $rev['place_id'] ?>&review_id=<?= $rev['id'] ?>&action=edit#review_<?= $rev['id'] ?>"
                             class="btn-edit">Edit</a>

@@ -129,38 +129,45 @@ include 'header.php';
                 </tr>
             </thead>
             <tbody>
-                <?php while ($user = $users->fetch_assoc()): ?>
+                <?php while ($user = $users->fetch_assoc()): 
+                    $image = $user['profile_image'] ?: 'assets/images/profiles/pro_null.png';
+                    $first_name = $user['first_name'] ?: 'Unknown';
+                    $last_name = $user['last_name'] ?: 'Unknown';
+                    $email = $user['email'] ?: 'No email';
+                    $gender = $user['gender'] ?: 'Unspecified';
+                    $about_me = $user['about_me'] ? htmlspecialchars(mb_strimwidth($user['about_me'], 0, 50, '…')) : 'No bio';
+                    $location = $user['location'] ?: 'Unknown';
+                    $role = $user['role'] ?: 'User';
+                    $created_at = $user['created_at'] ? substr($user['created_at'], 0, 10) : 'Unknown';
+                    $visibility = $user['visibility'] ?: 'Private';
+                ?>
                 <tr>
                     <td><?php echo $user['id']; ?></td>
-
                     <td>
                         <a href="profile.php?user_id=<?php echo $user['id']; ?>">
-                            <img src="<?php echo htmlspecialchars($user['profile_image'] ?: 'assets/images/profiles/pro_null.png'); ?>"
+                            <img src="<?php echo htmlspecialchars($image); ?>"
                                 alt="User Image" width="50" height="50">
                         </a>
                     </td>
-
                     <td>
                         <a href="profile.php?user_id=<?php echo $user['id']; ?>" class="admins_links">
-                            <?php echo htmlspecialchars($user['first_name']); ?>
+                            <?php echo htmlspecialchars($first_name); ?>
                         </a>
                     </td>
-
                     <td>
                         <a href="profile.php?user_id=<?php echo $user['id']; ?>" class="admins_links">
-                            <?php echo htmlspecialchars($user['last_name']); ?>
+                            <?php echo htmlspecialchars($last_name); ?>
                         </a>
                     </td>
-
-                    <td><?php echo htmlspecialchars($user['email']); ?></td>
-                    <td><?php echo htmlspecialchars($user['gender']); ?></td>
-                    <td><?php echo htmlspecialchars($user['about_me']); ?></td>
-                    <td><?php echo htmlspecialchars($user['location']); ?></td>
-                    <td><?php echo htmlspecialchars($user['role']); ?></td>
-                    <td><?php echo htmlspecialchars(substr($user['created_at'], 0, 10)); ?></td>
+                    <td><?php echo htmlspecialchars($email); ?></td>
+                    <td><?php echo htmlspecialchars($gender); ?></td>
+                    <td><?php echo $about_me; ?></td>
+                    <td><?php echo htmlspecialchars($location); ?></td>
+                    <td><?php echo htmlspecialchars($role); ?></td>
+                    <td><?php echo htmlspecialchars($created_at); ?></td>
                     <td>
-                        <span class="badge <?php echo $user['visibility'] === 'public' ? 'public' : 'private'; ?>">
-                            <?php echo htmlspecialchars($user['visibility']); ?>
+                        <span class="badge <?php echo strtolower($visibility) === 'public' ? 'public' : 'private'; ?>">
+                            <?php echo htmlspecialchars($visibility); ?>
                         </span>
                     </td>
                     <td class="actions">
