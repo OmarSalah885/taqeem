@@ -90,6 +90,7 @@ if (empty($_SESSION['csrf_token'])) {
         </div>
         <button class="gallery-btn right-btn">›</button>
         <?php if ($is_owner || $is_admin): ?>
+            <a href="edit_place.php?place_id=<?php echo $place['id']; ?>" class="btn__red btn__red--l btn">Edit</a>
             <form action="delete_place.php" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this place? This action cannot be undone.');">
                 <input type="hidden" name="place_id" value="<?= htmlspecialchars($place['id']) ?>">
                 <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
