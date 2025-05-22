@@ -496,7 +496,14 @@ function normalizeName($name) {
     return strtolower(trim(preg_replace('/[^a-zA-Z0-9]+/', '_', $name)));
 }
 ?>
-
+<style>
+.media_added--fetured, .media_added--gallery {
+    display: none;
+}
+.media_added--fetured.has-items, .media_added--gallery.has-items {
+    display: block;
+}
+</style>
 <main class="add-place">
   <?php if (!empty($errors)): ?>
     <div class="errors">
@@ -520,6 +527,8 @@ function normalizeName($name) {
   </div>
 
   <form class="add-place_main" method="POST" action="edit_place.php?place_id=<?= htmlspecialchars($place_id) ?>" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+
     <!-- GENERAL SECTION -->
     <div id="add-place-general" class="add-place_main--item add-place_main--general">
       <h2 class="add-place_title">GENERAL</h2>
@@ -562,7 +571,7 @@ function normalizeName($name) {
         <div id="map" style="height: 400px;"></div>
         <p>Selected Coordinates: <span id="coordinates"><?= htmlspecialchars($place['latitude'] ?? '31.9539') ?>, <?= htmlspecialchars($place['longitude'] ?? '35.9106') ?></span></p>
       </div>
-      <input type="hidden" name="address" id="address" value="<?= htmlspecialchars($place['address'] ?? '') ?>">
+      <input type="hidden" name="address" id="address Yanki" value="<?= htmlspecialchars($place['address'] ?? '') ?>">
       <input type="hidden" name="latitude" id="latitude" value="<?= htmlspecialchars($place['latitude'] ?? '31.9539') ?>">
       <input type="hidden" name="longitude" id="longitude" value="<?= htmlspecialchars($place['longitude'] ?? '35.9106') ?>">
     </div>
@@ -602,59 +611,70 @@ function normalizeName($name) {
     </div>
 
     <!-- MEDIA SECTION -->
-    <div class="add-place_main--item add-place_main--media" id="add-place-media">
-      <h2 class="add-place_title">MEDIA</h2>
-      <div class="media-contanier">
+    <?php
+// Fetch gallery images to define $has_gallery early
+$gallery_stmt = $conn->prepare("SELECT id, image_url FROM place_gallery WHERE place_id = ?");
+$gallery_stmt->bind_param("i", $place_id);
+$gallery_stmt->execute();
+$gallery_result = $gallery_stmt->get_result();
+$has_gallery = $gallery_result->num_rows > 0;
+?>
+<div class="add-place_main--item add-place_main--media" id="add-place-media">
+    <h2 class="add-place_title">MEDIA</h2>
+    <div class="media-contanier">
         <div class="media-contanier_featured">
-          <p class="media-contanier_title">FEATURED IMAGE</p>
-          <div class="drop-area">
-            <p><i class="fa-solid fa-arrow-up"></i>
-              <label for="fileInput1" class="browse-btn"></label>
-            </p>
-            <input type="file" id="fileInput1" name="featured_image" class="file-input" accept="image/*" hidden>
-          </div>
+            <p class="media-contanier_title">FEATURED IMAGE</p>
+            <div class="drop-area">
+                <p><i class="fa-solid fa-arrow-up"></i>
+                    <label for="fileInput1" class="browse-btn"></label>
+                </p>
+                <input type="file" id="fileInput1" name="featured_image" class="file-input" accept="image/*" hidden>
+            </div>
         </div>
         <div class="media-contanier_gallery">
-          <p class="media-contanier_title">GALLERY IMAGES</p>
-          <div class="drop-area gallery-drop-area">
-            <p><i class="fa-solid fa-arrow-up"></i> Drag & Drop files here
-              <label for="fileInput2" class="browse-btn"></label>
-            </p>
-            <input type="file" id="fileInput2" name="gallery_images[]" accept="image/*" multiple hidden>
-          </div>
+            <p class="media-contanier_title">GALLERY IMAGES</p>
+            <div class="drop-area gallery-drop-area">
+                <p><i class="fa-solid fa-arrow-up"></i> Drag & Drop files here
+                    <label for="fileInput2" class="browse-btn"></label>
+                </p>
+                <input type="file" id="fileInput2" name="gallery_images[]" accept="image/*" multiple hidden>
+            </div>
         </div>
-      </div>
-      <div class="media_added">
-        <div class="media_added--fetured">
-          <h3 class="media_added--title">ADDED FEATURED IMAGE</h3>
-          <div class="media_added--fetured_img">
-            <?php if (!empty($place['featured_image'])): ?>
-              <div class="media_added--fetured_img_item">
-                <img src="<?= htmlspecialchars($place['featured_image']) ?>" alt="Featured Image">
-                <button type="button" class="remove-featured-db">X</button>
-              </div>
-            <?php endif; ?>
-          </div>
-        </div>
-        <div class="media_added--gallery">
-          <h3 class="media_added--title">ADDED IMAGES FOR GALLERY</h3>
-          <div class="media_added--gallery_grid">
-            <?php
-            $gallery_stmt = $conn->prepare("SELECT id, image_url FROM place_gallery WHERE place_id = ?");
-            $gallery_stmt->bind_param("i", $place_id);
-            $gallery_stmt->execute();
-            $gallery_result = $gallery_stmt->get_result();
-            while ($img = $gallery_result->fetch_assoc()): ?>
-              <div class="media_added--gallery_grid_item" data-id="<?= $img['id'] ?>">
-                <img src="<?= htmlspecialchars($img['image_url']) ?>" alt="Gallery Image">
-                <button type="button" class="remove-gallery-db" data-id="<?= $img['id'] ?>">X</button>
-                <input type="hidden" name="existing_gallery_ids[]" value="<?= $img['id'] ?>">
-              </div>
-            <?php endwhile; $gallery_stmt->close(); ?>
-          </div>
-        </div>
-      </div>
     </div>
+    <div class="media_added">
+        <div class="media_added--fetured <?= !empty($place['featured_image']) ? 'has-items' : '' ?>">
+            <?php if (!empty($place['featured_image'])): ?>
+            <h3 class="media_added--title">ADDED FEATURED IMAGE</h3>
+            <?php endif; ?>
+            <div class="media_added--fetured_img">
+                <?php if (!empty($place['featured_image'])): ?>
+                    <div class="media_added--fetured_img_item">
+                        <img src="<?= htmlspecialchars($place['featured_image']) ?>" alt="Featured Image">
+                        <button type="button" class="remove-featured-db">X</button>
+                        <input type="hidden" name="remove_featured_image" id="removeFeaturedImage" value="0">
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+        <div class="media_added--gallery <?= $has_gallery ? 'has-items' : '' ?>">
+            <?php if ($has_gallery): ?>
+            <h3 class="media_added--title">ADDED IMAGES FOR GALLERY</h3>
+            <?php endif; ?>
+            <div class="media_added--gallery_grid">
+                <?php
+                // Reset result pointer to iterate over gallery images
+                $gallery_result->data_seek(0);
+                while ($img = $gallery_result->fetch_assoc()): ?>
+                    <div class="media_added--gallery_grid_item" data-id="<?= $img['id'] ?>">
+                        <img src="<?= htmlspecialchars($img['image_url']) ?>" alt="Gallery Image">
+                        <button type="button" class="remove-gallery-db" data-id="<?= $img['id'] ?>">X</button>
+                        <input type="hidden" name="existing_gallery_ids[]" value="<?= $img['id'] ?>">
+                    </div>
+                <?php endwhile; $gallery_stmt->close(); ?>
+            </div>
+        </div>
+    </div>
+</div>
 
     <!-- MENU SECTION -->
     <div class="add-place_main--item add-place_main--menu" id="add-place-menu">
@@ -680,7 +700,9 @@ function normalizeName($name) {
       </div>
       <button type="button" id="addMenuItemBtn" class="btn__red--s btn__red btn">ADD ITEM</button>
       <div class="add-menu_added">
-        <h3>ADDED MENU ITEMS</h3>
+        <?php if (!empty($menu_items)): ?>
+        <h3 class="media_added--title">ADDED MENU ITEMS</h3>
+        <?php endif; ?>
         <div class="add-menu_added-grid" id="menuItemsContainer">
           <?php foreach ($menu_items as $item): ?>
             <div class="add-menu_added-grid_item" data-id="<?= $item['id'] ?>">
@@ -692,7 +714,6 @@ function normalizeName($name) {
               </div>
               <a href="#" class="edit-menu-item"><i class="fa fa-edit"></i></a>
               <a href="#" class="delete-menu-item">X</a>
-              <input type="hidden" name="existing_menu_ids[]" value="<?= $item['id'] ?>">
             </div>
           <?php endforeach; ?>
         </div>
@@ -708,7 +729,9 @@ function normalizeName($name) {
       <input type="text" id="faq-answer" placeholder="ANSWER" class="input--red">
       <button type="button" class="btn__red--s btn__red btn" id="add-faq-btn">ADD QUESTION</button>
       <div class="added-faqs">
-        <h3>ADDED FAQS</h3>
+        <?php if (!empty($faqs)): ?>
+        <h3 class="media_added--title">ADDED FAQS</h3>
+        <?php endif; ?>
         <div class="added-faqs-grid" id="faqs-container">
           <?php foreach ($faqs as $faq): ?>
             <div class="added-faqs-grid_item" data-id="<?= $faq['id'] ?>">
@@ -716,7 +739,6 @@ function normalizeName($name) {
               <p><?= htmlspecialchars($faq['answer']) ?></p>
               <a href="#" class="edit-faq"><i class="fa fa-edit"></i></a>
               <a href="#" class="delete-faq">X</a>
-              <input type="hidden" name="existing_faq_ids[]" value="<?= $faq['id'] ?>">
             </div>
           <?php endforeach; ?>
         </div>
@@ -725,107 +747,418 @@ function normalizeName($name) {
       <input type="hidden" name="deleted_faq_ids" id="deletedFaqIdsInput">
     </div>
 
-    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-    <button class="btn__red--l btn__red btn" type="submit">UPDATE PLACE</button>
+    <button type="submit" class="btn__red--l btn__red btn">UPDATE PLACE</button>
   </form>
 </main>
 
-
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  let lat = parseFloat(<?= json_encode($place['latitude'] ?? '31.9539') ?>);
-  let lng = parseFloat(<?= json_encode($place['longitude'] ?? '35.9106') ?>);
-  if (isNaN(lat) || isNaN(lng)) {
-    lat = 31.9539;
-    lng = 35.9106;
+(() => {
+    const dropArea = document.querySelector('.media-contanier_featured .drop-area');
+    const fileInput1 = document.getElementById('fileInput1');
+    const previewContainer = document.querySelector('.media_added--fetured_img');
+    const removeFeaturedImageInput = document.getElementById('removeFeaturedImage');
+    const featuredContainer = document.querySelector('.media_added--fetured');
+
+    function updateFeaturedTitleAndVisibility() {
+        let title = document.querySelector('.media_added--fetured h3.media_added--title');
+        const hasItems = previewContainer.children.length > 0;
+        if (hasItems && !title) {
+            previewContainer.insertAdjacentHTML('beforebegin', '<h3 class="media_added--title">ADDED FEATURED IMAGE</h3>');
+        } else if (!hasItems && title) {
+            title.remove();
+        }
+        featuredContainer.classList.toggle('has-items', hasItems);
+    }
+
+    function clearPreview() {
+        previewContainer.innerHTML = '';
+        updateFeaturedTitleAndVisibility();
+    }
+
+    function showPreview(file) {
+        clearPreview();
+        const reader = new FileReader();
+        reader.onload = e => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'media_added--fetured_img_item';
+            wrapper.innerHTML = `
+                <img src="${e.target.result}" alt="Featured Image Preview">
+                <button type="button" class="remove-featured">X</button>
+            `;
+            previewContainer.appendChild(wrapper);
+            updateFeaturedTitleAndVisibility();
+
+            wrapper.querySelector('.remove-featured').onclick = () => {
+                fileInput1.value = '';
+                clearPreview();
+            };
+        };
+        reader.readAsDataURL(file);
+    }
+
+    fileInput1.addEventListener('change', () => {
+        if (fileInput1.files.length > 1) {
+            alert('Only one featured image is allowed.');
+            fileInput1.value = '';
+            clearPreview();
+            return;
+        }
+        if (fileInput1.files.length === 1) {
+            showPreview(fileInput1.files[0]);
+            removeFeaturedImageInput.value = '0';
+        } else {
+            clearPreview();
+        }
+    });
+
+    dropArea.addEventListener('dragover', e => {
+        e.preventDefault();
+        dropArea.classList.add('dragover');
+    });
+    dropArea.addEventListener('dragleave', e => {
+        e.preventDefault();
+        dropArea.classList.remove('dragover');
+    });
+    dropArea.addEventListener('drop', e => {
+        e.preventDefault();
+        dropArea.classList.remove('dragover');
+
+        const dtFiles = e.dataTransfer.files;
+        if (dtFiles.length > 1) {
+            alert('Only one featured image allowed.');
+            return;
+        }
+
+        if (dtFiles.length === 1) {
+            fileInput1.files = dtFiles;
+            showPreview(dtFiles[0]);
+            removeFeaturedImageInput.value = '0';
+        }
+    });
+
+    document.querySelectorAll('.remove-featured-db').forEach(btn => {
+        btn.addEventListener('click', () => {
+            removeFeaturedImageInput.value = '1';
+            btn.closest('.media_added--fetured_img_item').remove();
+            updateFeaturedTitleAndVisibility();
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const MAX_GALLERY_IMAGES = 8;
+        const galInput = document.getElementById('fileInput2');
+        const galContainer = document.querySelector('.media_added--gallery_grid');
+        const galDropArea = document.querySelector('.gallery-drop-area');
+        const galleryContainer = document.querySelector('.media_added--gallery');
+        let galleryFiles = [];
+
+        function updateGalleryTitleAndVisibility() {
+            let title = document.querySelector('.media_added--gallery h3.media_added--title');
+            const hasItems = galContainer.children.length > 0;
+            if (hasItems && !title) {
+                galContainer.insertAdjacentHTML('beforebegin', '<h3 class="media_added--title">ADDED IMAGES FOR GALLERY</h3>');
+            } else if (!hasItems && title) {
+                title.remove();
+            }
+            galleryContainer.classList.toggle('has-items', hasItems);
+        }
+
+        galInput.addEventListener('change', () => {
+            const existingImages = document.querySelectorAll('.media_added--gallery_grid_item[data-id]').length;
+            const newFiles = Array.from(galInput.files);
+            if (existingImages + galleryFiles.length + newFiles.length > MAX_GALLERY_IMAGES) {
+                alert(`You can only have up to ${MAX_GALLERY_IMAGES} gallery images.`);
+                galInput.value = '';
+                return;
+            }
+            galleryFiles = galleryFiles.concat(newFiles);
+            updateGalInputFiles();
+            renderGalleryPreviews();
+        });
+
+        function renderGalleryPreviews() {
+            const existingItems = document.querySelectorAll('.media_added--gallery_grid_item[data-id]');
+            galContainer.innerHTML = '';
+            existingItems.forEach(item => galContainer.appendChild(item));
+            galleryFiles.forEach((file, idx) => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'media_added--gallery_grid_item';
+                    wrapper.innerHTML = `
+                        <img src="${e.target.result}" alt="Gallery Image">
+                        <button type="button" class="remove-gallery" data-idx="${idx}">X</button>
+                    `;
+                    wrapper.querySelector('.remove-gallery').onclick = () => {
+                        galleryFiles.splice(idx, 1);
+                        updateGalInputFiles();
+                        renderGalleryPreviews();
+                    };
+                    galContainer.appendChild(wrapper);
+                    updateGalleryTitleAndVisibility();
+                };
+                reader.readAsDataURL(file);
+            });
+            updateGalleryTitleAndVisibility();
+        }
+
+        function updateGalInputFiles() {
+            const dt = new DataTransfer();
+            galleryFiles.forEach(f => dt.items.add(f));
+            galInput.files = dt.files;
+        }
+
+        galDropArea.addEventListener('dragover', e => {
+            e.preventDefault();
+            galDropArea.classList.add('dragover');
+        });
+        galDropArea.addEventListener('dragleave', e => {
+            e.preventDefault();
+            galDropArea.classList.remove('dragover');
+        });
+        galDropArea.addEventListener('drop', e => {
+            e.preventDefault();
+            galDropArea.classList.remove('dragover');
+
+            const existingImages = document.querySelectorAll('.media_added--gallery_grid_item[data-id]').length;
+            const dropped = Array.from(e.dataTransfer.files);
+            if (existingImages + galleryFiles.length + dropped.length > MAX_GALLERY_IMAGES) {
+                alert(`You can only have up to ${MAX_GALLERY_IMAGES} gallery images.`);
+                return;
+            }
+            galleryFiles = galleryFiles.concat(dropped);
+            updateGalInputFiles();
+            renderGalleryPreviews();
+        });
+
+        galContainer.addEventListener('click', e => {
+            if (e.target.classList.contains('remove-gallery-db')) {
+                const item = e.target.closest('.media_added--gallery_grid_item');
+                const id = item.dataset.id;
+                item.remove();
+                const hiddenInputs = document.querySelectorAll(`input[name="existing_gallery_ids[]"][value="${id}"]`);
+                hiddenInputs.forEach(input => input.remove());
+                updateGalleryTitleAndVisibility();
+            }
+        });
+
+        // Initialize gallery visibility
+        updateGalleryTitleAndVisibility();
+    });
+})();
+</script>
+<script>
+(() => {
+  const addMenuItemBtn = document.getElementById('addMenuItemBtn');
+  const menuItemsContainer = document.getElementById('menuItemsContainer');
+  const menuItemsInput = document.getElementById('menuItemsInput');
+  const deletedMenuItemsInput = document.getElementById('deletedMenuItemsInput');
+  let menuItems = [];
+  let deletedMenuItemIds = [];
+  let editingIndex = null;
+
+  function updateMenuTitle() {
+    let title = document.querySelector('.add-menu_added h3.media_added--title');
+    const hasItems = menuItemsContainer.children.length > 0;
+    if (hasItems && !title) {
+      menuItemsContainer.insertAdjacentHTML('beforebegin', '<h3 class="media_added--title">ADDED MENU ITEMS</h3>');
+    } else if (!hasItems && title) {
+      title.remove();
+    }
   }
-  initMap(lat, lng);
-});
+
+  // Load existing menu items
+  <?php if (!empty($menu_items)): ?>
+  menuItems = <?= json_encode($menu_items) ?>.map(item => ({
+    id: item.id,
+    name: item.name,
+    price: item.price,
+    description: item.description,
+    image: item.image
+  }));
+  renderMenuItems();
+  <?php endif; ?>
+
+  addMenuItemBtn.addEventListener('click', async () => {
+    const name = document.getElementById('menuItemName').value.trim();
+    const price = document.getElementById('menuItemPrice').value.trim();
+    const description = document.getElementById('menuItemDescription').value.trim();
+    const fileInput = document.getElementById('fileInput3');
+    let base64 = null;
+
+    if (!name || !price || !description) {
+      alert('Please fill all fields.');
+      return;
+    }
+
+    if (editingIndex !== null) {
+      if (fileInput.files[0]) {
+        base64 = await toBase64(fileInput.files[0]);
+      } else {
+        base64 = menuItems[editingIndex].image;
+      }
+      menuItems[editingIndex] = {
+        ...menuItems[editingIndex],
+        name, price, description, image: base64
+      };
+      editingIndex = null;
+    } else {
+      if (!fileInput.files[0]) {
+        alert('Please select an image.');
+        return;
+      }
+      base64 = await toBase64(fileInput.files[0]);
+      menuItems.push({ name, price, description, image: base64 });
+    }
+
+    renderMenuItems();
+    updateHiddenInput();
+    clearInputs();
+  });
+
+  menuItemsContainer.addEventListener('click', (e) => {
+    if (e.target.classList.contains('delete-menu-item') || e.target.closest('.delete-menu-item')) {
+      e.preventDefault();
+      const itemDiv = e.target.closest('.add-menu_added-grid_item');
+      const index = Array.from(menuItemsContainer.children).indexOf(itemDiv);
+      if (menuItems[index].id) {
+        deletedMenuItemIds.push(menuItems[index].id);
+      }
+      menuItems.splice(index, 1);
+      renderMenuItems();
+      updateHiddenInput();
+    }
+    if (e.target.classList.contains('edit-menu-item') || e.target.closest('.edit-menu-item')) {
+      e.preventDefault();
+      const itemDiv = e.target.closest('.add-menu_added-grid_item');
+      const index = Array.from(menuItemsContainer.children).indexOf(itemDiv);
+      const item = menuItems[index];
+      document.getElementById('menuItemName').value = item.name;
+      document.getElementById('menuItemPrice').value = item.price;
+      document.getElementById('menuItemDescription').value = item.description;
+      if (item.image) {
+        document.querySelector('.file-list').innerHTML = `<img src="${item.image}" style="max-width:60px;">`;
+      }
+      editingIndex = index;
+    }
+  });
+
+  function renderMenuItems() {
+    menuItemsContainer.innerHTML = '';
+    menuItems.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'add-menu_added-grid_item';
+      if (item.id) div.dataset.id = item.id;
+      div.innerHTML = `
+        <img src="${item.image}" alt="">
+        <div class="add-menu_added-grid_item--info">
+          <h4>${item.name}</h4>
+          <p>${item.description}</p>
+          <p>${item.price}</p>
+        </div>
+        <a href="#" class="delete-menu-item">X</a>
+        <a href="#" class="edit-menu-item"><i class="fa fa-edit"></i></a>
+      `;
+      menuItemsContainer.appendChild(div);
+    });
+    updateMenuTitle();
+    updateHiddenInput();
+  }
+
+  function updateHiddenInput() {
+    menuItemsInput.value = JSON.stringify(menuItems);
+    deletedMenuItemsInput.value = JSON.stringify(deletedMenuItemIds);
+  }
+
+  function clearInputs() {
+    document.getElementById('menuItemName').value = '';
+    document.getElementById('menuItemPrice').value = '';
+    document.getElementById('menuItemDescription').value = '';
+    document.getElementById('fileInput3').value = '';
+    document.querySelector('.file-list').innerHTML = '';
+  }
+
+  function toBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+    });
+  }
+
+  const fileInput = document.getElementById('fileInput3');
+  const fileListPreview = document.querySelector('.file-list');
+
+  fileInput.addEventListener('change', () => {
+    fileListPreview.innerHTML = '';
+    if (fileInput.files && fileInput.files[0]) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        fileListPreview.innerHTML = `<img src="${e.target.result}" style="max-width:60px;">`;
+      };
+      reader.readAsDataURL(fileInput.files[0]);
+    }
+  });
+
+  // Initialize menu title on load
+  updateMenuTitle();
+})();
 </script>
 
 <script>
-// FAQ Handling
 (() => {
-  const addFaqBtn = document.getElementById('add-faq-btn');
-  const faqsContainer = document.getElementById('faqs-container');
+  const faqQuestionInput = document.querySelector('#faq-question');
+  const faqAnswerInput = document.querySelector('#faq-answer');
+  const addFaqBtn = document.querySelector('#add-faq-btn');
+  const faqsContainer = document.querySelector('#faqs-container');
   const faqsInput = document.getElementById('faqsInput');
   const deletedFaqIdsInput = document.getElementById('deletedFaqIdsInput');
   let faqs = [];
   let deletedFaqIds = [];
   let editingIndex = null;
 
-  // Load existing FAQs from PHP
+  function updateFaqTitle() {
+    let title = document.querySelector('.added-faqs h3.media_added--title');
+    const hasItems = faqsContainer.children.length > 0;
+    if (hasItems && !title) {
+      faqsContainer.insertAdjacentHTML('beforebegin', '<h3 class="media_added--title">ADDED FAQS</h3>');
+    } else if (!hasItems && title) {
+      title.remove();
+    }
+  }
+
+  // Load existing FAQs
   <?php if (!empty($faqs)): ?>
-    faqs = <?= json_encode($faqs) ?>;
-    renderFaqs();
+  faqs = <?= json_encode($faqs) ?>.map(faq => ({
+    id: faq.id,
+    question: faq.question,
+    answer: faq.answer
+  }));
+  renderFaqs();
   <?php endif; ?>
 
-  addFaqBtn.addEventListener('click', () => {
-    const question = document.getElementById('faq-question').value.trim();
-    const answer = document.getElementById('faq-answer').value.trim();
-
-    if (!question || !answer) {
-      alert('Please fill both question and answer fields.');
-      return;
-    }
-
-    if (editingIndex !== null) {
-      // Edit mode
-      faqs[editingIndex] = {
-        ...faqs[editingIndex],
-        question,
-        answer
-      };
-      editingIndex = null;
-    } else {
-      // Add mode
-      faqs.push({ question, answer });
-    }
-
-    renderFaqs();
-    updateHiddenInput();
-    clearInputs();
-  });
-
-  faqsContainer.addEventListener('click', (e) => {
-    // Delete
-    if (e.target.classList.contains('delete-faq')) {
-      e.preventDefault();
-      const itemDiv = e.target.closest('.added-faqs-grid_item');
-      const index = Array.from(faqsContainer.children).indexOf(itemDiv);
-      if (faqs[index].id) {
-        deletedFaqIds.push(faqs[index].id);
-      }
-      faqs.splice(index, 1);
-      renderFaqs();
-      updateHiddenInput();
-    }
-    // Edit
-    if (e.target.classList.contains('edit-faq') || e.target.closest('.edit-faq')) {
-      e.preventDefault();
-      const itemDiv = e.target.closest('.added-faqs-grid_item');
-      const index = Array.from(faqsContainer.children).indexOf(itemDiv);
-      const faq = faqs[index];
-      document.getElementById('faq-question').value = faq.question;
-      document.getElementById('faq-answer').value = faq.answer;
-      editingIndex = index;
-    }
-  });
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
 
   function renderFaqs() {
     faqsContainer.innerHTML = '';
     faqs.forEach((faq, index) => {
       const div = document.createElement('div');
       div.className = 'added-faqs-grid_item';
+      if (faq.id) div.dataset.id = faq.id;
       div.innerHTML = `
-        <h4>${faq.question}</h4>
-        <p>${faq.answer}</p>
+        <h4>${escapeHtml(faq.question)}</h4>
+        <p>${escapeHtml(faq.answer)}</p>
         <a href="#" class="edit-faq"><i class="fa fa-edit"></i></a>
         <a href="#" class="delete-faq">X</a>
-        ${faq.id ? `<input type="hidden" name="existing_faq_ids[]" value="${faq.id}">` : ''}
       `;
       faqsContainer.appendChild(div);
     });
+    updateFaqTitle();
     updateHiddenInput();
   }
 
@@ -834,303 +1167,48 @@ document.addEventListener('DOMContentLoaded', () => {
     deletedFaqIdsInput.value = JSON.stringify(deletedFaqIds);
   }
 
-  function clearInputs() {
-    document.getElementById('faq-question').value = '';
-    document.getElementById('faq-answer').value = '';
-  }
-})();
-</script>
-
-<script>
-// Featured Image Handling
-(() => {
-  const featuredInput = document.getElementById('fileInput1');
-  const featuredPreview = document.querySelector('.media_added--fetured_img');
-  let featuredRemoved = false;
-
-  document.querySelectorAll('.remove-featured-db').forEach(btn => {
-    btn.onclick = () => {
-      btn.closest('.media_added--fetured_img_item').remove();
-      featuredRemoved = true;
-      let rm = document.querySelector('input[name="remove_featured_image"]');
-      if (!rm) {
-        rm = document.createElement('input');
-        rm.type = 'hidden';
-        rm.name = 'remove_featured_image';
-        rm.value = '1';
-        featuredInput.value = '';
-        document.querySelector('form.add-place_main').appendChild(rm);
-      }
-    };
-  });
-
-  featuredInput.addEventListener('change', () => {
-    featuredPreview.innerHTML = '';
-    if (featuredInput.files.length === 1) {
-      const reader = new FileReader();
-      reader.onload = e => {
-        const div = document.createElement('div');
-        div.className = 'media_added--fetured_img_item';
-        div.innerHTML = `<img src="${e.target.result}" alt="Featured Image">
-          <button type="button" class="remove-featured-new">X</button>`;
-        featuredPreview.appendChild(div);
-        div.querySelector('.remove-featured-new').onclick = () => {
-          featuredInput.value = '';
-          div.remove();
-        };
-      };
-      reader.readAsDataURL(featuredInput.files[0]);
-    }
-  });
-
-  const featuredDropArea = document.querySelector('.media-contanier_featured .drop-area');
-  featuredDropArea.addEventListener('dragover', e => {
+  addFaqBtn.addEventListener('click', (e) => {
     e.preventDefault();
-    featuredDropArea.classList.add('dragover');
-  });
-  featuredDropArea.addEventListener('dragleave', e => {
-    e.preventDefault();
-    featuredDropArea.classList.remove('dragover');
-  });
-  featuredDropArea.addEventListener('drop', e => {
-    e.preventDefault();
-    featuredDropArea.classList.remove('dragover');
-    const files = Array.from(e.dataTransfer.files);
-    if (files.length > 0) {
-      featuredInput.files = (new DataTransfer()).files;
-      const dt = new DataTransfer();
-      dt.items.add(files[0]);
-      featuredInput.files = dt.files;
-      featuredInput.dispatchEvent(new Event('change'));
-    }
-  });
-})();
-</script>
-
-<script>
-// Gallery Images Handling
-(() => {
-  const galInput = document.getElementById('fileInput2');
-  const galContainer = document.querySelector('.media_added--gallery_grid');
-  const MAX_GALLERY_IMAGES = 8;
-  let galleryFiles = [];
-  let existingGalleryIds = Array.from(document.querySelectorAll('.media_added--gallery_grid_item[data-id]'))
-    .map(item => parseInt(item.dataset.id, 10));
-
-  function bindRemoveGalleryDb() {
-    galContainer.querySelectorAll('.remove-gallery-db').forEach(btn => {
-      btn.onclick = () => {
-        const id = parseInt(btn.dataset.id, 10);
-        existingGalleryIds = existingGalleryIds.filter(x => x !== id);
-        btn.closest('.media_added--gallery_grid_item').remove();
-        galContainer.querySelectorAll(`input[name="existing_gallery_ids[]"][value="${id}"]`).forEach(inp => inp.remove());
-      };
-    });
-  }
-  bindRemoveGalleryDb();
-
-  galInput.addEventListener('change', () => {
-    const newFiles = Array.from(galInput.files);
-    const total = galleryFiles.length + existingGalleryIds.length;
-    if (total + newFiles.length > MAX_GALLERY_IMAGES) {
-      alert(`You can only upload up to ${MAX_GALLERY_IMAGES} gallery images.`);
-      return;
-    }
-    galleryFiles = galleryFiles.concat(newFiles);
-    updateGalInputFiles();
-    renderGalleryPreviews();
-  });
-
-  function renderGalleryPreviews() {
-    galContainer.querySelectorAll('.media_added--gallery_grid_item.new').forEach(el => el.remove());
-    galleryFiles.forEach((file, idx) => {
-      const reader = new FileReader();
-      reader.onload = e => {
-        const div = document.createElement('div');
-        div.className = 'media_added--gallery_grid_item new';
-        div.innerHTML = `<img src="${e.target.result}" alt="Gallery Image">
-          <button type="button" class="remove-gallery-new" data-idx="${idx}">X</button>`;
-        galContainer.appendChild(div);
-        div.querySelector('.remove-gallery-new').onclick = () => {
-          galleryFiles.splice(idx, 1);
-          updateGalInputFiles();
-          renderGalleryPreviews();
-        };
-      };
-      reader.readAsDataURL(file);
-    });
-  }
-
-  function updateGalInputFiles() {
-    const dt = new DataTransfer();
-    galleryFiles.forEach(f => dt.items.add(f));
-    galInput.files = dt.files;
-  }
-
-  const galDropArea = document.querySelector('.gallery-drop-area');
-  galDropArea.addEventListener('dragover', e => {
-    e.preventDefault();
-    galDropArea.classList.add('dragover');
-  });
-  galDropArea.addEventListener('dragleave', e => {
-    e.preventDefault();
-    galDropArea.classList.remove('dragover');
-  });
-  galDropArea.addEventListener('drop', e => {
-    e.preventDefault();
-    galDropArea.classList.remove('dragover');
-    const dropped = Array.from(e.dataTransfer.files);
-    const total = galleryFiles.length + existingGalleryIds.length;
-    if (total + dropped.length > MAX_GALLERY_IMAGES) {
-      alert(`You can only upload up to ${MAX_GALLERY_IMAGES} gallery images.`);
-      return;
-    }
-    galleryFiles = galleryFiles.concat(dropped);
-    updateGalInputFiles();
-    renderGalleryPreviews();
-  });
-})();
-</script>
-
-<script>
-// Menu Items Handling
-const addMenuItemBtn = document.getElementById('addMenuItemBtn');
-const menuItemsContainer = document.getElementById('menuItemsContainer');
-const menuItemsInput = document.getElementById('menuItemsInput');
-const deletedMenuItemsInput = document.getElementById('deletedMenuItemsInput');
-let menuItems = [];
-let deletedMenuItemIds = [];
-let editingIndex = null;
-
-<?php if (!empty($menu_items)): ?>
-menuItems = <?= json_encode($menu_items) ?>.map(item => ({
-    ...item,
-    image: item.image
-}));
-renderMenuItems();
-<?php endif; ?>
-
-addMenuItemBtn.addEventListener('click', async () => {
-    const name = document.getElementById('menuItemName').value.trim();
-    const price = document.getElementById('menuItemPrice').value.trim();
-    const description = document.getElementById('menuItemDescription').value.trim();
-    const fileInput = document.getElementById('fileInput3');
-    let base64 = null;
-
-    if (!name || !price || !description) {
-        alert('Please fill all fields.');
-        return;
-    }
-
-    if (editingIndex !== null) {
-        if (fileInput.files[0]) {
-            base64 = await toBase64(fileInput.files[0]);
-        } else {
-            base64 = menuItems[editingIndex].image;
-        }
-        menuItems[editingIndex] = {
-            ...menuItems[editingIndex],
-            name, price, description, image: base64
-        };
+    const question = faqQuestionInput.value.trim();
+    const answer = faqAnswerInput.value.trim();
+    if (question && answer) {
+      if (editingIndex !== null) {
+        faqs[editingIndex] = { ...faqs[editingIndex], question, answer };
         editingIndex = null;
-    } else {
-        if (!fileInput.files[0]) {
-            alert('Please select an image.');
-            return;
-        }
-        base64 = await toBase64(fileInput.files[0]);
-        menuItems.push({ name, price, description, image: base64 });
+      } else {
+        faqs.push({ question, answer });
+      }
+      faqQuestionInput.value = '';
+      faqAnswerInput.value = '';
+      renderFaqs();
     }
+  });
 
-    renderMenuItems();
-    updateHiddenInput();
-    clearInputs();
-});
-
-menuItemsContainer.addEventListener('click', (e) => {
-    if (e.target.classList.contains('delete-menu-item')) {
-        e.preventDefault();
-        const itemDiv = e.target.closest('.add-menu_added-grid_item');
-        const index = Array.from(menuItemsContainer.children).indexOf(itemDiv);
-        if (menuItems[index].id) {
-            deletedMenuItemIds.push(menuItems[index].id);
-        }
-        menuItems.splice(index, 1);
-        renderMenuItems();
-        updateHiddenInput();
+  faqsContainer.addEventListener('click', (e) => {
+    if (e.target.classList.contains('delete-faq') || e.target.closest('.delete-faq')) {
+      e.preventDefault();
+      const itemDiv = e.target.closest('.added-faqs-grid_item');
+      const index = Array.from(faqsContainer.children).indexOf(itemDiv);
+      if (faqs[index].id) {
+        deletedFaqIds.push(faqs[index].id);
+      }
+      faqs.splice(index, 1);
+      renderFaqs();
     }
-    if (e.target.classList.contains('edit-menu-item') || e.target.closest('.edit-menu-item')) {
-        e.preventDefault();
-        const itemDiv = e.target.closest('.add-menu_added-grid_item');
-        const index = Array.from(menuItemsContainer.children).indexOf(itemDiv);
-        const item = menuItems[index];
-        document.getElementById('menuItemName').value = item.name;
-        document.getElementById('menuItemPrice').value = item.price;
-        document.getElementById('menuItemDescription').value = item.description;
-        if (item.image && !item.image.startsWith('data:')) {
-            document.querySelector('.file-list').innerHTML = `<img src="${item.image}" style="max-width:60px;">`;
-        } else if (item.image) {
-            document.querySelector('.file-list').innerHTML = `<img src="${item.image}" style="max-width:60px;">`;
-        }
-        editingIndex = index;
+    if (e.target.classList.contains('edit-faq') || e.target.closest('.edit-faq')) {
+      e.preventDefault();
+      const itemDiv = e.target.closest('.added-faqs-grid_item');
+      const index = Array.from(faqsContainer.children).indexOf(itemDiv);
+      const faq = faqs[index];
+      faqQuestionInput.value = faq.question;
+      faqAnswerInput.value = faq.answer;
+      editingIndex = index;
     }
-});
+  });
 
-function renderMenuItems() {
-    menuItemsContainer.innerHTML = '';
-    menuItems.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'add-menu_added-grid_item';
-        div.innerHTML = `
-            <img src="${item.image}" alt="">
-            <div class="add-menu_added-grid_item--info">
-                <h4>${item.name}</h4>
-                <p>${item.description}</p>
-                <p>${item.price}</p>
-            </div>
-            <a href="#" class="delete-menu-item">X</a>
-            <a href="#" class="edit-menu-item"><i class="fa fa-edit"></i></a>
-        `;
-        menuItemsContainer.appendChild(div);
-    });
-    updateHiddenInput();
-}
-
-function updateHiddenInput() {
-    menuItemsInput.value = JSON.stringify(menuItems);
-    deletedMenuItemsInput.value = JSON.stringify(deletedMenuItemIds);
-}
-
-function clearInputs() {
-    document.getElementById('menuItemName').value = '';
-    document.getElementById('menuItemPrice').value = '';
-    document.getElementById('menuItemDescription').value = '';
-    document.getElementById('fileInput3').value = '';
-    document.querySelector('.file-list').innerHTML = '';
-}
-
-function toBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
-    });
-}
-
-const fileInput = document.getElementById('fileInput3');
-const fileListPreview = document.querySelector('.file-list');
-
-fileInput.addEventListener('change', () => {
-    fileListPreview.innerHTML = '';
-    if (fileInput.files && fileInput.files[0]) {
-        const reader = new FileReader();
-        reader.onload = e => {
-            fileListPreview.innerHTML = `<img src="${e.target.result}" style="max-width:60px;">`;
-        };
-        reader.readAsDataURL(fileInput.files[0]);
-    }
-});
+  // Initialize FAQ title on load
+  updateFaqTitle();
+})();
 </script>
 
 <?php include 'footer.php'; ?>
