@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 22, 2025 at 09:18 AM
+-- Generation Time: May 22, 2025 at 12:58 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -283,42 +283,16 @@ INSERT INTO `menu_items` (`id`, `place_id`, `name`, `price`, `description`, `ima
 (8, 2, 'Beef Teriyaki', 16.99, 'Grilled slices of tender beef glazed with a rich and flavorful teriyaki sauce, served with a side of steamed rice and stir-fried vegetables.', 'assets/images/places/restaurants/R(8).jpg'),
 (9, 2, 'Green Tea Ice Cream', 5.99, 'A refreshing and creamy green tea-flavored ice cream with a subtle earthy sweetness, served with a drizzle of honey.', 'assets/images/places/restaurants/R(9).jpg'),
 (10, 2, 'Ramen Bowl', 12.99, 'A steaming bowl of traditional ramen noodles in a rich miso broth, topped with tender slices of pork, soft-boiled egg, and green onions.', 'assets/images/places/restaurants/R(10).jpg'),
-(11, 3, 'Steak Frites', 18.99, 'A French bistro classic featuring a juicy, grilled steak paired with golden crispy French fries and served with a side of creamy peppercorn sauce.', 'assets/images/places/restaurants/shawarma_reem/menu/R(11).jpg'),
-(12, 3, 'French Onion Soup', 6.99, 'A deeply flavorful caramelized onion soup topped with a layer of melted Gruyère cheese and served with a crispy baguette.', 'assets/images/places/restaurants/shawarma_reem/menu/R(12).jpg'),
-(13, 3, 'Croissant', 3.99, 'A buttery and flaky French pastry with a golden, crispy exterior and a soft, airy interior, perfect for breakfast or a light snack.', 'assets/images/places/restaurants/shawarma_reem/menu/R(13).jpg'),
-(14, 3, 'Coq au Vin', 17.99, 'A classic French dish featuring tender chicken slow-cooked in a rich red wine sauce with mushrooms, onions, and fresh herbs.', 'assets/images/places/restaurants/shawarma_reem/menu/R(14).jpg'),
-(15, 3, 'Crème Brûlée', 8.99, 'A creamy vanilla custard dessert topped with a caramelized sugar crust that cracks with every spoonful.', 'assets/images/places/restaurants/shawarma_reem/menu/R(15).jpg'),
-(16, 3, 'Duck Confit', 19.99, 'Slow-cooked duck leg, perfectly crispy on the outside and tender on the inside, served with a side of roasted potatoes.', 'assets/images/places/restaurants/shawarma_reem/menu/R(16).jpg'),
+(11, 3, 'Steak Frites', 18.99, 'A French bistro classic featuring a juicy, grilled steak paired with golden crispy French fries and served with a side of creamy peppercorn sauce.', 'assets/images/places/restaurants/shawarma_reem/menu/menu_682ef5d3edeec4.42753204.jpg'),
+(12, 3, 'French Onion Soup', 6.99, 'A deeply flavorful caramelized onion soup topped with a layer of melted Gruyère cheese and served with a crispy baguette.', 'assets/images/places/restaurants/shawarma_reem/menu/menu_682ef5d3eedab8.10201671.jpg'),
+(13, 3, 'Croissant', 3.99, 'A buttery and flaky French pastry with a golden, crispy exterior and a soft, airy interior, perfect for breakfast or a light snack.', 'assets/images/places/restaurants/shawarma_reem/menu/menu_682ef5d3efd5d0.23819148.jpg'),
+(14, 3, 'Coq au Vin', 17.99, 'A classic French dish featuring tender chicken slow-cooked in a rich red wine sauce with mushrooms, onions, and fresh herbs.', 'assets/images/places/restaurants/shawarma_reem/menu/menu_682ef5d3f0cc75.57572166.jpg'),
 (17, 4, 'Pepperoni Pizza', 14.99, 'A deliciously cheesy pizza topped with crispy pepperoni slices, a tangy tomato sauce, and a perfectly baked golden crust.', 'assets/images/places/restaurants/R(17).jpg'),
 (18, 4, 'Garlic Bread', 4.99, 'Warm and crispy garlic bread topped with melted butter, minced garlic, and fresh parsley, perfect as a side dish.', 'assets/images/places/restaurants/R(18).jpg'),
 (19, 4, 'Chicken Wings', 9.99, 'Crispy, golden chicken wings tossed in your choice of buffalo, BBQ, or honey garlic sauce, served with ranch or blue cheese dip.', 'assets/images/places/restaurants/R(19).jpg'),
 (20, 4, 'Mozzarella Sticks', 7.99, 'Crispy fried mozzarella cheese sticks served with a side of tangy marinara sauce for dipping.', 'assets/images/places/restaurants/R(20).jpg'),
 (21, 4, 'Chocolate Lava Cake', 6.99, 'A decadent chocolate cake with a warm, gooey molten chocolate center, served with a scoop of vanilla ice cream.', 'assets/images/places/restaurants/R(1).jpg'),
-(22, 4, 'BBQ Ribs', 21.99, 'Slow-cooked, fall-off-the-bone pork ribs glazed in a smoky barbecue sauce, served with a side of coleslaw.', 'assets/images/places/restaurants/R(2).jpg'),
-(23, 5, 'Tacos al Pastor', 9.99, 'Delicious corn tortillas filled with marinated pork, pineapple, onions, and fresh cilantro, served with a side of tangy salsa.', 'assets/images/places/restaurants/R(21).jpg'),
-(24, 5, 'Guacamole & Chips', 6.99, 'Freshly made guacamole with ripe avocados, lime, diced tomatoes, and cilantro, served with crispy tortilla chips.', 'assets/images/places/restaurants/R(22).jpg'),
-(25, 5, 'Enchiladas Verdes', 11.99, 'Soft corn tortillas stuffed with shredded chicken, covered in a tangy green tomatillo sauce, and topped with melted cheese.', 'assets/images/places/restaurants/R(23).jpg'),
-(26, 5, 'Churros', 5.99, 'Crispy, golden-fried pastries coated in cinnamon sugar, served with warm chocolate dipping sauce.', 'assets/images/places/restaurants/R(24).jpg'),
-(27, 5, 'Carne Asada', 14.99, 'Grilled marinated beef served with a side of rice, beans, and fresh salsa, perfect for a hearty meal.', 'assets/images/places/restaurants/R(25).jpg'),
-(28, 5, 'Mexican Street Corn', 4.99, 'Grilled corn on the cob slathered with mayonnaise, cheese, chili powder, and fresh lime juice for a true taste of Mexico.', 'assets/images/places/restaurants/R(26).jpg'),
-(29, 6, 'Margherita Pizza', 12.99, 'A classic Italian pizza topped with fresh tomatoes, mozzarella cheese, basil, and a drizzle of olive oil.', 'assets/images/places/restaurants/R(27).jpg'),
-(30, 6, 'Lasagna', 14.99, 'Layers of pasta, ricotta cheese, and marinara sauce, baked to perfection with a golden, bubbly top.', 'assets/images/places/restaurants/R(28).jpg'),
-(31, 6, 'Bruschetta', 6.99, 'Grilled bread topped with a mixture of diced tomatoes, garlic, basil, and balsamic vinegar for a fresh, light appetizer.', 'assets/images/places/restaurants/R(29).jpg'),
-(32, 6, 'Fettuccine Alfredo', 13.99, 'Rich and creamy Alfredo sauce served with fettuccine noodles, topped with Parmesan cheese and grilled chicken or shrimp.', 'assets/images/places/restaurants/R(30).jpg'),
-(33, 6, 'Tiramisu', 6.99, 'A rich and indulgent Italian dessert made with layers of coffee-soaked ladyfingers, mascarpone cream, and cocoa powder.', 'assets/images/places/restaurants/R(31).jpg'),
-(34, 6, 'Caprese Salad', 8.99, 'Fresh mozzarella, tomatoes, and basil drizzled with olive oil and balsamic vinegar, a light and flavorful dish.', 'assets/images/places/restaurants/R(32).jpg'),
-(35, 7, 'Grilled Salmon', 18.99, 'Fresh, grilled salmon fillet served with a side of lemon-butter sauce and roasted vegetables.', 'assets/images/places/restaurants/R(33).jpg'),
-(36, 7, 'Fish Tacos', 9.99, 'Crispy fried fish served in soft tortillas with cabbage slaw, avocado, and a creamy sauce.', 'assets/images/places/restaurants/R(34).jpg'),
-(37, 7, 'Clam Chowder', 7.99, 'A creamy soup made with fresh clams, potatoes, celery, and onions, served in a bread bowl for a unique experience.', 'assets/images/places/restaurants/R(35).jpg'),
-(38, 7, 'Lobster Roll', 22.99, 'A fresh lobster salad with mayonnaise, celery, and lemon served in a buttered and toasted roll.', 'assets/images/places/restaurants/R(36).jpg'),
-(39, 7, 'Shrimp Scampi', 15.99, 'Succulent shrimp sautéed in garlic butter and white wine, served over a bed of linguine pasta.', 'assets/images/places/restaurants/R(37).jpg'),
-(40, 7, 'Crab Cakes', 13.99, 'Golden-fried crab cakes filled with tender crab meat, herbs, and spices, served with a tangy remoulade sauce.', 'assets/images/places/restaurants/R(38).jpg'),
-(41, 8, 'Dim Sum', 11.99, 'A variety of steamed dumplings and buns filled with pork, shrimp, and vegetables, served with soy sauce.', 'assets/images/places/restaurants/R(39).jpg'),
-(42, 8, 'Kung Pao Chicken', 12.99, 'Stir-fried chicken with peanuts, chili peppers, and a flavorful kung pao sauce, served with steamed rice.', 'assets/images/places/restaurants/R(40).jpg'),
-(43, 8, 'Sushi Platter', 18.99, 'A beautiful assortment of fresh sushi, including nigiri, sashimi, and rolls, served with soy sauce, wasabi, and pickled ginger.', 'assets/images/places/restaurants/R(41).jpg'),
-(44, 8, 'Beef and Broccoli', 13.99, 'Tender slices of beef stir-fried with fresh broccoli in a savory soy-based sauce.', 'assets/images/places/restaurants/R(42).jpg'),
-(45, 8, 'Sweet and Sour Pork', 14.99, 'Crispy battered pork chunks tossed in a tangy sweet and sour sauce with pineapple and bell peppers.', 'assets/images/places/restaurants/R(43).jpg'),
-(46, 8, 'Miso Ramen', 12.99, 'A comforting bowl of ramen noodles in a rich miso broth, topped with pork, soft-boiled egg, bamboo shoots, and green onions.', 'assets/images/places/restaurants/R(44).jpg');
+(22, 4, 'BBQ Ribs', 21.99, 'Slow-cooked, fall-off-the-bone pork ribs glazed in a smoky barbecue sauce, served with a side of coleslaw.', 'assets/images/places/restaurants/R(2).jpg');
 
 -- --------------------------------------------------------
 
@@ -339,13 +313,6 @@ CREATE TABLE `opening_hours` (
 --
 
 INSERT INTO `opening_hours` (`id`, `place_id`, `day`, `open_time`, `close_time`) VALUES
-(1031, 6, 'Monday', '10:00:00', '11:00:00'),
-(1032, 6, 'Tuesday', '10:00:00', '11:00:00'),
-(1033, 6, 'Wednesday', '10:00:00', '11:00:00'),
-(1034, 6, 'Thursday', '10:00:00', '11:00:00'),
-(1035, 6, 'Friday', '10:00:00', '11:00:00'),
-(1036, 6, 'Saturday', '10:00:00', '11:00:00'),
-(1037, 6, 'Sunday', '10:00:00', '11:00:00'),
 (1038, 11, 'Monday', '10:00:00', '11:00:00'),
 (1039, 11, 'Tuesday', '10:00:00', '11:00:00'),
 (1040, 11, 'Wednesday', '10:00:00', '11:00:00'),
@@ -416,20 +383,48 @@ INSERT INTO `opening_hours` (`id`, `place_id`, `day`, `open_time`, `close_time`)
 (1364, 1, 'Friday', '10:42:00', '11:00:00'),
 (1365, 1, 'Saturday', '10:00:00', '11:00:00'),
 (1366, 1, 'Sunday', '10:00:00', '11:00:00'),
-(2886, 3, 'Monday', '09:00:00', '17:00:00'),
-(2887, 3, 'Tuesday', '09:00:00', '17:00:00'),
-(2888, 3, 'Wednesday', '09:00:00', '17:00:00'),
-(2889, 3, 'Thursday', '09:00:00', '17:00:00'),
-(2890, 3, 'Friday', '09:00:00', '17:00:00'),
-(2891, 3, 'Saturday', '09:00:00', '17:00:00'),
-(2892, 3, 'Sunday', '09:00:00', '17:00:00'),
 (2907, 118, 'Monday', '09:00:00', '17:00:00'),
 (2908, 118, 'Tuesday', '09:00:00', '17:00:00'),
 (2909, 118, 'Wednesday', '09:00:00', '17:00:00'),
 (2910, 118, 'Thursday', '09:00:00', '17:00:00'),
 (2911, 118, 'Friday', '09:00:00', '17:00:00'),
 (2912, 118, 'Saturday', '09:00:00', '17:00:00'),
-(2913, 118, 'Sunday', '09:00:00', '17:00:00');
+(2913, 118, 'Sunday', '09:00:00', '17:00:00'),
+(2921, 5, 'Monday', '09:00:00', '17:00:00'),
+(2922, 5, 'Tuesday', '09:00:00', '17:00:00'),
+(2923, 5, 'Wednesday', '09:00:00', '17:00:00'),
+(2924, 5, 'Thursday', '09:00:00', '17:00:00'),
+(2925, 5, 'Friday', '09:00:00', '17:00:00'),
+(2926, 5, 'Saturday', '09:00:00', '17:00:00'),
+(2927, 5, 'Sunday', '09:00:00', '17:00:00'),
+(2928, 6, 'Monday', '10:00:00', '11:00:00'),
+(2929, 6, 'Tuesday', '10:00:00', '11:00:00'),
+(2930, 6, 'Wednesday', '10:00:00', '11:00:00'),
+(2931, 6, 'Thursday', '10:00:00', '11:00:00'),
+(2932, 6, 'Friday', '10:00:00', '11:00:00'),
+(2933, 6, 'Saturday', '10:00:00', '11:00:00'),
+(2934, 6, 'Sunday', '10:00:00', '11:00:00'),
+(2935, 7, 'Monday', '09:00:00', '17:00:00'),
+(2936, 7, 'Tuesday', '09:00:00', '17:00:00'),
+(2937, 7, 'Wednesday', '09:00:00', '17:00:00'),
+(2938, 7, 'Thursday', '09:00:00', '17:00:00'),
+(2939, 7, 'Friday', '09:00:00', '17:00:00'),
+(2940, 7, 'Saturday', '09:00:00', '17:00:00'),
+(2941, 7, 'Sunday', '09:00:00', '17:00:00'),
+(2942, 8, 'Monday', '09:00:00', '17:00:00'),
+(2943, 8, 'Tuesday', '09:00:00', '17:00:00'),
+(2944, 8, 'Wednesday', '09:00:00', '17:00:00'),
+(2945, 8, 'Thursday', '09:00:00', '17:00:00'),
+(2946, 8, 'Friday', '09:00:00', '17:00:00'),
+(2947, 8, 'Saturday', '09:00:00', '17:00:00'),
+(2948, 8, 'Sunday', '09:00:00', '17:00:00'),
+(2963, 3, 'Monday', '09:00:00', '17:00:00'),
+(2964, 3, 'Tuesday', '09:00:00', '17:00:00'),
+(2965, 3, 'Wednesday', '09:00:00', '17:00:00'),
+(2966, 3, 'Thursday', '09:00:00', '17:00:00'),
+(2967, 3, 'Friday', '09:00:00', '17:00:00'),
+(2968, 3, 'Saturday', '09:00:00', '17:00:00'),
+(2969, 3, 'Sunday', '09:00:00', '17:00:00');
 
 -- --------------------------------------------------------
 
@@ -471,10 +466,10 @@ INSERT INTO `places` (`id`, `user_id`, `category_id`, `name`, `price`, `tags`, `
 (2, 2, 1, 'Habibah Sweets', '$', 'Desserts, Sweets, Kunafa', 'Famous for its mouthwatering kunafa, a true taste of Amman.', 'Jordan', 'Amman', 'https://goo.gl/maps/example2', 'info@habibahsweets.com', '0792345678', NULL, NULL, 'https://facebook.com/habibah', NULL, 'https://x.com/home', 'assets/images/places/restaurants/RM(2).jpg', '2025-03-15 11:37:28', NULL, NULL, NULL),
 (3, 3, 1, 'Shawarma Reem', '$', 'Shawarma, Fast Food, Street Food', 'One of the best shawarma spots in Amman, known for its rich flavors.', 'Jordan', 'Amman', 'https://www.google.com/maps/place/%D8%B4%D8%A7%D9%88%D8%B1%D9%85%D8%A7+%D8%B1%D9%8A%D9%85%E2%80%AD/@31.9520581,35.9178948,17z/data=!3m1!4b1!4m6!3m5!1s0x151b5f80a7447b61:0x2307e0d069101889!8m2!3d31.9520536!4d35.9153199!16s%2Fg%2F12qf5m9zj?coh=245187&entry=', '', '0793456789', '', '', '', '', '', 'assets/images/places/restaurants/RM(3).jpg', '2025-03-15 11:37:28', 31.953900, 35.910600, ''),
 (4, 4, 1, 'Fakhr El-Din', '$$$', 'Lebanese, Fine Dining', 'A high-end Lebanese restaurant offering exquisite dishes and great ambiance.', 'Jordan', 'Amman', 'https://goo.gl/maps/example4', 'reservations@fakhreldin.com', '0794567890', NULL, 'https://fakhreldin.com', 'https://facebook.com/fakhreldin', 'https://instagram.com/fakhreldin', NULL, 'assets/images/places/restaurants/RM(4).jpg', '2025-03-15 11:37:28', NULL, NULL, NULL),
-(5, 5, 1, 'Rakwet Arab', '$$', 'Middle Eastern, Café', 'A cozy spot offering shisha, delicious food, and a vibrant atmosphere.', 'Jordan', 'Amman', 'https://goo.gl/maps/example5', NULL, '0795678901', NULL, NULL, NULL, NULL, NULL, 'assets/images/places/restaurants/RM(5).jpg', '2025-03-15 11:37:28', NULL, NULL, NULL),
-(6, 6, 1, 'Tawaheen Al-Hawa', '$$', 'Jordanian, Traditional', 'A classic restaurant serving traditional Jordanian dishes with a warm ambiance.', 'Jordan', 'Amman', 'https://goo.gl/maps/example6', 'info@tawaheen.com', '0796789012', NULL, 'https://tawaheen.com', NULL, NULL, NULL, 'assets/images/places/restaurants/RM(6).jpg', '2025-03-15 11:37:28', NULL, NULL, NULL),
-(7, 7, 1, 'Cantaloupe Gastro Pub', '$$$', 'International, Fine Dining', 'A stylish rooftop restaurant offering great views and gourmet cuisine.', 'Jordan', 'Amman', 'https://goo.gl/maps/example7', 'info@cantaloupe.com', '0797890123', NULL, 'https://cantaloupe.com', 'https://facebook.com/cantaloupejo', 'https://instagram.com/cantaloupejo', NULL, 'assets/images/places/restaurants/RM(7).jpg', '2025-03-15 11:37:28', NULL, NULL, NULL),
-(8, 8, 1, 'Al-Quds Falafel', '$', 'Falafel, Street Food', 'A legendary falafel spot in Amman, serving the best in the city.', 'Jordan', 'Amman', 'https://goo.gl/maps/example8', NULL, '0798901234', NULL, NULL, NULL, NULL, NULL, 'assets/images/places/restaurants/RM(8).jpg', '2025-03-15 11:37:28', NULL, NULL, NULL),
+(5, 5, 1, 'Rakwet Arab', '$$', 'Middle Eastern, Café', 'A cozy spot offering shisha, delicious food, and a vibrant atmosphere.', 'Jordan', 'Amman', 'https://goo.gl/maps/example5', '', '0795678901', '', '', '', '', '', 'assets/images/places/restaurants/RM(5).jpg', '2025-03-15 11:37:28', 31.953900, 35.910600, ''),
+(6, 6, 1, 'Tawaheen Al-Hawa', '$$', 'Jordanian, Traditional', 'A classic restaurant serving traditional Jordanian dishes with a warm ambiance.', 'Jordan', 'Amman', 'https://goo.gl/maps/example6', 'info@tawaheen.com', '0796789012', '', 'https://tawaheen.com', '', '', '', 'assets/images/places/restaurants/RM(6).jpg', '2025-03-15 11:37:28', 31.953900, 35.910600, ''),
+(7, 7, 1, 'Cantaloupe Gastro Pub', '$$$', 'International, Fine Dining', 'A stylish rooftop restaurant offering great views and gourmet cuisine.', 'Jordan', 'Amman', 'https://goo.gl/maps/example7', 'info@cantaloupe.com', '0797890123', '', 'https://cantaloupe.com', 'https://facebook.com/cantaloupejo', 'https://instagram.com/cantaloupejo', '', 'assets/images/places/restaurants/RM(7).jpg', '2025-03-15 11:37:28', 31.953900, 35.910600, ''),
+(8, 8, 1, 'Al-Quds Falafel', '$', 'Falafel, Street Food', 'A legendary falafel spot in Amman, serving the best in the city.', 'Jordan', 'Amman', 'https://goo.gl/maps/example8', '', '0798901234', '', '', '', '', '', 'assets/images/places/restaurants/RM(8).jpg', '2025-03-15 11:37:28', 31.953900, 35.910600, ''),
 (9, 9, 2, 'Taj Mall', '$$$', 'Shopping Mall, Fashion, Entertainment', 'A luxurious shopping mall with international brands and entertainment facilities.', 'Jordan', 'Amman', 'https://goo.gl/maps/example9', 'info@tajmall.com', '0799012345', '0797676767', 'https://tajmall.com', 'https://facebook.com/tajmalljo', NULL, NULL, 'assets/images/places/shopping/sh(1).jpg', '2025-03-15 11:37:28', NULL, NULL, NULL),
 (10, 10, 2, 'City Mall', '$$', 'Shopping Mall, Retail, Dining', 'A family-friendly mall with a variety of shops, restaurants, and a cinema.', 'Jordan', 'Amman', 'https://goo.gl/maps/example10', NULL, '0790123456', NULL, NULL, NULL, NULL, NULL, 'assets/images/places/shopping/sh(2).jpg', '2025-03-15 11:37:28', NULL, NULL, NULL),
 (11, 11, 2, 'Souq Jara', '$', 'Handicrafts, Antiques, Local Market', 'A seasonal outdoor market featuring handmade crafts and traditional products.', 'Jordan', 'Amman', 'https://goo.gl/maps/example11', NULL, '0791234567', NULL, NULL, NULL, NULL, NULL, 'assets/images/places/shopping/sh(3).jpg', '2025-03-15 11:37:28', NULL, NULL, NULL),
@@ -2328,7 +2323,7 @@ ALTER TABLE `menu_items`
 -- AUTO_INCREMENT for table `opening_hours`
 --
 ALTER TABLE `opening_hours`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2914;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2970;
 
 --
 -- AUTO_INCREMENT for table `places`
