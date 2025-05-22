@@ -90,6 +90,7 @@ if (empty($_SESSION['csrf_token'])) {
         </div>
         <button class="gallery-btn right-btn">›</button>
         <?php if ($is_owner || $is_admin): ?>
+            <a href="edit_place.php?place_id=<?php echo $place['id']; ?>" class="btn__red btn__red--l btn">Edit</a>
             <form action="delete_place.php" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this place? This action cannot be undone.');">
                 <input type="hidden" name="place_id" value="<?= htmlspecialchars($place['id']) ?>">
                 <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
@@ -496,20 +497,7 @@ if (empty($_SESSION['csrf_token'])) {
 </main>
 
 <?php include 'footer.php'; ?>
-<!--
-<style>
-.extra_stars_container {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.extra_rating {
-    font-size: 16px;
-    font-weight: 500;
-    color: #333;
-}
-</style>
-        -->
+
 <script>
 function showEditForm(reviewId) {
     const form = document.getElementById(`editForm-${reviewId}`);
@@ -540,13 +528,7 @@ function canEditReview(reviewId, currentUserId, reviewOwners, isAdmin) {
         console.log('Review ID not found in reviewOwners');
         return false;
     }
-    if (isAdmin) {
-        const params = new URLSearchParams(window.location.search);
-        const action = params.get('action');
-        console.log(`Admin detected, action parameter: ${action}`);
-        return action === 'edit';
-    }
-    return currentUserId === reviewOwners[reviewId];
+    return currentUserId === reviewOwners[reviewId] || isAdmin;
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -577,6 +559,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const reviewOwners = <?= json_encode($review_owners) ?>;
     const params = new URLSearchParams(window.location.search);
     const rid = params.get('review_id');
+    const action = params.get('action');
 
     if (rid) {
         console.log(`Processing review_id: ${rid}`);
@@ -587,11 +570,11 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             console.warn(`Review element review_${rid} not found`);
         }
-        if (canEditReview(rid, currentUserId, reviewOwners, isAdmin)) {
+        if (action === 'edit' && canEditReview(rid, currentUserId, reviewOwners, isAdmin)) {
             console.log(`User can edit review ${rid}, calling showEditForm`);
             showEditForm(rid);
         } else {
-            console.log(`User cannot edit review ${rid}`);
+            console.log(`Edit form not shown for review ${rid}: action=${action}, canEdit=${canEditReview(rid, currentUserId, reviewOwners, isAdmin)}`);
         }
     } else {
         console.log('No review_id in URL');

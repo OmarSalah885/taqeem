@@ -17,9 +17,6 @@ if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 
 }
 $_SESSION['LAST_ACTIVITY'] = time(); // Update last activity time
 
-
-
-
 if (!isset($_SESSION['profile_image']) || !isset($_SESSION['first_name']) || !isset($_SESSION['last_name'])) {
     if (isset($_SESSION['user_id'])) {
         $user_id = $_SESSION['user_id'];
@@ -39,7 +36,6 @@ if (!isset($_SESSION['profile_image']) || !isset($_SESSION['first_name']) || !is
     }
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -69,6 +65,9 @@ if (!isset($_SESSION['profile_image']) || !isset($_SESSION['first_name']) || !is
     <title>Taqeem</title>
     <script>
     const isLoggedIn = <?php echo isset($_SESSION['user_id']) ? 'true' : 'false'; ?>;
+    const hasLoginErrors = <?php echo !empty($_SESSION['login_errors']) ? 'true' : 'false'; ?>;
+    const hasSignupErrors = <?php echo !empty($_SESSION['signup_errors']) ? 'true' : 'false'; ?>;
+    const hasChangePasswordErrors = <?php echo !empty($_SESSION['change_password_errors']) ? 'true' : 'false'; ?>;
     </script>
 </head>
 
@@ -79,7 +78,6 @@ if (!isset($_SESSION['profile_image']) || !isset($_SESSION['first_name']) || !is
             <div class="navbar_container">
                 <div class="navbar_container--menu-L">
                     <a href="./index.php">home</a>
-
                     <a href="blogs.php">blogs</a>
                     <a href="listing.php">categories</a>
                     <a href="./index.php#aboutUs">about us</a>
@@ -90,7 +88,6 @@ if (!isset($_SESSION['profile_image']) || !isset($_SESSION['first_name']) || !is
                 <div class="navbar_container--menu-R">
                     <a class="btn__red--m btn__red btn" id="search-btn" href="#"><i class="fa-solid fa-magnifying-glass"></i></a>
                     
-
                     <?php if (isset($_SESSION['user_id'])): ?>
                     <!-- Show profile link when the user is logged in -->
                     <a href="profile.php?user_id=<?php echo htmlspecialchars($_SESSION['user_id']); ?>"
@@ -107,7 +104,6 @@ if (!isset($_SESSION['profile_image']) || !isset($_SESSION['first_name']) || !is
                     <?php endif; ?>
                     <a class="btn__red--m btn__red btn" href="add-place.php">Add Place</a>
                 </div>
-
             </div>
         </nav>
 
@@ -116,18 +112,18 @@ if (!isset($_SESSION['profile_image']) || !isset($_SESSION['first_name']) || !is
                 <a href="index.php"><img src="assets/images/logo.png" alt="logo"></a>
             </div>
             
-  <form class="navbar_mobile--search" id="mobile-search-form" method="GET">
-    <input
-      type="text"
-      name="search_term"
-      id="mobile-search-term"
-      placeholder="Search"
-    >
-    <button type="submit">
-      <i class="fa-solid fa-magnifying-glass"></i>
-    </button>
-  </form>
-  <script>
+            <form class="navbar_mobile--search" id="mobile-search-form" method="GET">
+                <input
+                    type="text"
+                    name="search_term"
+                    id="mobile-search-term"
+                    placeholder="Search"
+                >
+                <button type="submit">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+            </form>
+            <script>
 document.addEventListener('DOMContentLoaded', function() {
   const currentPage   = window.location.pathname;
   const searchForm    = document.getElementById('mobile-search-form');
@@ -147,27 +143,25 @@ document.addEventListener('DOMContentLoaded', function() {
   searchForm.setAttribute('action', formAction);
   searchInput.setAttribute('placeholder', placeholderText);
 });
-</script>
-
-
+            </script>
 
             <a class="navbar_mobile--menu" id="mobile_emnu-open" href="#"><i class="fa-solid fa-bars"></i></a>
         </nav>
 
         <div class="navbar_search--overlay" id="search-overlay">
-  <a id="close-btn" href="#">X</a>
-  <form class="navbar_search--overlay-content" method="GET">
-    <input
-      type="text"
-      name="search_term"
-      id="search-term"
-      placeholder="Search places or tags"
-    >
-    <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
-  </form>
-</div>
+            <a id="close-btn" href="#">X</a>
+            <form class="navbar_search--overlay-content" method="GET">
+                <input
+                    type="text"
+                    name="search_term"
+                    id="search-term"
+                    placeholder="Search places or tags"
+                >
+                <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </form>
+        </div>
 
-<script>
+        <script>
 document.addEventListener('DOMContentLoaded', function() {
   const currentPage = window.location.pathname;
   const searchForm  = document.querySelector('.navbar_search--overlay-content');
@@ -189,10 +183,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   console.log('Search form ➞', formAction, '| placeholder ➞', placeholderText);
 });
-</script>
-
-
-
+        </script>
 
         <div class="LogOverlay">
             <div class="LogOverlay__content">
@@ -209,7 +200,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     <?php
                     $login_errors = $_SESSION['login_errors'] ?? [];
                     $login_data = $_SESSION['login_data'] ?? [];
-                    unset($_SESSION['login_errors'], $_SESSION['login_data']);
                     ?>
                     <input type="hidden" name="redirect_url"
                         value="<?php echo htmlspecialchars($_SERVER['REQUEST_URI']); ?>">
@@ -233,8 +223,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     <?php
                     $signup_errors = $_SESSION['signup_errors'] ?? [];
                     $signup_data = $_SESSION['signup_data'] ?? [];
-                    unset($_SESSION['signup_errors'], $_SESSION['signup_data']);
                     ?>
+                    <input type="hidden" name="redirect_url"
+                        value="<?php echo htmlspecialchars($_SERVER['REQUEST_URI']); ?>">
                     <div class="LogOverlay__content--signup_name">
                         <input type="text" name="first_name" placeholder="FIRST NAME"
                             value="<?php echo htmlspecialchars($signup_data['first_name'] ?? ''); ?>" required>
@@ -299,3 +290,32 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         </div>
     </nav>
+    <!-- Add cleanup script at the end of the body -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (hasLoginErrors) {
+            // Clear login session errors after rendering
+            fetch('clear_login_errors.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'clear_errors=true'
+            }).catch(error => console.error('Error clearing login session:', error));
+        }
+        if (hasSignupErrors) {
+            // Clear signup session errors after rendering
+            fetch('clear_signup_errors.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'clear_errors=true'
+            }).catch(error => console.error('Error clearing signup session:', error));
+        }
+        if (hasChangePasswordErrors) {
+            // Clear change password session errors after rendering
+            fetch('clear_change_password_errors.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'clear_errors=true'
+            }).catch(error => console.error('Error clearing change password session:', error));
+        }
+    });
+    </script>

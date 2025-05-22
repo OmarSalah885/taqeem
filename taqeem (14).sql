@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 22, 2025 at 08:22 AM
+-- Generation Time: May 22, 2025 at 09:18 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -1997,10 +1997,6 @@ INSERT INTO `review_likes` (`id`, `user_id`, `review_id`, `created_at`) VALUES
 (172, 1, 73, '2025-04-12 15:54:45'),
 (186, 25, 51, '2025-04-12 16:27:32'),
 (187, 25, 52, '2025-04-12 16:27:35'),
-(188, 76, 22, '2025-04-12 16:33:40'),
-(189, 76, 70, '2025-04-12 16:33:41'),
-(190, 76, 150, '2025-04-12 16:33:42'),
-(191, 76, 118, '2025-04-12 16:33:43'),
 (193, 1, 153, '2025-04-17 03:06:58'),
 (194, 1, 114, '2025-04-17 03:07:02'),
 (204, 1, 380, '2025-04-17 06:48:01'),
@@ -2123,10 +2119,6 @@ INSERT INTO `saved_places` (`id`, `user_id`, `place_id`, `created_at`) VALUES
 (109, 25, 18, '2025-04-12 16:25:41'),
 (114, 25, 45, '2025-04-12 16:27:15'),
 (115, 25, 51, '2025-04-12 16:27:17'),
-(116, 76, 84, '2025-04-12 16:34:00'),
-(117, 76, 130, '2025-04-12 16:34:01'),
-(118, 76, 27, '2025-04-12 16:34:01'),
-(119, 76, 6, '2025-04-12 16:34:03'),
 (136, 1, 103, '2025-04-17 04:17:12'),
 (138, 1, 88, '2025-04-17 04:17:14'),
 (146, 1, 51, '2025-04-17 04:26:09'),
@@ -2191,24 +2183,7 @@ INSERT INTO `users` (`id`, `first_name`, `last_name`, `email`, `password`, `prof
 (30, 'Bashir', 'Al-Sharif', 'bashir.alsharif@example.com', '$2y$10$TRAStttnsH02NdodloSEJespf9CCuQ/0CZntKxmnWaE2n25oKpWgq', 'assets/images/profiles/m(10).jpg', 'Male', 'I’m Bashir! A software engineer who loves solving complex problems. I enjoy visiting tech hubs and finding places that challenge my mind. Know any cool spots to work or unwind? Let me know!', 'Irbid, Jordan', 'Owner', '2025-03-15 09:24:35', 'public'),
 (31, 'Sana', 'Al-Mawajda', 'sana.almowajda@example.com', '$2y$10$8Q/0bJFcxcc2dEL./s55ouK4Rc4axhc28F.7xcR2b6gjCcL5Fhr1e', 'assets/images/profiles/w(10).jpg', 'Female', 'Hi, I’m Sana! I enjoy writing and digital marketing, always exploring new ways to connect with people online. When I’m not working, I’m brainstorming creative marketing ideas. If you’re into writing or marketing, let’s connect!', 'Mafraq, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
 (32, 'Zain', 'Al-Hamdan', 'zain.alhamdan@example.com', '$2y$10$03S9ykbEoFIU9WVCYcVNG.niioRYMcWmdMDHn3F8GGEX8YCP8.r2y', NULL, 'Male', 'Hi, I’m Zain! I love creating innovative tech solutions, always focused on building something new and impactful. When I’m not developing, I’m researching the latest advancements in tech. If you love innovation, let’s chat!', 'Amman, Jordan', 'Owner', '2025-03-15 09:24:35', 'public'),
-(33, 'Rania', 'Al-Jabari', 'rania.aljabari@example.com', '$2y$10$LJJi45SjrdHO0rDbM8otWeFKsGtFu61ruFgYIBZ25ktNdEh1Gyyv6', NULL, 'Female', 'Hi, I’m Rania! I’m passionate about education and technology, always looking for ways to combine these two fields. When I’m not learning, I’m teaching others and sharing my knowledge. Let’s connect if you share these interests!', 'Karak, Jordan', 'Guest', '2025-03-15 09:24:35', 'public'),
-(57, 'omarss', 'shilbaya', 'omarkisng00013@gmail.com', '$2y$10$QieKpMuLjsaI2kCuRA0IOOGvMezC7YPPIsGTkw3KycoS3JW5bv6JK', NULL, NULL, NULL, NULL, 'Guest', '2025-04-10 07:49:57', 'public'),
-(58, 'omarsadsda', 'shilbaya', 'ali.dasdaghaddad@example.com', '$2y$10$W2P2ippscq0DIEGoQ2R6muOW.YkMW84DpPwmEh6Mon6rcZh5zgQHe', NULL, NULL, NULL, NULL, 'Guest', '2025-04-10 08:09:50', 'public'),
-(59, 'omarvff', 'shilbaya', 'wacv@gmail.com', '$2y$10$UUKvlXZZRO5E0MkGFb.EH.nDBN.EovsY/7x9O7aRlLvLkRGXiShaG', NULL, NULL, NULL, NULL, 'Guest', '2025-04-10 08:15:54', 'public'),
-(60, 'omarsssssss', 'shilbaya', 'wxve@gmail.com', '$2y$10$Y/Y.fcpCCtzgOoW/3gFcr.u58sFLVh/fTghU.lh9qUL8TH.Ig.Gri', NULL, NULL, NULL, NULL, 'Guest', '2025-04-10 12:59:52', 'public'),
-(61, 'sgdsfgsdaf', 'shilbaya', 'wxvsafsfe@gmail.com', '$2y$10$42FdN9VMmU8rCqWn2LAq8Or1eKVDhaa85uZRzSj22Wwvy6URW0Gwy', NULL, NULL, NULL, NULL, 'Guest', '2025-04-10 13:10:55', 'public'),
-(62, 'test', 'user', 'testuser@example.com', '$2y$10$72PRZimGu5VlNxZZQFGX2eQ1fE6YVAiAdsZ484xQzTy/woi15Ploa', NULL, NULL, NULL, NULL, 'Guest', '2025-04-10 13:37:37', 'public'),
-(63, 'omaasdr', 'shilbaya', 'ali.gasddahaddad@example.com', '$2y$10$O/dAgrUKStAhYfpnv8SnC.c7T1bptiGdL5dcQ6i51MUe/ZIUoLUnC', NULL, NULL, NULL, NULL, 'Guest', '2025-04-10 13:52:21', 'public'),
-(64, 'omarsssvxc', 'shilbaya', 'ali.ghzcscaddad@example.com', '$2y$10$uYauKgWSZvue0gfT40sXoe5yS6fcbdwGCQlVTI8pxxIfh6Y68G1mK', NULL, NULL, NULL, NULL, 'Guest', '2025-04-10 14:37:28', 'public'),
-(65, 'omarbc', 'shilbaya', 'wbc@gmail.com', '$2y$10$Kg6i4oOilbXDpmdU1tSfGusOsvvn3kHwOA68bOeJ3nT6Qc//ahds6', NULL, NULL, NULL, NULL, 'Guest', '2025-04-10 14:48:53', 'public'),
-(66, 'omaraczxcz', 'shilbayaasdaszxc', 'omarkinczxasg00013@gmail.com', '$2y$10$sYLt929ShiGfE4tu/jmlUeIequEZcmgUUjdmhUkFEBF57IAPRyIri', NULL, NULL, NULL, NULL, 'Guest', '2025-04-10 14:52:40', 'public'),
-(67, 'omarxzsada', 'shilbaya', 'wzxwfd@gmail.com', '$2y$10$DpgSO4T2GlTxgdfkHRvrPuSOq4ou76lS7dXsegc5MCO21Sv5npXO6', NULL, NULL, NULL, NULL, 'Guest', '2025-04-10 14:59:39', 'public'),
-(68, 'abdulrhman', 'alshafee', 'aulshafee@gmail.com', '$2y$10$U6J1PmjJODmuVAjmtzYbieEnX57z8TeBmVwnCjtU/lCA5IVi91SeO', NULL, NULL, NULL, NULL, 'Guest', '2025-04-10 15:42:15', 'public'),
-(73, 'omarsas', 'shilbaya', 'w@gmail.comcsddc', '$2y$10$9oHV6xXaDVZXdr316NXYg.WpuQ.7jSHLdcbxvw/BDcLfDVkpayIKu', NULL, NULL, NULL, NULL, 'Guest', '2025-04-12 10:25:22', 'public'),
-(74, 'omaracadsa', 'shilbaya', 'w@ssddagmail.com', '$2y$10$wpt.xldbbNR//4xIswxY6.yQaAxSm7jUwwbE4Cngma0NndnFDdgaG', NULL, NULL, NULL, NULL, 'Guest', '2025-04-12 10:36:30', 'public'),
-(75, 'omarsasd', 'shilbaya', 'ali.aaghaddad@example.com', '$2y$10$qeFesNjC8eaF18ttHH26u.SXS/CbhQhyBX.zK9O1PSq3U44Hh4p6W', NULL, NULL, NULL, NULL, 'Guest', '2025-04-12 10:42:24', 'public'),
-(76, 'omar', 'shilbaya', 'wm@gmail.com', '$2y$10$tZuKQjiQrZApU5urtlucaeOttRnHFuSrrrZuBZpUFmaqQystEHbwi', NULL, NULL, NULL, NULL, 'Guest', '2025-04-12 19:29:55', 'public'),
-(77, 'omarcxs', 'shilbaya', 'wcxs@gmail.com', '$2y$10$DEKRhSt3T827OIuI54vk/OdbLYmT79ko9yrds6vZhDh8vRpw3zGH6', 'assets/images/profiles/6810d619d1235.jpg', 'Male', 'i the king of this gungale', 'Downtown habeba sa', 'Guest', '2025-04-29 13:35:58', 'public');
+(33, 'Rania', 'Al-Jabari', 'rania.aljabari@example.com', '$2y$10$LJJi45SjrdHO0rDbM8otWeFKsGtFu61ruFgYIBZ25ktNdEh1Gyyv6', NULL, 'Female', 'Hi, I’m Rania! I’m passionate about education and technology, always looking for ways to combine these two fields. When I’m not learning, I’m teaching others and sharing my knowledge. Let’s connect if you share these interests!', 'Karak, Jordan', 'Guest', '2025-03-15 09:24:35', 'public');
 
 --
 -- Indexes for dumped tables
@@ -2312,7 +2287,8 @@ ALTER TABLE `saved_places`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`);
+  ADD UNIQUE KEY `email` (`email`),
+  ADD UNIQUE KEY `email_2` (`email`);
 
 --
 -- AUTO_INCREMENT for dumped tables
