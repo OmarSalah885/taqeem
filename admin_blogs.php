@@ -119,23 +119,28 @@ $rowNum = $offset + 1;
 if ($blogs->num_rows > 0):
     while ($blog = $blogs->fetch_assoc()):
         $blogId = (int)$blog['id'];
+        $image = $blog['image'] ?: 'assets/images/blogs/placeholder.png';
+        $title = $blog['title'] ?: 'Untitled';
+        $tags = $blog['tags'] ?: 'None';
+        $content = $blog['content'] ? mb_strimwidth(strip_tags($blog['content']), 0, 50, '…') : 'No content';
+        $created_at = $blog['created_at'] ? substr($blog['created_at'], 0, 10) : 'Unknown';
 ?>
                 <tr>
                     <td><?php echo $rowNum++; ?></td>
                     <td>
                         <a href="single-blog.php?id=<?php echo $blogId; ?>">
-                            <img src="<?php echo htmlspecialchars($blog['image'] ?: 'assets/images/blogs/placeholder.png', ENT_QUOTES); ?>"
+                            <img src="<?php echo htmlspecialchars($image, ENT_QUOTES); ?>"
                                 alt="Blog Image" width="80" height="50">
                         </a>
                     </td>
                     <td>
                         <a href="single-blog.php?id=<?php echo $blogId; ?>" class="admins_links">
-                            <?php echo htmlspecialchars($blog['title'], ENT_QUOTES); ?>
+                            <?php echo htmlspecialchars($title, ENT_QUOTES); ?>
                         </a>
                     </td>
-                    <td><?php echo htmlspecialchars($blog['tags'], ENT_QUOTES); ?></td>
-                    <td><?php echo htmlspecialchars(mb_strimwidth(strip_tags($blog['content']), 0, 50, '…')); ?></td>
-                    <td><?php echo htmlspecialchars(substr($blog['created_at'], 0, 10), ENT_QUOTES); ?></td>
+                    <td><?php echo htmlspecialchars($tags, ENT_QUOTES); ?></td>
+                    <td><?php echo htmlspecialchars($content); ?></td>
+                    <td><?php echo htmlspecialchars($created_at, ENT_QUOTES); ?></td>
                     <td class="actions">
                         <a href="edit_blog.php?id=<?php echo $blogId; ?>" class="btn-edit">Edit</a>
                         <a href="delete_blog.php?id=<?php echo $blogId; ?>" class="btn-delete"
@@ -158,7 +163,7 @@ else:
     <div class="listing_indicator">
         <?php
 $range = 2;   // pages to show on each side of current
-$jump = 3;    // pages to jump when clicking “…”
+$jump = 3;    // pages to jump when clicking "…"
 
 function renderEllipsis(int $targetPage, string $search) {
     echo '<li class="indicator_item ellipsis">';
