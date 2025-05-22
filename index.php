@@ -5,7 +5,7 @@ session_start();
 include 'header.php'; // Include the header
 ?>
 
-<main>
+<main class="index-main">
 
     <!-- Carousel Section -->
     <div class="carousel">

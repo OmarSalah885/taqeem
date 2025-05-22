@@ -129,6 +129,10 @@ body p {
   text-transform: uppercase;
 }
 
+.index-main {
+  overflow-y: hidden;
+}
+
 .btn {
   font-family: inherit;
   cursor: pointer;
