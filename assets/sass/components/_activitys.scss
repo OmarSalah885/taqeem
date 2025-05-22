@@ -182,8 +182,8 @@
 
                     &_link {
                         display: block;
-                        width: 3.2rem;
-                        height: 3.2rem;
+                        width: 3.6rem;
+                        height: 3.6rem;
                         display: flex;
                         align-items: center;
                         justify-content: center;
@@ -193,8 +193,8 @@
                         font-size: $F-M;
 
                         &:hover {
-                            background-color: $red-900;
-                            color: $red-00;
+                            background-color: $red-200;
+                            color: $red-900;
                         }
                     }
                 }

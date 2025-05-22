@@ -40,3 +40,12 @@
 2025-05-21 12:51:23 - submit_comment.php started, method: GET, action: delete
 2025-05-21 12:51:23 - Deleting comment ID: 68
 2025-05-21 12:51:23 - Comment ID: 68 deleted successfully
+2025-05-22 06:57:25 - submit_comment.php started, method: POST, action: add
+2025-05-22 06:57:25 - Adding comment for blog ID: 3, parent_comment_id: 9
+2025-05-22 06:57:25 - Comment added successfully for blog ID: 3
+2025-05-22 06:57:58 - submit_comment.php started, method: POST, action: add
+2025-05-22 06:57:58 - Adding comment for blog ID: 12, parent_comment_id: null
+2025-05-22 06:57:58 - Comment added successfully for blog ID: 12
+2025-05-22 07:00:37 - submit_comment.php started, method: POST, action: add
+2025-05-22 07:00:37 - Adding comment for blog ID: 10, parent_comment_id: null
+2025-05-22 07:00:37 - Comment added successfully for blog ID: 10

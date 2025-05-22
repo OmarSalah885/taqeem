@@ -3,6 +3,15 @@ require_once 'config.php';
 require_once 'db_connect.php';
 session_start();
 
+function format_count($number) {
+    if ($number >= 1000000) {
+        return round($number / 1000000, 1) . 'M';
+    } elseif ($number >= 1000) {
+        return round($number / 1000, 1) . 'k';
+    }
+    return (string)$number;
+}
+
 // Get the profile user ID from the query string
 $profile_user_id   = isset($_GET['user_id'])   ? (int)$_GET['user_id']   : 0;
 
@@ -135,13 +144,15 @@ include 'header.php';
 
 <main class="profile">
     <?php if ($error): ?>
-        <div class="error-message"><?= htmlspecialchars($error) ?></div>
+    <div class="error-message"><?= htmlspecialchars($error) ?></div>
     <?php endif; ?>
 
     <div class="profile_sidebar">
         <!-- User Image -->
-        <div class="profile_sidebar--img" style="cursor: pointer;" onclick="document.getElementById('profileInput').click();">
-            <img src="<?php echo htmlspecialchars($user['profile_image'] ?? 'assets/images/profiles/pro_null.png'); ?>?v=<?php echo time(); ?>" alt="User Profile">
+        <div class="profile_sidebar--img" style="cursor: pointer;"
+            onclick="document.getElementById('profileInput').click();">
+            <img src="<?php echo htmlspecialchars($user['profile_image'] ?? 'assets/images/profiles/pro_null.png'); ?>?v=<?php echo time(); ?>"
+                alt="User Profile">
         </div>
 
         <!-- Hidden Upload Form -->
@@ -156,20 +167,22 @@ include 'header.php';
             <h3 class="name"><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></h3>
 
             <?php if (!$is_private): ?>
-                <!-- Show email only if the profile is not private -->
-                <a href="mailto:<?php echo htmlspecialchars($user['email']); ?>"><?php echo htmlspecialchars($user['email']); ?></a>
+            <!-- Show email only if the profile is not private -->
+            <a
+                href="mailto:<?php echo htmlspecialchars($user['email']); ?>"><?php echo htmlspecialchars($user['email']); ?></a>
             <?php endif; ?>
 
             <?php if (!$is_private): ?>
-                <!-- Show location only if the profile is not private -->
-                <h2 class="location"><?php echo htmlspecialchars($user['location'] ?? 'Unknown Location'); ?></h2>
+            <!-- Show location only if the profile is not private -->
+            <h2 class="location"><?php echo htmlspecialchars($user['location'] ?? 'Unknown Location'); ?></h2>
             <?php endif; ?>
         </div>
 
         <!-- Edit Buttons (Only for Profile Owner or Admin) -->
         <?php if ($is_owner || $is_admin): ?>
         <div class="profile_sidebar--edit">
-            <a class="profile_sidebar--edit-btn" href="edit-profile.php<?= $is_admin && !$is_owner ? '?user_id=' . $user['id'] : '' ?>">
+            <a class="profile_sidebar--edit-btn"
+                href="edit-profile.php<?= $is_admin && !$is_owner ? '?user_id=' . $user['id'] : '' ?>">
                 <i class="fa-solid fa-pen"></i>Edit profile
             </a>
             <label for="profileInput" class="profile_sidebar--edit-btn" style="cursor:pointer;">
@@ -177,7 +190,9 @@ include 'header.php';
             </label>
         </div>
         <?php if ($show_delete_button): ?>
-        <a href="delete_account.php" class="btn__transparent--l btn__transparent btn" onclick="return confirm('Are you SURE you want to delete your account? This cannot be undone.');">DELETE ACCOUNT</a>
+        <a href="delete_account.php" class="btn__transparent--l btn__transparent btn"
+            onclick="return confirm('Are you SURE you want to delete your account? This cannot be undone.');">DELETE
+            ACCOUNT</a>
         <?php endif; ?>
         <a href="logout.php" class="btn__transparent--l btn__transparent btn">LOGOUT</a>
         <?php endif; ?>
@@ -257,19 +272,27 @@ include 'header.php';
             <div class="profile_container">
                 <?php
                 // Fetch the newest 2 places
-                $places_query = $conn->prepare("
-                    SELECT
-                        p.id, p.name, p.price, p.tags, p.city, p.address, p.featured_image, p.google_map_location,
-                        c.id AS category_id,
-                        c.icon AS category_icon,
-                        COALESCE(AVG(r.rating), 0) AS avg_rating
-                    FROM places p
-                    LEFT JOIN reviews r ON p.id = r.place_id
-                    LEFT JOIN categories c ON p.category_id = c.id
-                    WHERE p.user_id = ?
-                    GROUP BY p.id
-                    ORDER BY p.created_at DESC
-                    LIMIT 2
+                    $places_query = $conn->prepare("
+                        SELECT
+                            p.id,
+                            p.name,
+                            p.price,
+                            p.tags,
+                            p.city,
+                            p.address,
+                            p.featured_image,
+                            p.google_map_location,
+                            c.id AS category_id,
+                            c.icon AS category_icon,
+                            COALESCE(AVG(r.rating), 0) AS avg_rating,
+                            COUNT(r.id) AS total_reviews
+                        FROM places p
+                        LEFT JOIN reviews r ON p.id = r.place_id
+                        LEFT JOIN categories c ON p.category_id = c.id
+                        WHERE p.user_id = ?
+                        GROUP BY p.id
+                        ORDER BY p.created_at DESC
+                        LIMIT 2
                 ");
                 $places_query->bind_param("i", $profile_user_id);
                 $places_query->execute();
@@ -278,18 +301,25 @@ include 'header.php';
                 while ($place = $places_result->fetch_assoc()): ?>
                 <div class="listing_grid--item">
                     <div class="listing_grid--item-img">
-                        <a href="single-place.php?place_id=<?php echo $place['id']; ?>" class="listing_grid--item-img_img">
-                            <img src="<?php echo htmlspecialchars($place['featured_image'] ?? 'assets/images/listing.jpg'); ?>" alt="Place Image">
+                        <a href="single-place.php?place_id=<?php echo $place['id']; ?>"
+                            class="listing_grid--item-img_img">
+                            <img src="<?php echo htmlspecialchars($place['featured_image'] ?? 'assets/images/listing.jpg'); ?>"
+                                alt="Place Image">
                         </a>
-                        <a href="listing.php?category_id=<?php echo urlencode($place['category_id']); ?>" class="listing_grid--item-img_category">
-                            <i class="<?php echo htmlspecialchars($place['category_icon'] ?? 'fa-solid fa-question'); ?>"></i>
+                        <a href="listing.php?category_id=<?php echo urlencode($place['category_id']); ?>"
+                            class="listing_grid--item-img_category">
+                            <i
+                                class="<?php echo htmlspecialchars($place['category_icon'] ?? 'fa-solid fa-question'); ?>"></i>
                         </a>
                         <!-- Save Icon -->
-                        <a href="#" class="listing_grid--item-img_save" onclick="toggleSave(event, <?php echo $place['id']; ?>)">
-                            <i class="<?php echo in_array($place['id'], $saved_places) ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark'; ?>"></i>
+                        <a href="#" class="listing_grid--item-img_save"
+                            onclick="toggleSave(event, <?php echo $place['id']; ?>)">
+                            <i
+                                class="<?php echo in_array($place['id'], $saved_places) ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark'; ?>"></i>
                         </a>
                         <?php if ($is_owner || $is_admin): ?>
-                        <a href="edit_place.php?place_id=<?php echo $place['id']; ?>" class="edit_place--btn">EDIT PLACE</a>
+                        <a href="edit_place.php?place_id=<?php echo $place['id']; ?>" class="edit_place--btn">EDIT
+                            PLACE</a>
                         <?php endif; ?>
                     </div>
                     <div class="listing_grid--item-content">
@@ -298,38 +328,53 @@ include 'header.php';
                             $tags = explode(',', $place['tags']);
                             foreach ($tags as $tag):
                             ?>
-                            <a href="listing.php?search=<?php echo urlencode(trim($tag)); ?>"><?php echo htmlspecialchars($tag); ?></a>
+                            <a
+                                href="listing.php?search=<?php echo urlencode(trim($tag)); ?>"><?php echo htmlspecialchars($tag); ?></a>
                             <?php endforeach; ?>
                         </div>
-                        <a class="listing_grid--item-content_name" href="single-place.php?place_id=<?php echo $place['id']; ?>">
+                        <a class="listing_grid--item-content_name"
+                            href="single-place.php?place_id=<?php echo $place['id']; ?>">
                             <?php echo htmlspecialchars($place['name']); ?>
                         </a>
-                        <a href="<?php echo htmlspecialchars($place['google_map_location']); ?>" class="listing_grid--item-content_location" target="_blank">
-                            <i class="fa-solid fa-location-dot"></i> <?php echo htmlspecialchars($place['address'] ?: $place['city']); ?>
+                        <a href="<?php echo htmlspecialchars($place['google_map_location']); ?>"
+                            class="listing_grid--item-content_location" target="_blank">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <?php echo htmlspecialchars($place['address'] ?: $place['city']); ?>
                         </a>
                         <div class="listing_grid--item-content_stars">
                             <?php
                             $rating = $place['avg_rating'];
                             $percentage = ($rating / 5) * 100;
                             ?>
-                            <div class="listing_grid--item-content_stars-stars" style="background: linear-gradient(90deg, #A21111 var(--rating, <?php echo $percentage; ?>%), #D0D0D0 var(--rating,<?php echo $percentage-100; ?>%)); display: inline-block; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-                                <i class="fa-solid fa-star star-rating"></i>
-                                <i class="fa-solid fa-star star-rating"></i>
-                                <i class="fa-solid fa-star star-rating"></i>
-                                <i class="fa-solid fa-star star-rating"></i>
-                                <i class="fa-solid fa-star star-rating"></i>
+                            <div>
+                                <div class="listing_grid--item-content_stars-stars"
+                                    style="background: linear-gradient(90deg, #A21111 var(--rating, <?php echo $percentage; ?>%), #D0D0D0 var(--rating,<?php echo $percentage-100; ?>%)); display: inline-block; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                                    <i class="fa-solid fa-star star-rating"></i>
+                                    <i class="fa-solid fa-star star-rating"></i>
+                                    <i class="fa-solid fa-star star-rating"></i>
+                                    <i class="fa-solid fa-star star-rating"></i>
+                                    <i class="fa-solid fa-star star-rating"></i>
+                                </div>
+                                <span class="rating-number">
+                                    <?php 
+                                        echo number_format($place['avg_rating'], 1); 
+                                        $review_count = (int)$place['total_reviews'];
+                                        echo ' (' . format_count($review_count) . ' ' . ($review_count === 1 ? 'review' : 'reviews') . ')';
+                                    ?>
+                                </span>
                             </div>
-                            <span class="rating-number"><?php echo number_format($rating, 1); ?></span>
-                            <h4 class="listing_grid--item-content_stars-price"><?php echo htmlspecialchars($place['price']); ?></h4>
+                            <h4 class="listing_grid--item-content_stars-price">
+                                <?php echo htmlspecialchars($place['price']); ?></h4>
                         </div>
                     </div>
                 </div>
                 <?php endwhile; ?>
-                </div>
-                <?php if ($total_places > 2): ?>
-                <a href="my_places.php?user_id=<?php echo $profile_user_id; ?>&page=1" class="btn__red--l btn__red btn">see all</a>
-                <?php endif; ?>
             </div>
+            <?php if ($total_places > 2): ?>
+            <a href="my_places.php?user_id=<?php echo $profile_user_id; ?>&page=1" class="btn__red--l btn__red btn">see
+                all</a>
+            <?php endif; ?>
+        </div>
         <?php endif; ?>
 
         <!-- MY REVIEWS Section -->
@@ -369,12 +414,17 @@ include 'header.php';
                 ?>
                 <div class="activity_grid--item">
                     <div class="activity_grid--item_img">
-                        <a class="activity_grid--item_img_user" href="profile.php?user_id=<?php echo $review['user_id']; ?>">
-                            <img src="<?php echo htmlspecialchars($review['profile_image'] ?? 'assets/images/profiles/pro_null.png'); ?>" alt="User Image">
+                        <a class="activity_grid--item_img_user"
+                            href="profile.php?user_id=<?php echo $review['user_id']; ?>">
+                            <img src="<?php echo htmlspecialchars($review['profile_image'] ?? 'assets/images/profiles/pro_null.png'); ?>"
+                                alt="User Image">
                             <p><?php echo htmlspecialchars($review['first_name'] . ' ' . $review['last_name']); ?></p>
                         </a>
-                        <a href="single-place.php?place_id=<?php echo $review['place_id']; ?>#review_<?php echo $review['review_id']; ?>">
-                            <img class="activity_grid--item_img_user-img" src="<?php echo htmlspecialchars($review['place_image'] ?? 'assets/images/listing.jpg'); ?>" alt="Place Image">
+                        <a
+                            href="single-place.php?place_id=<?php echo $review['place_id']; ?>#review_<?php echo $review['review_id']; ?>">
+                            <img class="activity_grid--item_img_user-img"
+                                src="<?php echo htmlspecialchars($review['place_image'] ?? 'assets/images/listing.jpg'); ?>"
+                                alt="Place Image">
                         </a>
                         <?php
                         $is_liked = false;
@@ -387,7 +437,8 @@ include 'header.php';
                             $is_liked = $check_like_result->num_rows > 0;
                         }
                         ?>
-                        <a class="activity_grid--item_img_like" href="#" onclick="toggleLike(event, <?php echo $review['review_id']; ?>)">
+                        <a class="activity_grid--item_img_like" href="#"
+                            onclick="toggleLike(event, <?php echo $review['review_id']; ?>)">
                             <i class="<?php echo $is_liked ? 'fa-solid fa-heart' : 'fa-regular fa-heart'; ?>"></i>
                         </a>
                     </div>
@@ -412,7 +463,8 @@ include 'header.php';
                         <p>
                             <?php echo htmlspecialchars(substr($review['review_text'], 0, 150)); ?>
                             <?php if (strlen($review['review_text']) > 150): ?>
-                            <a href="review_details.php?id=<?php echo $review['review_id']; ?>" class="read-more">Read more</a>
+                            <a href="review_details.php?id=<?php echo $review['review_id']; ?>" class="read-more">Read
+                                more</a>
                             <?php endif; ?>
                         </p>
                     </div>
@@ -420,7 +472,8 @@ include 'header.php';
                 <?php endwhile; ?>
             </div>
             <?php if ($total_reviews > 2): ?>
-            <a href="my_reviews.php?user_id=<?php echo $profile_user_id; ?>&page=1" class="btn__red--l btn__red btn">see all</a>
+            <a href="my_reviews.php?user_id=<?php echo $profile_user_id; ?>&page=1" class="btn__red--l btn__red btn">see
+                all</a>
             <?php endif; ?>
         </div>
         <?php endif; ?>
@@ -463,12 +516,18 @@ include 'header.php';
                 ?>
                 <div class="activity_grid--item">
                     <div class="activity_grid--item_img">
-                        <a class="activity_grid--item_img_user" href="profile.php?user_id=<?php echo $liked_review['user_id']; ?>">
-                            <img src="<?php echo htmlspecialchars($liked_review['profile_image'] ?? 'assets/images/profiles/pro_null.png'); ?>" alt="User Image">
-                            <p><?php echo htmlspecialchars($liked_review['first_name'] . ' ' . $liked_review['last_name']); ?></p>
+                        <a class="activity_grid--item_img_user"
+                            href="profile.php?user_id=<?php echo $liked_review['user_id']; ?>">
+                            <img src="<?php echo htmlspecialchars($liked_review['profile_image'] ?? 'assets/images/profiles/pro_null.png'); ?>"
+                                alt="User Image">
+                            <p><?php echo htmlspecialchars($liked_review['first_name'] . ' ' . $liked_review['last_name']); ?>
+                            </p>
                         </a>
-                        <a href="single-place.php?place_id=<?php echo $liked_review['place_id']; ?>#review_<?php echo $liked_review['review_id']; ?>">
-                            <img class="activity_grid--item_img_user-img" src="<?php echo htmlspecialchars($liked_review['place_image'] ?? 'assets/images/listing.jpg'); ?>" alt="Place Image">
+                        <a
+                            href="single-place.php?place_id=<?php echo $liked_review['place_id']; ?>#review_<?php echo $liked_review['review_id']; ?>">
+                            <img class="activity_grid--item_img_user-img"
+                                src="<?php echo htmlspecialchars($liked_review['place_image'] ?? 'assets/images/listing.jpg'); ?>"
+                                alt="Place Image">
                         </a>
                         <?php
                         if ($is_owner) {
@@ -477,7 +536,8 @@ include 'header.php';
                             $is_liked = false;
                         }
                         ?>
-                        <a class="activity_grid--item_img_like" href="#" onclick="toggleLike(event, <?php echo $liked_review['review_id']; ?>)">
+                        <a class="activity_grid--item_img_like" href="#"
+                            onclick="toggleLike(event, <?php echo $liked_review['review_id']; ?>)">
                             <i class="<?php echo $is_liked ? 'fa-solid fa-heart' : 'fa-regular fa-heart'; ?>"></i>
                         </a>
                     </div>
@@ -502,14 +562,16 @@ include 'header.php';
                         <p>
                             <?php echo htmlspecialchars(substr($liked_review['review_text'], 0, 150)); ?>
                             <?php if (strlen($liked_review['review_text']) > 150): ?>
-                            <a href="single-place.php?place_id=<?php echo $liked_review['place_id']; ?>#review_<?php echo $liked_review['review_id']; ?>" class="read-more">Read more</a>
+                            <a href="single-place.php?place_id=<?php echo $liked_review['place_id']; ?>#review_<?php echo $liked_review['review_id']; ?>"
+                                class="read-more">Read more</a>
                             <?php endif; ?>
                         </p>
                     </div>
                 </div>
                 <?php endwhile; ?>
                 <?php if ($total_liked_reviews > 2): ?>
-                <a href="liked_rev.php?user_id=<?php echo $profile_user_id; ?>&page=1" class="btn__red--l btn__red btn">see all</a>
+                <a href="liked_rev.php?user_id=<?php echo $profile_user_id; ?>&page=1"
+                    class="btn__red--l btn__red btn">see all</a>
                 <?php endif; ?>
             </div>
         </div>
@@ -521,21 +583,29 @@ include 'header.php';
             <h2 class="profile_title">MY COLLECTIONS</h2>
             <div class="profile_container">
                 <?php
-                $saved_places_query = $conn->prepare("
-                    SELECT
-                        sp.place_id, p.name, p.price, p.tags, p.city, p.address, p.featured_image, p.google_map_location,
-                        c.id AS category_id,
-                        c.icon AS category_icon,
-                        COALESCE(AVG(r.rating), 0) AS avg_rating
-                    FROM saved_places sp
-                    INNER JOIN places p ON sp.place_id = p.id
-                    LEFT JOIN reviews r ON p.id = r.place_id
-                    LEFT JOIN categories c ON p.category_id = c.id
-                    WHERE sp.user_id = ?
-                    GROUP BY sp.place_id
-                    ORDER BY sp.created_at DESC
-                    LIMIT 2
-                ");
+                    $saved_places_query = $conn->prepare("
+    SELECT
+        sp.place_id,
+        p.name,
+        p.price,
+        p.tags,
+        p.city,
+        p.address,
+        p.featured_image,
+        p.google_map_location,
+        c.id AS category_id,
+        c.icon AS category_icon,
+        COALESCE(AVG(r.rating), 0) AS avg_rating,
+        COUNT(r.id) AS total_reviews
+    FROM saved_places sp
+    INNER JOIN places p ON sp.place_id = p.id
+    LEFT JOIN reviews r ON p.id = r.place_id
+    LEFT JOIN categories c ON p.category_id = c.id
+    WHERE sp.user_id = ?
+    GROUP BY sp.place_id
+    ORDER BY sp.created_at DESC
+    LIMIT 2
+");
                 $saved_places_query->bind_param("i", $profile_user_id);
                 $saved_places_query->execute();
                 $saved_places_result = $saved_places_query->get_result();
@@ -544,14 +614,20 @@ include 'header.php';
                 ?>
                 <div class="listing_grid--item">
                     <div class="listing_grid--item-img">
-                        <a href="single-place.php?place_id=<?php echo $saved_place['place_id']; ?>" class="listing_grid--item-img_img">
-                            <img src="<?php echo htmlspecialchars($saved_place['featured_image'] ?? 'assets/images/listing.jpg'); ?>" alt="Place Image">
+                        <a href="single-place.php?place_id=<?php echo $saved_place['place_id']; ?>"
+                            class="listing_grid--item-img_img">
+                            <img src="<?php echo htmlspecialchars($saved_place['featured_image'] ?? 'assets/images/listing.jpg'); ?>"
+                                alt="Place Image">
                         </a>
-                        <a href="listing.php?category_id=<?php echo urlencode($saved_place['category_id']); ?>" class="listing_grid--item-img_category">
-                            <i class="<?php echo htmlspecialchars($saved_place['category_icon'] ?? 'fa-solid fa-question'); ?>"></i>
+                        <a href="listing.php?category_id=<?php echo urlencode($saved_place['category_id']); ?>"
+                            class="listing_grid--item-img_category">
+                            <i
+                                class="<?php echo htmlspecialchars($saved_place['category_icon'] ?? 'fa-solid fa-question'); ?>"></i>
                         </a>
-                        <a href="#" class="listing_grid--item-img_save" onclick="toggleSave(event, <?php echo $saved_place['place_id']; ?>)">
-                            <i class="<?php echo in_array($saved_place['place_id'], $saved_places) ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark'; ?>"></i>
+                        <a href="#" class="listing_grid--item-img_save"
+                            onclick="toggleSave(event, <?php echo $saved_place['place_id']; ?>)">
+                            <i
+                                class="<?php echo in_array($saved_place['place_id'], $saved_places) ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark'; ?>"></i>
                         </a>
                     </div>
                     <div class="listing_grid--item-content">
@@ -560,36 +636,51 @@ include 'header.php';
                             $tags = explode(',', $saved_place['tags']);
                             foreach ($tags as $tag):
                             ?>
-                            <a href="listing.php?search=<?php echo urlencode(trim($tag)); ?>"><?php echo htmlspecialchars($tag); ?></a>
+                            <a
+                                href="listing.php?search=<?php echo urlencode(trim($tag)); ?>"><?php echo htmlspecialchars($tag); ?></a>
                             <?php endforeach; ?>
                         </div>
-                        <a class="listing_grid--item-content_name" href="single-place.php?place_id=<?php echo $saved_place['place_id']; ?>">
+                        <a class="listing_grid--item-content_name"
+                            href="single-place.php?place_id=<?php echo $saved_place['place_id']; ?>">
                             <?php echo htmlspecialchars($saved_place['name']); ?>
                         </a>
-                        <a href="<?php echo htmlspecialchars($saved_place['google_map_location']); ?>" class="listing_grid--item-content_location" target="_blank">
-                            <i class="fa-solid fa-location-dot"></i> <?php echo htmlspecialchars($saved_place['address'] ?: $saved_place['city']); ?>
+                        <a href="<?php echo htmlspecialchars($saved_place['google_map_location']); ?>"
+                            class="listing_grid--item-content_location" target="_blank">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <?php echo htmlspecialchars($saved_place['address'] ?: $saved_place['city']); ?>
                         </a>
                         <div class="listing_grid--item-content_stars">
                             <?php
                             $rating = $saved_place['avg_rating'];
                             $percentage = ($rating / 5) * 100;
                             ?>
-                            <div class="listing_grid--item-content_stars-stars" style="background: linear-gradient(90deg, #A21111 var(--rating, <?php echo $percentage; ?>%), #D0D0D0 var(--rating,<?php echo $percentage-100; ?>%)); display: inline-block; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-                                <i class="fa-solid fa-star star-rating"></i>
-                                <i class="fa-solid fa-star star-rating"></i>
-                                <i class="fa-solid fa-star star-rating"></i>
-                                <i class="fa-solid fa-star star-rating"></i>
-                                <i class="fa-solid fa-star star-rating"></i>
+                            <div>
+                                <div class="listing_grid--item-content_stars-stars"
+                                    style="background: linear-gradient(90deg, #A21111 var(--rating, <?php echo $percentage; ?>%), #D0D0D0 var(--rating,<?php echo $percentage-100; ?>%)); display: inline-block; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                                    <i class="fa-solid fa-star star-rating"></i>
+                                    <i class="fa-solid fa-star star-rating"></i>
+                                    <i class="fa-solid fa-star star-rating"></i>
+                                    <i class="fa-solid fa-star star-rating"></i>
+                                    <i class="fa-solid fa-star star-rating"></i>
+                                </div>
+                                <span class="rating-number">
+                                    <?php 
+                                        echo number_format($saved_place['avg_rating'], 1); 
+                                        $review_count = (int)$saved_place['total_reviews'];
+                                        echo ' (' . format_count($review_count) . ' ' . ($review_count === 1 ? 'review' : 'reviews') . ')';
+                                    ?>
+                                </span>
                             </div>
-                            <span class="rating-number"><?php echo number_format($rating, 1); ?></span>
-                            <h4 class="listing_grid--item-content_stars-price"><?php echo htmlspecialchars($saved_place['price']); ?></h4>
+                            <h4 class="listing_grid--item-content_stars-price">
+                                <?php echo htmlspecialchars($saved_place['price']); ?></h4>
                         </div>
                     </div>
                 </div>
                 <?php endwhile; ?>
             </div>
             <?php if ($total_saved_places > 2): ?>
-            <a href="my_collections.php?user_id=<?php echo $profile_user_id; ?>&page=1" class="btn__red--l btn__red btn">see all</a>
+            <a href="my_collections.php?user_id=<?php echo $profile_user_id; ?>&page=1"
+                class="btn__red--l btn__red btn">see all</a>
             <?php endif; ?>
         </div>
         <?php endif; ?>
