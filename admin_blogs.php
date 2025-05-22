@@ -94,13 +94,8 @@ include 'header.php';
     <h1>Blog Management</h1>
 
     <form method="GET" action="" class="search-container">
-        <input
-          type="text"
-          id="blogSearch"
-          name="search"
-          placeholder="Search by title, tags, or date..."
-          value="<?php echo htmlspecialchars($search, ENT_QUOTES); ?>"
-        >
+        <input type="text" id="blogSearch" name="search" placeholder="Search by title, tags, or date..."
+            value="<?php echo htmlspecialchars($search, ENT_QUOTES); ?>">
         <button type="submit">Search</button>
     </form>
 
@@ -119,7 +114,7 @@ include 'header.php';
                 </tr>
             </thead>
             <tbody>
-<?php
+                <?php
 $rowNum = $offset + 1;
 if ($blogs->num_rows > 0):
     while ($blog = $blogs->fetch_assoc()):
@@ -129,16 +124,12 @@ if ($blogs->num_rows > 0):
                     <td><?php echo $rowNum++; ?></td>
                     <td>
                         <a href="single-blog.php?id=<?php echo $blogId; ?>">
-                            <img
-                              src="<?php echo htmlspecialchars($blog['image'] ?: 'assets/images/blogs/placeholder.png', ENT_QUOTES); ?>"
-                              alt="Blog Image"
-                              width="80"
-                              height="50"
-                            >
+                            <img src="<?php echo htmlspecialchars($blog['image'] ?: 'assets/images/blogs/placeholder.png', ENT_QUOTES); ?>"
+                                alt="Blog Image" width="80" height="50">
                         </a>
                     </td>
                     <td>
-                        <a href="single-blog.php?id=<?php echo $blogId; ?>">
+                        <a href="single-blog.php?id=<?php echo $blogId; ?>" class="admins_links">
                             <?php echo htmlspecialchars($blog['title'], ENT_QUOTES); ?>
                         </a>
                     </td>
@@ -147,24 +138,25 @@ if ($blogs->num_rows > 0):
                     <td><?php echo htmlspecialchars(substr($blog['created_at'], 0, 10), ENT_QUOTES); ?></td>
                     <td class="actions">
                         <a href="edit_blog.php?id=<?php echo $blogId; ?>" class="btn-edit">Edit</a>
-                        <a href="delete_blog.php?id=<?php echo $blogId; ?>" class="btn-delete" onclick="return confirm('Delete this blog?');">Delete</a>
+                        <a href="delete_blog.php?id=<?php echo $blogId; ?>" class="btn-delete"
+                            onclick="return confirm('Delete this blog?');">Delete</a>
                     </td>
                 </tr>
-<?php
+                <?php
     endwhile;
 else:
 ?>
                 <tr>
                     <td colspan="7" style="text-align:center;">No blogs found.</td>
                 </tr>
-<?php endif; ?>
+                <?php endif; ?>
             </tbody>
         </table>
     </div>
 
     <!-- Pagination -->
     <div class="listing_indicator">
-<?php
+        <?php
 $range = 2;   // pages to show on each side of current
 $jump = 3;    // pages to jump when clicking “…”
 
@@ -178,56 +170,57 @@ $currentPage = $page;
 
 if ($totalPages > 1):
 ?>
-<ul class="listing_indicator">
-  <!-- Previous arrow -->
-  <?php if ($currentPage > 1): ?>
-    <li class="indicator_item">
-      <a href="?page=<?php echo $currentPage - 1; ?>&search=<?php echo urlencode($search); ?>">
-        <i class="fa-solid fa-chevron-left"></i>
-      </a>
-    </li>
-  <?php endif; ?>
+        <ul class="listing_indicator">
+            <!-- Previous arrow -->
+            <?php if ($currentPage > 1): ?>
+            <li class="indicator_item">
+                <a href="?page=<?php echo $currentPage - 1; ?>&search=<?php echo urlencode($search); ?>">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </a>
+            </li>
+            <?php endif; ?>
 
-  <!-- First page + leading ellipsis -->
-  <?php if ($currentPage > $range + 1): ?>
-    <li class="indicator_item">
-      <a href="?page=1&search=<?php echo urlencode($search); ?>">1</a>
-    </li>
-    <?php renderEllipsis(max(1, $currentPage - $jump), $search); ?>
-  <?php endif; ?>
+            <!-- First page + leading ellipsis -->
+            <?php if ($currentPage > $range + 1): ?>
+            <li class="indicator_item">
+                <a href="?page=1&search=<?php echo urlencode($search); ?>">1</a>
+            </li>
+            <?php renderEllipsis(max(1, $currentPage - $jump), $search); ?>
+            <?php endif; ?>
 
-  <!-- Pages around current -->
-  <?php
+            <!-- Pages around current -->
+            <?php
     $start = max(1, $currentPage - $range);
     $end = min($totalPages, $currentPage + $range);
     for ($i = $start; $i <= $end; $i++): ?>
-      <li class="indicator_item <?php echo $i === $currentPage ? 'active' : ''; ?>">
-        <?php if ($i === $currentPage): ?>
-          <a href="javascript:void(0)"><?php echo $i; ?></a>
-        <?php else: ?>
-          <a href="?page=<?php echo $i; ?>&search=<?php echo urlencode($search); ?>"><?php echo $i; ?></a>
+            <li class="indicator_item <?php echo $i === $currentPage ? 'active' : ''; ?>">
+                <?php if ($i === $currentPage): ?>
+                <a href="javascript:void(0)"><?php echo $i; ?></a>
+                <?php else: ?>
+                <a href="?page=<?php echo $i; ?>&search=<?php echo urlencode($search); ?>"><?php echo $i; ?></a>
+                <?php endif; ?>
+            </li>
+            <?php endfor; ?>
+
+            <!-- Trailing ellipsis + last page -->
+            <?php if ($currentPage < $totalPages - $range): ?>
+            <?php renderEllipsis(min($totalPages, $currentPage + $jump), $search); ?>
+            <li class="indicator_item">
+                <a
+                    href="?page=<?php echo $totalPages; ?>&search=<?php echo urlencode($search); ?>"><?php echo $totalPages; ?></a>
+            </li>
+            <?php endif; ?>
+
+            <!-- Next arrow -->
+            <?php if ($currentPage < $totalPages): ?>
+            <li class="indicator_item">
+                <a href="?page=<?php echo $currentPage + 1; ?>&search=<?php echo urlencode($search); ?>">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </li>
+            <?php endif; ?>
+        </ul>
         <?php endif; ?>
-      </li>
-  <?php endfor; ?>
-
-  <!-- Trailing ellipsis + last page -->
-  <?php if ($currentPage < $totalPages - $range): ?>
-    <?php renderEllipsis(min($totalPages, $currentPage + $jump), $search); ?>
-    <li class="indicator_item">
-      <a href="?page=<?php echo $totalPages; ?>&search=<?php echo urlencode($search); ?>"><?php echo $totalPages; ?></a>
-    </li>
-  <?php endif; ?>
-
-  <!-- Next arrow -->
-  <?php if ($currentPage < $totalPages): ?>
-    <li class="indicator_item">
-      <a href="?page=<?php echo $currentPage + 1; ?>&search=<?php echo urlencode($search); ?>">
-        <i class="fa-solid fa-chevron-right"></i>
-      </a>
-    </li>
-  <?php endif; ?>
-</ul>
-<?php endif; ?>
     </div>
 </main>
 

@@ -129,6 +129,7 @@
                     flex-direction: column;
                     gap: 1.6rem;
 
+
                     .comment {
                         padding: 2rem 2.4rem;
                         display: flex;
@@ -258,6 +259,28 @@
                 color: $gray-500;
                 text-transform: capitalize;
             }
+        }
+    }
+}
+
+.replies {
+    .reply-comment {
+        margin-bottom: 1.2rem;
+    }
+}
+
+.comment_actions {
+    display: flex;
+    gap: 1.6rem;
+
+    a {
+        color: $red-500;
+        font-size: $F-XXS;
+        text-decoration: none;
+        transition: all .3s;
+
+        &:hover {
+            color: $red-900;
         }
     }
 }

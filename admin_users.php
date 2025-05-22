@@ -105,13 +105,8 @@ include 'header.php';
     <h1>User Management</h1>
 
     <form method="GET" action="" class="search-container">
-        <input
-          type="text"
-          id="userSearch"
-          name="search"
-          placeholder="Search by name, email, or ID..."
-          value="<?php echo htmlspecialchars($search); ?>"
-        >
+        <input type="text" id="userSearch" name="search" placeholder="Search by name, email, or ID..."
+            value="<?php echo htmlspecialchars($search); ?>">
         <button type="submit">Search</button>
     </form>
 
@@ -134,33 +129,29 @@ include 'header.php';
                 </tr>
             </thead>
             <tbody>
-<?php while ($user = $users->fetch_assoc()): ?>
+                <?php while ($user = $users->fetch_assoc()): ?>
                 <tr>
                     <td><?php echo $user['id']; ?></td>
-                    
+
                     <td>
                         <a href="profile.php?user_id=<?php echo $user['id']; ?>">
-                            <img
-                                src="<?php echo htmlspecialchars($user['profile_image'] ?: 'assets/images/profiles/pro_null.png'); ?>"
-                                alt="User Image"
-                                width="50"
-                                height="50"
-                            >
+                            <img src="<?php echo htmlspecialchars($user['profile_image'] ?: 'assets/images/profiles/pro_null.png'); ?>"
+                                alt="User Image" width="50" height="50">
                         </a>
                     </td>
-                    
+
                     <td>
-                        <a href="profile.php?user_id=<?php echo $user['id']; ?>">
+                        <a href="profile.php?user_id=<?php echo $user['id']; ?>" class="admins_links">
                             <?php echo htmlspecialchars($user['first_name']); ?>
                         </a>
                     </td>
-                    
+
                     <td>
                         <a href="profile.php?user_id=<?php echo $user['id']; ?>">
                             <?php echo htmlspecialchars($user['last_name']); ?>
                         </a>
                     </td>
-                    
+
                     <td><?php echo htmlspecialchars($user['email']); ?></td>
                     <td><?php echo htmlspecialchars($user['gender']); ?></td>
                     <td><?php echo htmlspecialchars($user['about_me']); ?></td>
@@ -175,11 +166,12 @@ include 'header.php';
                     <td class="actions">
                         <a href="edit-profile.php?user_id=<?php echo $user['id']; ?>" class="btn-edit">Edit</a>
                         <?php if (!(strtolower($user['role']) === 'admin' && $admin_count === 1)): ?>
-                        <a href="delete_account.php?id=<?php echo $user['id']; ?>" class="btn-delete" onclick="return confirm('Are you sure you want to delete this user?');">Delete</a>
+                        <a href="delete_account.php?id=<?php echo $user['id']; ?>" class="btn-delete"
+                            onclick="return confirm('Are you sure you want to delete this user?');">Delete</a>
                         <?php endif; ?>
                     </td>
                 </tr>
-<?php endwhile; ?>
+                <?php endwhile; ?>
             </tbody>
         </table>
     </div>
@@ -198,53 +190,53 @@ include 'header.php';
         }
         ?>
         <ul class="listing_indicator">
-          <!-- Previous arrow -->
-          <?php if ($currentPage > 1): ?>
+            <!-- Previous arrow -->
+            <?php if ($currentPage > 1): ?>
             <li class="indicator_item">
-              <a href="?page=<?= $currentPage - 1 ?>&search=<?= urlencode($search) ?>">
-                <i class="fa-solid fa-chevron-left"></i>
-              </a>
+                <a href="?page=<?= $currentPage - 1 ?>&search=<?= urlencode($search) ?>">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </a>
             </li>
-          <?php endif; ?>
+            <?php endif; ?>
 
-          <!-- First page + leading ellipsis -->
-          <?php if ($currentPage > $range + 1): ?>
+            <!-- First page + leading ellipsis -->
+            <?php if ($currentPage > $range + 1): ?>
             <li class="indicator_item">
-              <a href="?page=1&search=<?= urlencode($search) ?>">1</a>
+                <a href="?page=1&search=<?= urlencode($search) ?>">1</a>
             </li>
             <?php renderEllipsis(max(1, $currentPage - $jump), $search); ?>
-          <?php endif; ?>
+            <?php endif; ?>
 
-          <!-- Pages around current -->
-          <?php
+            <!-- Pages around current -->
+            <?php
             $start = max(1, $currentPage - $range);
             $end   = min($totalPages, $currentPage + $range);
             for ($i = $start; $i <= $end; $i++): ?>
-              <li class="indicator_item <?= $i === $currentPage ? 'active' : '' ?>">
+            <li class="indicator_item <?= $i === $currentPage ? 'active' : '' ?>">
                 <?php if ($i === $currentPage): ?>
-                  <a href="javascript:void(0)"><?= $i ?></a>
+                <a href="javascript:void(0)"><?= $i ?></a>
                 <?php else: ?>
-                  <a href="?page=<?= $i ?>&search=<?= urlencode($search) ?>"><?= $i ?></a>
+                <a href="?page=<?= $i ?>&search=<?= urlencode($search) ?>"><?= $i ?></a>
                 <?php endif; ?>
-              </li>
-          <?php endfor; ?>
+            </li>
+            <?php endfor; ?>
 
-          <!-- Trailing ellipsis + last page -->
-          <?php if ($currentPage < $totalPages - $range): ?>
+            <!-- Trailing ellipsis + last page -->
+            <?php if ($currentPage < $totalPages - $range): ?>
             <?php renderEllipsis(min($totalPages, $currentPage + $jump), $search); ?>
             <li class="indicator_item">
-              <a href="?page=<?= $totalPages ?>&search=<?= urlencode($search) ?>"><?= $totalPages ?></a>
+                <a href="?page=<?= $totalPages ?>&search=<?= urlencode($search) ?>"><?= $totalPages ?></a>
             </li>
-          <?php endif; ?>
+            <?php endif; ?>
 
-          <!-- Next arrow -->
-          <?php if ($currentPage < $totalPages): ?>
+            <!-- Next arrow -->
+            <?php if ($currentPage < $totalPages): ?>
             <li class="indicator_item">
-              <a href="?page=<?= $currentPage + 1 ?>&search=<?= urlencode($search) ?>">
-                <i class="fa-solid fa-chevron-right"></i>
-              </a>
+                <a href="?page=<?= $currentPage + 1 ?>&search=<?= urlencode($search) ?>">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
             </li>
-          <?php endif; ?>
+            <?php endif; ?>
         </ul>
     </div>
 </main>

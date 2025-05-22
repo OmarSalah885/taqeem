@@ -87,7 +87,8 @@ include 'header.php';
         <?php if ($error): ?>
         <div class="error-message"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
-        <input type="text" name="title" placeholder="BLOG TITLE" value="<?= htmlspecialchars($_POST['title'] ?? '') ?>" required class="input">
+        <input type="text" name="title" placeholder="BLOG TITLE" value="<?= htmlspecialchars($_POST['title'] ?? '') ?>"
+            required class="input">
 
         <!-- Static Preview Container with "No Image" Text -->
         <div class="add_blog-img" id="image-container">
@@ -97,11 +98,13 @@ include 'header.php';
         </div>
 
         <label class="custom-file-upload">
-            <input type="file" id="image" name="image" class="img_input" accept="image/*" onchange="previewImage(event)">
+            <input type="file" id="image" name="image" class="img_input" accept="image/*"
+                onchange="previewImage(event)">
             ADD BLOG IMAGE
         </label>
 
-        <input type="text" name="tags" placeholder="BLOG TAGS (comma separated)" value="<?= htmlspecialchars($_POST['tags'] ?? '') ?>" required class="input">
+        <input type="text" name="tags" placeholder="BLOG TAGS (comma separated)"
+            value="<?= htmlspecialchars($_POST['tags'] ?? '') ?>" required class="input">
 
         <div class="add_blog-f">
             <h3>Please write your blog code in this format:</h3>
@@ -123,10 +126,10 @@ include 'header.php';
                 &nbsp;&nbsp;&lt;/ul&gt;<br>
                 &lt;/div&gt;
             </p>
-            <p><a href="https://www.w3schools.com/html/" target="_blank" class="comment_content--reply">New to HTML? Learn how to format your content here.</a></p>
         </div>
 
-        <textarea id="code" name="code"><?= htmlspecialchars($_POST['code'] ?? '// write your blog code here') ?></textarea>
+        <textarea id="code"
+            name="code"><?= htmlspecialchars($_POST['code'] ?? '// write your blog code here') ?></textarea>
         <button class="btn__red--l btn__red btn">ADD BLOG</button>
     </form>
 </main>

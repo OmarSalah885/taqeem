@@ -206,6 +206,17 @@ td img {
 
 }
 
+.actions a {
+    margin-right: .6rem;
+    margin-bottom: .6rem;
+    padding: 6px 12px;
+    font-family: inherit;
+    font-size: inherit;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+}
+
 .btn-edit {
     background-color: $red-300;
     color: $red-00;
@@ -214,4 +225,9 @@ td img {
 .btn-delete {
     background-color: $red-700;
     color: $red-00;
+}
+
+.admins_links {
+    color: $red-500;
+    text-decoration: none;
 }

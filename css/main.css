@@ -2015,6 +2015,24 @@ body p {
   text-transform: capitalize;
 }
 
+.replies .reply-comment {
+  margin-bottom: 1.2rem;
+}
+
+.comment_actions {
+  display: flex;
+  gap: 1.6rem;
+}
+.comment_actions a {
+  color: #D01515;
+  font-size: 1.072rem;
+  text-decoration: none;
+  transition: all 0.3s;
+}
+.comment_actions a:hover {
+  color: #170202;
+}
+
 .listing {
   display: flex;
   align-items: center;
@@ -4367,9 +4385,8 @@ body p {
 }
 .add_blog-container form .add_blog-img a {
   position: absolute;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  text-align: center;
+  padding-top: 1.1rem;
   color: #FDE8E8;
   font-size: 1.872rem;
   text-decoration: none;
@@ -4616,6 +4633,17 @@ td img {
   cursor: pointer;
 }
 
+.actions a {
+  margin-right: 0.6rem;
+  margin-bottom: 0.6rem;
+  padding: 6px 12px;
+  font-family: inherit;
+  font-size: inherit;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+}
+
 .btn-edit {
   background-color: #EE5D5D;
   color: #FDE8E8;
@@ -4624,4 +4652,9 @@ td img {
 .btn-delete {
   background-color: #740C0C;
   color: #FDE8E8;
+}
+
+.admins_links {
+  color: #D01515;
+  text-decoration: none;
 }/*# sourceMappingURL=main.css.map */

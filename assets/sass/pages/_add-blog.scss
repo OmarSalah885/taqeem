@@ -54,9 +54,8 @@
 
             a {
                 position: absolute;
-                display: flex;
-                justify-content: center;
-                align-items: center;
+                text-align: center;
+                padding-top: 1.1rem;
                 color: $red-00;
                 font-size: $F-M;
                 text-decoration: none;

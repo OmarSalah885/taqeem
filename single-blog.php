@@ -92,21 +92,21 @@ foreach ($comments as $comment) {
 
 <main class="single-blog">
     <?php if (isset($_SESSION['error'])): ?>
-        <p style="color: red;"><?php echo htmlspecialchars($_SESSION['error']); ?></p>
-        <?php unset($_SESSION['error']); ?>
+    <p style="color: red;"><?php echo htmlspecialchars($_SESSION['error']); ?></p>
+    <?php unset($_SESSION['error']); ?>
     <?php endif; ?>
     <div class="single-blog_img">
         <img src="<?php echo htmlspecialchars($blog['image']); ?>" alt>
     </div>
     <div class="single-blog_tags">
-    <?php
+        <?php
         if (!empty($blog['tags'])) {
             $tags = explode(',', $blog['tags']);
             foreach ($tags as $tag): ?>
-                <a href="blogs.php?search_term=<?php echo urlencode(trim($tag)); ?>" style="text-decoration: none;">
-                    <?php echo htmlspecialchars(trim($tag)); ?>
-                </a>
-    <?php endforeach;
+        <a href="blogs.php?search_term=<?php echo urlencode(trim($tag)); ?>" style="text-decoration: none;">
+            <?php echo htmlspecialchars(trim($tag)); ?>
+        </a>
+        <?php endforeach;
         } else {
             echo "<p>No tags available for this blog.</p>";
         }
@@ -135,17 +135,19 @@ foreach ($comments as $comment) {
                             $is_author = isset($_SESSION['user_id']) && $_SESSION['user_id'] == $comment['user_id'];
                             $is_admin = isset($_SESSION['role']) && strtolower($_SESSION['role']) === 'admin';
                             ?>
-                            <div class="comments_container--single <?php echo $parent_id == 0 ? 'main-comment' : 'reply-comment'; ?>" data-comment-id="<?php echo $comment['id']; ?>">
-                                <div class="comment">
-                                    <div class="comment_img">
-                                        <img src="<?php echo htmlspecialchars($comment['profile_image'] ?: 'assets/images/profiles/pro_null.png'); ?>" alt="User Profile">
-                                    </div>
-                                    <div class="comment_content">
-                                        <h4 class="comment_content--name">
-                                            <?php echo htmlspecialchars($comment['first_name'] . ' ' . $comment['last_name']); ?>
-                                        </h4>
-                                        <p class="comment_content--date">
-                                            <?php
+                <div class="comments_container--single <?php echo $parent_id == 0 ? 'main-comment' : 'reply-comment'; ?>"
+                    data-comment-id="<?php echo $comment['id']; ?>">
+                    <div class="comment">
+                        <div class="comment_img">
+                            <img src="<?php echo htmlspecialchars($comment['profile_image'] ?: 'assets/images/profiles/pro_null.png'); ?>"
+                                alt="User Profile">
+                        </div>
+                        <div class="comment_content">
+                            <h4 class="comment_content--name">
+                                <?php echo htmlspecialchars($comment['first_name'] . ' ' . $comment['last_name']); ?>
+                            </h4>
+                            <p class="comment_content--date">
+                                <?php
                                             $comment_date = new DateTime($comment['created_at']);
                                             $current_date = new DateTime();
                                             $interval = $comment_date->diff($current_date);
@@ -164,25 +166,29 @@ foreach ($comments as $comment) {
                                                 echo 'Just now';
                                             }
                                             ?>
-                                        </p>
-                                        <p class="comment_content--text"><?php echo htmlspecialchars($comment['comment']); ?></p>
-                                        <div class="comment_actions">
-                                            <?php if ($is_author || $is_admin): ?>
-                                                <a href="submit_comment.php?action=delete&comment_id=<?php echo $comment['id']; ?>&blog_id=<?php echo $GLOBALS['blog_id']; ?>" class="comment_content--delete" onclick="return confirm('Are you sure you want to delete this comment?');">DELETE</a>
-                                                <a href="#" class="comment_content--edit" data-comment-id="<?php echo $comment['id']; ?>" data-comment-text="<?php echo htmlspecialchars($comment['comment'], ENT_QUOTES); ?>">EDIT</a>
-                                            <?php endif; ?>
-                                            <a href="#" class="comment_content--reply">REPLY</a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <?php
-                                if (!empty($grouped_comments[$comment['id']])): ?>
-                                    <div class="replies">
-                                        <?php display_comments($grouped_comments, $comment['id']); ?>
-                                    </div>
+                            </p>
+                            <p class="comment_content--text"><?php echo htmlspecialchars($comment['comment']); ?></p>
+                            <div class="comment_actions">
+                                <?php if ($is_author || $is_admin): ?>
+                                <a href="submit_comment.php?action=delete&comment_id=<?php echo $comment['id']; ?>&blog_id=<?php echo $GLOBALS['blog_id']; ?>"
+                                    class="comment_content--delete"
+                                    onclick="return confirm('Are you sure you want to delete this comment?');">DELETE</a>
+                                <a href="#" class="comment_content--edit"
+                                    data-comment-id="<?php echo $comment['id']; ?>"
+                                    data-comment-text="<?php echo htmlspecialchars($comment['comment'], ENT_QUOTES); ?>">EDIT</a>
                                 <?php endif; ?>
+                                <a href="#" class="comment_content--reply">REPLY</a>
                             </div>
-                        <?php endforeach;
+                        </div>
+                    </div>
+                    <?php
+                                if (!empty($grouped_comments[$comment['id']])): ?>
+                    <div class="replies">
+                        <?php display_comments($grouped_comments, $comment['id']); ?>
+                    </div>
+                    <?php endif; ?>
+                </div>
+                <?php endforeach;
                     }
                 }
 
@@ -224,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const commentId = link.getAttribute('data-comment-id');
             const commentText = link.getAttribute('data-comment-text');
-            
+
             const textarea = form.querySelector('textarea[name="comment"]');
             const commentIdInput = form.querySelector('#comment_id');
             const actionInput = form.querySelector('#action');
@@ -240,7 +246,9 @@ document.addEventListener('DOMContentLoaded', () => {
             cancelButton.style.display = 'inline-block';
             parentCommentIdInput.value = '';
 
-            form.scrollIntoView({ behavior: 'smooth' });
+            form.scrollIntoView({
+                behavior: 'smooth'
+            });
         });
     });
 
@@ -264,7 +272,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.comment_content--reply').forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
-            const commentId = link.closest('.comments_container--single').getAttribute('data-comment-id');
+            const commentId = link.closest('.comments_container--single').getAttribute(
+                'data-comment-id');
             const parentCommentIdInput = form.querySelector('#parent_comment_id');
             const actionInput = form.querySelector('#action');
             const submitButton = form.querySelector('#submit_button');
@@ -275,7 +284,9 @@ document.addEventListener('DOMContentLoaded', () => {
             submitButton.textContent = 'Submit';
             submitButton.disabled = false;
             cancelButton.style.display = 'none';
-            form.scrollIntoView({ behavior: 'smooth' });
+            form.scrollIntoView({
+                behavior: 'smooth'
+            });
         });
     });
 });

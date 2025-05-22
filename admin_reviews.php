@@ -140,13 +140,8 @@ include 'header.php';
     <h1>Reviews Management</h1>
 
     <form method="GET" action="" class="search-container">
-        <input
-          type="text"
-          id="reviewSearch"
-          name="search"
-          placeholder="Search by user, place name, rating, or date..."
-          value="<?= htmlspecialchars($search) ?>"
-        >
+        <input type="text" id="reviewSearch" name="search" placeholder="Search by user, place name, rating, or date..."
+            value="<?= htmlspecialchars($search) ?>">
         <button type="submit">Search</button>
     </form>
 
@@ -165,7 +160,7 @@ include 'header.php';
                 </tr>
             </thead>
             <tbody>
-<?php
+                <?php
 $rowNum = $offset + 1;
 while ($rev = $reviews->fetch_assoc()):
     $userImg   = $rev['profile_image'] ?: 'assets/images/profiles/pro_null.png';
@@ -183,18 +178,20 @@ while ($rev = $reviews->fetch_assoc()):
                         </a>
                     </td>
                     <td>
-                        <a href="profile.php?user_id=<?= (int)$userId ?>"><?= $userName ?></a>
+                        <a href="profile.php?user_id=<?= (int)$userId ?>" class="admins_links"><?= $userName ?></a>
                     </td>
                     <td><?= $placeName ?></td>
                     <td><?= (int)$rev['rating'] ?></td>
                     <td><?= $text ?></td>
                     <td><?= $created ?></td>
                     <td class="actions">
-                        <a href="single-place.php?place_id=<?= $rev['place_id'] ?>&review_id=<?= $rev['id'] ?>&action=edit#review_<?= $rev['id'] ?>" class="btn-edit">Edit</a>
-                        <a href="delete_review.php?id=<?= $rev['id'] ?>" class="btn-delete" onclick="return confirm('Delete this review?');">Delete</a>
+                        <a href="single-place.php?place_id=<?= $rev['place_id'] ?>&review_id=<?= $rev['id'] ?>&action=edit#review_<?= $rev['id'] ?>"
+                            class="btn-edit">Edit</a>
+                        <a href="delete_review.php?id=<?= $rev['id'] ?>" class="btn-delete"
+                            onclick="return confirm('Delete this review?');">Delete</a>
                     </td>
                 </tr>
-<?php endwhile; ?>
+                <?php endwhile; ?>
             </tbody>
         </table>
     </div>
@@ -209,11 +206,11 @@ while ($rev = $reviews->fetch_assoc()):
 
             // Previous arrow
             if ($currentPage > 1): ?>
-                <li class="indicator_item">
-                    <a href="?page=<?= $currentPage - 1 ?>&search=<?= urlencode($search) ?>">
-                        <i class="fa-solid fa-chevron-left"></i>
-                    </a>
-                </li>
+            <li class="indicator_item">
+                <a href="?page=<?= $currentPage - 1 ?>&search=<?= urlencode($search) ?>">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </a>
+            </li>
             <?php endif; ?>
 
             <?php
@@ -221,10 +218,10 @@ while ($rev = $reviews->fetch_assoc()):
             if ($currentPage > $range + 1):
                 $leadTarget = max(1, $currentPage - $jump);
             ?>
-                <li class="indicator_item">
-                    <a href="?page=1&search=<?= urlencode($search) ?>">1</a>
-                </li>
-                <?php renderEllipsis($leadTarget, $search); ?>
+            <li class="indicator_item">
+                <a href="?page=1&search=<?= urlencode($search) ?>">1</a>
+            </li>
+            <?php renderEllipsis($leadTarget, $search); ?>
             <?php endif; ?>
 
             <?php
@@ -232,13 +229,13 @@ while ($rev = $reviews->fetch_assoc()):
             $start = max(1, $currentPage - $range);
             $end   = min($totalPages, $currentPage + $range);
             for ($i = $start; $i <= $end; $i++): ?>
-                <li class="indicator_item <?= $i === $currentPage ? 'active' : '' ?>">
-                    <?php if ($i === $currentPage): ?>
-                        <a href="javascript:void(0)"><?= $i ?></a>
-                    <?php else: ?>
-                        <a href="?page=<?= $i ?>&search=<?= urlencode($search) ?>"><?= $i ?></a>
-                    <?php endif; ?>
-                </li>
+            <li class="indicator_item <?= $i === $currentPage ? 'active' : '' ?>">
+                <?php if ($i === $currentPage): ?>
+                <a href="javascript:void(0)"><?= $i ?></a>
+                <?php else: ?>
+                <a href="?page=<?= $i ?>&search=<?= urlencode($search) ?>"><?= $i ?></a>
+                <?php endif; ?>
+            </li>
             <?php endfor; ?>
 
             <?php
@@ -246,20 +243,20 @@ while ($rev = $reviews->fetch_assoc()):
             if ($currentPage < $totalPages - $range):
                 $trailTarget = min($totalPages, $currentPage + $jump);
             ?>
-                <?php renderEllipsis($trailTarget, $search); ?>
-                <li class="indicator_item">
-                    <a href="?page=<?= $totalPages ?>&search=<?= urlencode($search) ?>"><?= $totalPages ?></a>
-                </li>
+            <?php renderEllipsis($trailTarget, $search); ?>
+            <li class="indicator_item">
+                <a href="?page=<?= $totalPages ?>&search=<?= urlencode($search) ?>"><?= $totalPages ?></a>
+            </li>
             <?php endif; ?>
 
             <?php
             // Next arrow
             if ($currentPage < $totalPages): ?>
-                <li class="indicator_item">
-                    <a href="?page=<?= $currentPage + 1 ?>&search=<?= urlencode($search) ?>">
-                        <i class="fa-solid fa-chevron-right"></i>
-                    </a>
-                </li>
+            <li class="indicator_item">
+                <a href="?page=<?= $currentPage + 1 ?>&search=<?= urlencode($search) ?>">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </li>
             <?php endif; ?>
         </ul>
     </div>
