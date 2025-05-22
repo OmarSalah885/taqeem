@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 21, 2025 at 11:20 AM
+-- Generation Time: May 22, 2025 at 08:22 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -41,8 +41,8 @@ CREATE TABLE `blogs` (
 --
 
 INSERT INTO `blogs` (`id`, `title`, `image`, `tags`, `content`, `created_at`) VALUES
-(3, 'Discovering the Hidden Gems of Petra', 'assets/images/blogs/discovering_the_hidden_gems_of_petra/blog_682637632e92c8.45865394.jpg', 'History, Travel, Petra', '<div class=\"single-blog_content--paragraph\">\r\n    <p>Petra, the ancient city carved into rose-red rock, is one of the most iconic archaeological sites in the world. Explore its wonders and uncover the secrets of this mysterious city.</p>\r\n</div>\r\n<div class=\"single-blog_content--paragraph\">\r\n    <h2>The Entrance to Petra</h2>\r\n    <p>As you enter Petra through the narrow Siq, you\'ll be greeted by the majestic view of the Treasury, one of the most impressive monuments in the ancient city.</p>\r\n</div>\r\n<div class=\"single-blog_content--paragraph\">\r\n    <h2>Exploring the Lost City</h2>\r\n    <p>Wander through the ancient streets, discovering temples, tombs, and amphitheaters. Petra\'s intricate rock-cut architecture and stunning surroundings will leave you in awe.</p>\r\n</div>\r\n<div class=\"single-blog_content--paragraph\">\r\n    <h2>Hiking in Petra</h2>\r\n    <p>For the adventurous, a hike to the Monastery or High Place of Sacrifice offers breathtaking views and a deeper connection to this ancient wonder.</p>\r\n</div>\r\n<div class=\"single-blog_content--paragraph\">\r\n    <h2>Petra by Night</h2>\r\n    <p>Experience Petra in a whole new light as you visit the Treasury by night, illuminated by thousands of candles. It\'s a magical and unforgettable experience.</p>\r\n</div>', '2025-03-15 08:15:35'),
-(4, 'A Journey Through Wadi Rum', 'assets/images/blogs/Wadi Rum(1).jpg', 'Adventure, Desert, Wadi Rum', '<div class=\"single-blog_content--paragraph\">\r\n    <p>Wadi Rum, a vast desert valley in southern Jordan, offers breathtaking landscapes and a chance to experience the beauty of the desert like never before.</p>\r\n</div>\r\n<div class=\"single-blog_content--paragraph\">\r\n    <h2>The Red Sand Dunes</h2>\r\n    <p>Wadi Rum\'s striking red sand dunes create a surreal landscape. Hiking or driving through them, you\'ll feel like you\'re on another planet.</p>\r\n</div>\r\n<div class=\"single-blog_content--paragraph\">\r\n    <h2>Bedouin Culture</h2>\r\n    <p>Learn about the Bedouin tribes who call Wadi Rum home. Experience their hospitality and traditional lifestyle in this incredible desert setting.</p>\r\n</div>\r\n<div class=\"single-blog_content--paragraph\">\r\n    <h2>Climbing in Wadi Rum</h2>\r\n    <p>For thrill-seekers, Wadi Rum is a climber’s paradise. With towering rock formations, it’s one of the most famous climbing destinations in the world.</p>\r\n</div>\r\n<div class=\"single-blog_content--paragraph\">\r\n    <h2>Wadi Rum by Night</h2>\r\n    <p>Camping under the stars in Wadi Rum is an unforgettable experience. The clear desert skies are perfect for stargazing.</p>\r\n</div>\r\n', '2025-03-15 08:15:35'),
+(3, 'Discovering the Hidden Gems of Petra', 'assets/images/blogs/discovering_the_hidden_gems_of_petra/blog_682dec67762af8.50536225.jpg', 'History, Travel, Petra', '<div class=\"single-blog_content--paragraph\">\r\n    <p>Petra, the ancient city carved into rose-red rock, is one of the most iconic archaeological sites in the world. Explore its wonders and uncover the secrets of this mysterious city.</p>\r\n</div>\r\n<div class=\"single-blog_content--paragraph\">\r\n    <h2>The Entrance to Petra</h2>\r\n    <p>As you enter Petra through the narrow Siq, you\'ll be greeted by the majestic view of the Treasury, one of the most impressive monuments in the ancient city.</p>\r\n</div>\r\n<div class=\"single-blog_content--paragraph\">\r\n    <h2>Exploring the Lost City</h2>\r\n    <p>Wander through the ancient streets, discovering temples, tombs, and amphitheaters. Petra\'s intricate rock-cut architecture and stunning surroundings will leave you in awe.</p>\r\n</div>\r\n<div class=\"single-blog_content--paragraph\">\r\n    <h2>Hiking in Petra</h2>\r\n    <p>For the adventurous, a hike to the Monastery or High Place of Sacrifice offers breathtaking views and a deeper connection to this ancient wonder.</p>\r\n</div>\r\n<div class=\"single-blog_content--paragraph\">\r\n    <h2>Petra by Night</h2>\r\n    <p>Experience Petra in a whole new light as you visit the Treasury by night, illuminated by thousands of candles. It\'s a magical and unforgettable experience.</p>\r\n</div>', '2025-03-15 08:15:35'),
+(4, 'A Journey Through Wadi Rum', 'assets/images/blogs/Wadi Rum(1).jpg', 'Adventure, Desert, Wadi Rum', '<div class=\"single-blog_content--paragraph\">\r\n    <p>Wadi Rum, a vast desert valley in southern Jordan, offers breathtaking landscapes and a chance to experience the beauty of the desert like never before.</p>\r\n</div>\r\n<div class=\"single-blog_content--paragraph\">\r\n    <h2>The Red Sand Dunes</h2>\r\n    <p>Wadi Rum\'s striking red sand dunes create a surreal landscape. Hiking or driving through them, you\'ll feel like you\'re on another planet.</p>\r\n</div>\r\n<div class=\"single-blog_content--paragraph\">\r\n    <h2>Bedouin Culture</h2>\r\n    <p>Learn about the Bedouin tribes who call Wadi Rum home. Experience their hospitality and traditional lifestyle in this incredible desert setting.</p>\r\n</div>\r\n<div class=\"single-blog_content--paragraph\">\r\n    <h2>Climbing in Wadi Rum</h2>\r\n    <p>For thrill-seekers, Wadi Rum is a climber’s paradise. With towering rock formations, it’s one of the most famous climbing destinations in the world.</p>\r\n</div>\r\n<div class=\"single-blog_content--paragraph\">\r\n    <h2>Wadi Rum by Night</h2>\r\n    <p>Camping under the stars in Wadi Rum is an unforgettable experience. The clear desert skies are perfect for stargazing.</p>\r\n</div>', '2025-03-15 08:15:35'),
 (5, 'Exploring the Dead Sea', 'assets/images/blogs/dead sea(1).jpg', 'Wellness, Nature, Dead Sea', '<div class=\"single-blog_content--paragraph\">\r\n    <p>The Dead Sea, known for its high salt concentration and therapeutic properties, is a must-visit destination in Jordan. Here\'s what you need to know.</p>\r\n</div>\r\n<div class=\"single-blog_content--paragraph\">\r\n    <h2>The Healing Waters</h2>\r\n    <p>The mineral-rich waters of the Dead Sea have been used for thousands of years for their healing properties. Float in the salty water and feel the stress melt away.</p>\r\n</div>\r\n<div class=\"single-blog_content--paragraph\">\r\n    <h2>Therapeutic Mud</h2>\r\n    <p>Slather yourself in the famous Dead Sea mud, known for its skin-healing benefits. Many visitors enjoy covering themselves in the black mud for a natural spa experience.</p>\r\n</div>\r\n<div class=\"single-blog_content--paragraph\">\r\n    <h2>Visit the Surrounding Attractions</h2>\r\n    <p>While at the Dead Sea, explore nearby attractions such as the Baptism Site of Jesus Christ and the historical site of Mount Nebo.</p>\r\n</div>\r\n<div class=\"single-blog_content--paragraph\">\r\n    <h2>Best Time to Visit</h2>\r\n    <p>The best time to visit the Dead Sea is during the cooler months, from November to March, when temperatures are more comfortable for outdoor activities.</p>\r\n</div>', '2025-03-15 08:15:35'),
 (6, 'A Guide to Jerash: The Roman Ruins of Jordan', 'assets/images/blogs/Jerash(1).jpg', 'History, Culture, Jerash', '<div class=\"single-blog_content--paragraph\">\r\n    <p>Jerash, one of the best-preserved Roman cities in the world, offers a glimpse into ancient Roman life. This guide will take you through the city’s most iconic landmarks.</p>\r\n</div>\r\n<div class=\"single-blog_content--paragraph\">\r\n    <h2>The Oval Plaza</h2>\r\n    <p>The heart of Jerash, the Oval Plaza, is a magnificent example of Roman architecture. Surrounded by columns, it’s the perfect place to start your exploration of the city.</p>\r\n</div>\r\n<div class=\"single-blog_content--paragraph\">\r\n    <h2>The Roman Theatre</h2>\r\n    <p>The Roman Theatre in Jerash is one of the city’s most iconic structures. It still hosts performances today, offering a blend of history and modern entertainment.</p>\r\n</div>\r\n<div class=\"single-blog_content--paragraph\">\r\n    <h2>The Temple of Artemis</h2>\r\n    <p>The Temple of Artemis, dedicated to the goddess of the hunt, is a stunning example of Roman religious architecture. The ruins offer incredible photo opportunities.</p>\r\n</div>\r\n<div class=\"single-blog_content--paragraph\">\r\n    <h2>The Hippodrome</h2>\r\n    <p>Visit the Hippodrome, a chariot racing stadium where you can witness reenactments of ancient Roman games and races.</p>\r\n</div>\r\n', '2025-03-15 08:15:35'),
 (7, 'A Food Lover\'s Guide to Amman', 'assets/images/blogs/food.jpg', 'Food, Culture, Amman', '<div class=\"single-blog_content--paragraph\">\r\n    <p>Amman is a culinary paradise, offering a wide range of delicious Jordanian dishes. From street food to fine dining, here’s where to eat in the capital.</p>\r\n</div>\r\n<div class=\"single-blog_content--paragraph\">\r\n    <h2>Traditional Jordanian Breakfast</h2>\r\n    <p>Start your day with a traditional Jordanian breakfast of hummus, falafel, and labneh at one of Amman\'s many popular restaurants.</p>\r\n</div>\r\n<div class=\"single-blog_content--paragraph\">\r\n    <h2>Street Food Adventures</h2>\r\n    <p>Explore the bustling streets of Amman and indulge in mouthwatering street food like shawarma, falafel, and fresh juices.</p>\r\n</div>\r\n<div class=\"single-blog_content--paragraph\">\r\n    <h2>Dining with a View</h2>\r\n    <p>Amman offers many rooftop restaurants where you can enjoy delicious meals while taking in the stunning views of the city.</p>\r\n</div>\r\n<div class=\"single-blog_content--paragraph\">\r\n    <h2>Sweet Treats</h2>\r\n    <p>End your meal with traditional Jordanian desserts like kunafa, baklava, and atayef. Pair them with a cup of mint tea for the ultimate indulgence.</p>\r\n</div>', '2025-03-15 08:15:35'),
@@ -79,9 +79,9 @@ CREATE TABLE `blog_comments` (
 --
 
 INSERT INTO `blog_comments` (`id`, `blog_id`, `user_id`, `comment`, `parent_comment_id`, `created_at`) VALUES
-(1, 3, 1, 'Petra has always been on my bucket list! The rock-cut architecture looks absolutely stunning, and I can only imagine how breathtaking it must be in person. Has anyone visited recently? I’d love to hear about your experience, especially any tips for first-time visitors!', NULL, '2025-03-15 11:11:07'),
+(1, 3, 1, 'Petra has always been on my bucket list! The rock-cut architecture looks absolutely stunning, and I can only imagine how breathtaking it must be in person. Has anyone visited recently? I’d love to hear about your experience, especially any tips for first-time visitors!', NULL, '2025-05-21 10:50:33'),
 (2, 3, 2, 'Yes! I went last year, and it was truly a once-in-a-lifetime experience. Walking through the Siq and finally seeing the Treasury appear before my eyes was magical. I highly recommend visiting Petra by night as well. The candle-lit atmosphere creates such a mystical vibe!', 1, '2025-03-15 11:11:07'),
-(3, 3, 3, 'That sounds amazing! I’ve read about the Monastery hike—how difficult was it? I’ve heard mixed reviews, with some saying it’s exhausting and others saying it’s manageable with breaks. Also, how long did it take you to reach the top?', 1, '2025-03-15 11:11:07'),
+(3, 3, 3, 'That sounds amazing! I’ve read about the Monastery hike—how difficult was it? I’ve heard mixed reviews, with some saying it’s exhausting and others saying it’s manageable with breaks. Also, how long did it take you to reach the top?', 1, '2025-05-22 06:12:05'),
 (4, 3, 2, 'It’s definitely a bit of a challenge, but totally doable if you pace yourself. The climb took me about 45 minutes to an hour, but the view from the top made every step worth it. There’s even a small café up there where you can rest and enjoy the scenery. Just bring plenty of water!', 3, '2025-03-15 11:11:07'),
 (5, 3, 4, 'The entrance to Petra through the Siq looks like something out of a fantasy movie! Those towering cliffs and the anticipation of seeing the Treasury must be such an unforgettable experience. I bet it feels like stepping back in time.', NULL, '2025-03-15 11:11:07'),
 (6, 3, 5, 'It really does! Fun fact: the Treasury was featured in \"Indiana Jones and the Last Crusade.\" That scene where they ride up to it made it even more legendary. But in real life, it’s even more massive and intricate than I ever imagined!', 5, '2025-03-15 11:11:07'),
@@ -101,14 +101,7 @@ INSERT INTO `blog_comments` (`id`, `blog_id`, `user_id`, `comment`, `parent_comm
 (20, 14, 16, 'Yes, it’s generally safe, but if you have any cuts or sensitive skin, the salt can cause a stinging sensation. It’s best to rinse off with fresh water after floating to avoid irritation.', 19, '2025-03-15 11:20:31'),
 (21, 14, 11, 'I love the idea of a natural spa experience! Has anyone tried the Dead Sea mud treatments? Do they really help with skin conditions?', NULL, '2025-03-15 11:20:31'),
 (22, 14, 26, 'I tried it last summer, and my skin felt so smooth afterward! The minerals in the mud are great for exfoliation, and it helped with some dryness I had. Definitely worth trying!', 21, '2025-03-15 11:20:31'),
-(24, 7, 32, 'i love the life here its more cozy', NULL, '2025-04-05 04:48:13'),
-(25, 3, 1, 'omar like the sun there but not me its too hot', 1, '2025-04-12 16:49:32'),
-(26, 4, 1, 'hi  i didnt like how the camal looked at me it was like he can see throue my soul', 0, '2025-04-12 16:50:42'),
-(27, 4, 4, 'no one  care', 26, '2025-04-12 16:51:51'),
-(28, 4, 4, 'i like it so much it was the perfict trip for me', 0, '2025-04-12 16:52:24'),
-(29, 4, 1, 'who do u think u are every one care', 27, '2025-04-12 16:53:21'),
-(30, 4, 1, 'fuck u', 28, '2025-04-12 17:40:02'),
-(31, 0, 1, 'thx u so much', NULL, '2025-04-22 14:35:53');
+(24, 7, 32, 'i love the life here its more cozy', NULL, '2025-04-05 04:48:13');
 
 -- --------------------------------------------------------
 
@@ -290,12 +283,12 @@ INSERT INTO `menu_items` (`id`, `place_id`, `name`, `price`, `description`, `ima
 (8, 2, 'Beef Teriyaki', 16.99, 'Grilled slices of tender beef glazed with a rich and flavorful teriyaki sauce, served with a side of steamed rice and stir-fried vegetables.', 'assets/images/places/restaurants/R(8).jpg'),
 (9, 2, 'Green Tea Ice Cream', 5.99, 'A refreshing and creamy green tea-flavored ice cream with a subtle earthy sweetness, served with a drizzle of honey.', 'assets/images/places/restaurants/R(9).jpg'),
 (10, 2, 'Ramen Bowl', 12.99, 'A steaming bowl of traditional ramen noodles in a rich miso broth, topped with tender slices of pork, soft-boiled egg, and green onions.', 'assets/images/places/restaurants/R(10).jpg'),
-(11, 3, 'Steak Frites', 18.99, 'A French bistro classic featuring a juicy, grilled steak paired with golden crispy French fries and served with a side of creamy peppercorn sauce.', 'assets/images/places/restaurants/R(11).jpg'),
-(12, 3, 'French Onion Soup', 6.99, 'A deeply flavorful caramelized onion soup topped with a layer of melted Gruyère cheese and served with a crispy baguette.', 'assets/images/places/restaurants/R(12).jpg'),
-(13, 3, 'Croissant', 3.99, 'A buttery and flaky French pastry with a golden, crispy exterior and a soft, airy interior, perfect for breakfast or a light snack.', 'assets/images/places/restaurants/R(13).jpg'),
-(14, 3, 'Coq au Vin', 17.99, 'A classic French dish featuring tender chicken slow-cooked in a rich red wine sauce with mushrooms, onions, and fresh herbs.', 'assets/images/places/restaurants/R(14).jpg'),
-(15, 3, 'Crème Brûlée', 8.99, 'A creamy vanilla custard dessert topped with a caramelized sugar crust that cracks with every spoonful.', 'assets/images/places/restaurants/R(15).jpg'),
-(16, 3, 'Duck Confit', 19.99, 'Slow-cooked duck leg, perfectly crispy on the outside and tender on the inside, served with a side of roasted potatoes.', 'assets/images/places/restaurants/R(16).jpg'),
+(11, 3, 'Steak Frites', 18.99, 'A French bistro classic featuring a juicy, grilled steak paired with golden crispy French fries and served with a side of creamy peppercorn sauce.', 'assets/images/places/restaurants/shawarma_reem/menu/R(11).jpg'),
+(12, 3, 'French Onion Soup', 6.99, 'A deeply flavorful caramelized onion soup topped with a layer of melted Gruyère cheese and served with a crispy baguette.', 'assets/images/places/restaurants/shawarma_reem/menu/R(12).jpg'),
+(13, 3, 'Croissant', 3.99, 'A buttery and flaky French pastry with a golden, crispy exterior and a soft, airy interior, perfect for breakfast or a light snack.', 'assets/images/places/restaurants/shawarma_reem/menu/R(13).jpg'),
+(14, 3, 'Coq au Vin', 17.99, 'A classic French dish featuring tender chicken slow-cooked in a rich red wine sauce with mushrooms, onions, and fresh herbs.', 'assets/images/places/restaurants/shawarma_reem/menu/R(14).jpg'),
+(15, 3, 'Crème Brûlée', 8.99, 'A creamy vanilla custard dessert topped with a caramelized sugar crust that cracks with every spoonful.', 'assets/images/places/restaurants/shawarma_reem/menu/R(15).jpg'),
+(16, 3, 'Duck Confit', 19.99, 'Slow-cooked duck leg, perfectly crispy on the outside and tender on the inside, served with a side of roasted potatoes.', 'assets/images/places/restaurants/shawarma_reem/menu/R(16).jpg'),
 (17, 4, 'Pepperoni Pizza', 14.99, 'A deliciously cheesy pizza topped with crispy pepperoni slices, a tangy tomato sauce, and a perfectly baked golden crust.', 'assets/images/places/restaurants/R(17).jpg'),
 (18, 4, 'Garlic Bread', 4.99, 'Warm and crispy garlic bread topped with melted butter, minced garlic, and fresh parsley, perfect as a side dish.', 'assets/images/places/restaurants/R(18).jpg'),
 (19, 4, 'Chicken Wings', 9.99, 'Crispy, golden chicken wings tossed in your choice of buffalo, BBQ, or honey garlic sauce, served with ranch or blue cheese dip.', 'assets/images/places/restaurants/R(19).jpg'),
@@ -422,7 +415,21 @@ INSERT INTO `opening_hours` (`id`, `place_id`, `day`, `open_time`, `close_time`)
 (1363, 1, 'Thursday', '10:00:00', '11:00:00'),
 (1364, 1, 'Friday', '10:42:00', '11:00:00'),
 (1365, 1, 'Saturday', '10:00:00', '11:00:00'),
-(1366, 1, 'Sunday', '10:00:00', '11:00:00');
+(1366, 1, 'Sunday', '10:00:00', '11:00:00'),
+(2886, 3, 'Monday', '09:00:00', '17:00:00'),
+(2887, 3, 'Tuesday', '09:00:00', '17:00:00'),
+(2888, 3, 'Wednesday', '09:00:00', '17:00:00'),
+(2889, 3, 'Thursday', '09:00:00', '17:00:00'),
+(2890, 3, 'Friday', '09:00:00', '17:00:00'),
+(2891, 3, 'Saturday', '09:00:00', '17:00:00'),
+(2892, 3, 'Sunday', '09:00:00', '17:00:00'),
+(2907, 118, 'Monday', '09:00:00', '17:00:00'),
+(2908, 118, 'Tuesday', '09:00:00', '17:00:00'),
+(2909, 118, 'Wednesday', '09:00:00', '17:00:00'),
+(2910, 118, 'Thursday', '09:00:00', '17:00:00'),
+(2911, 118, 'Friday', '09:00:00', '17:00:00'),
+(2912, 118, 'Saturday', '09:00:00', '17:00:00'),
+(2913, 118, 'Sunday', '09:00:00', '17:00:00');
 
 -- --------------------------------------------------------
 
@@ -462,7 +469,7 @@ CREATE TABLE `places` (
 INSERT INTO `places` (`id`, `user_id`, `category_id`, `name`, `price`, `tags`, `description`, `country`, `city`, `google_map_location`, `email`, `phone_1`, `phone_2`, `website`, `facebook_url`, `instagram_url`, `twitter_url`, `featured_image`, `created_at`, `latitude`, `longitude`, `address`) VALUES
 (1, 1, 1, 'Zarb House', '$$$', 'Jordanian, BBQ, Traditional', 'A must-visit for lovers of authentic Jordanian zarb, slow-cooked underground.', 'Jordan', 'Amman', 'https://goo.gl/maps/example1', 'contact@zarbhouse.com', '0791234567', '0797676767', 'https://zarbhouse.com', 'http://localhost/taqeem/add-place.php', '', 'https://x.com/home', 'assets/images/places/restaurants/RM(1).jpg', '2025-03-15 11:37:28', NULL, NULL, NULL),
 (2, 2, 1, 'Habibah Sweets', '$', 'Desserts, Sweets, Kunafa', 'Famous for its mouthwatering kunafa, a true taste of Amman.', 'Jordan', 'Amman', 'https://goo.gl/maps/example2', 'info@habibahsweets.com', '0792345678', NULL, NULL, 'https://facebook.com/habibah', NULL, 'https://x.com/home', 'assets/images/places/restaurants/RM(2).jpg', '2025-03-15 11:37:28', NULL, NULL, NULL),
-(3, 3, 1, 'Shawarma Reem', '$', 'Shawarma, Fast Food, Street Food', 'One of the best shawarma spots in Amman, known for its rich flavors.', 'Jordan', 'Amman', 'https://goo.gl/maps/example3', NULL, '0793456789', NULL, NULL, NULL, NULL, NULL, 'assets/images/places/restaurants/RM(3).jpg', '2025-03-15 11:37:28', NULL, NULL, NULL),
+(3, 3, 1, 'Shawarma Reem', '$', 'Shawarma, Fast Food, Street Food', 'One of the best shawarma spots in Amman, known for its rich flavors.', 'Jordan', 'Amman', 'https://www.google.com/maps/place/%D8%B4%D8%A7%D9%88%D8%B1%D9%85%D8%A7+%D8%B1%D9%8A%D9%85%E2%80%AD/@31.9520581,35.9178948,17z/data=!3m1!4b1!4m6!3m5!1s0x151b5f80a7447b61:0x2307e0d069101889!8m2!3d31.9520536!4d35.9153199!16s%2Fg%2F12qf5m9zj?coh=245187&entry=', '', '0793456789', '', '', '', '', '', 'assets/images/places/restaurants/RM(3).jpg', '2025-03-15 11:37:28', 31.953900, 35.910600, ''),
 (4, 4, 1, 'Fakhr El-Din', '$$$', 'Lebanese, Fine Dining', 'A high-end Lebanese restaurant offering exquisite dishes and great ambiance.', 'Jordan', 'Amman', 'https://goo.gl/maps/example4', 'reservations@fakhreldin.com', '0794567890', NULL, 'https://fakhreldin.com', 'https://facebook.com/fakhreldin', 'https://instagram.com/fakhreldin', NULL, 'assets/images/places/restaurants/RM(4).jpg', '2025-03-15 11:37:28', NULL, NULL, NULL),
 (5, 5, 1, 'Rakwet Arab', '$$', 'Middle Eastern, Café', 'A cozy spot offering shisha, delicious food, and a vibrant atmosphere.', 'Jordan', 'Amman', 'https://goo.gl/maps/example5', NULL, '0795678901', NULL, NULL, NULL, NULL, NULL, 'assets/images/places/restaurants/RM(5).jpg', '2025-03-15 11:37:28', NULL, NULL, NULL),
 (6, 6, 1, 'Tawaheen Al-Hawa', '$$', 'Jordanian, Traditional', 'A classic restaurant serving traditional Jordanian dishes with a warm ambiance.', 'Jordan', 'Amman', 'https://goo.gl/maps/example6', 'info@tawaheen.com', '0796789012', NULL, 'https://tawaheen.com', NULL, NULL, NULL, 'assets/images/places/restaurants/RM(6).jpg', '2025-03-15 11:37:28', NULL, NULL, NULL),
@@ -574,11 +581,11 @@ INSERT INTO `places` (`id`, `user_id`, `category_id`, `name`, `price`, `tags`, `
 (112, 18, 11, 'Al-Kindi Hospital', '$$', 'Hospital, General Medicine, Surgery', 'Al-Kindi Hospital offers a wide range of healthcare services, including general medicine, surgery, and diagnostic testing.', 'Jordan', 'Amman', 'https://goo.gl/maps/example78', 'info@kindihospital.com', '0795858585', NULL, 'https://kindihospital.com', NULL, NULL, NULL, 'assets/images/places/health/h(9).jpg', '2025-03-15 11:46:39', NULL, NULL, NULL),
 (113, 20, 11, 'Jordan Heart Center', '$$$', 'Medical Center, Cardiology, Heart Care', 'Jordan Heart Center is a leading provider of cardiology services, offering heart surgery, diagnostic tests, and post-treatment care.', 'Jordan', 'Amman', 'https://goo.gl/maps/example79', 'info@jordanheartcenter.com', '0795959595', '0797676767', 'https://jordanheartcenter.com', 'https://facebook.com/jordanheartcenter', 'https://instagram.com/jordanheartcenter', 'https://x.com/home', 'assets/images/places/health/h(10).jpg', '2025-03-15 11:46:39', NULL, NULL, NULL),
 (114, 22, 11, 'Noor Al-Hussein Cancer Center', '$$$', 'Cancer Treatment, Medical Research', 'Noor Al-Hussein Cancer Center provides advanced cancer treatments and has a renowned research department for the latest medical breakthroughs.', 'Jordan', 'Amman', 'https://goo.gl/maps/example80', 'info@nhcc.jo', '0796060606', '0797676767', 'https://nhcc.jo', NULL, NULL, NULL, 'assets/images/places/health/h(11).jpg', '2025-03-15 11:46:39', NULL, NULL, NULL),
-(115, 24, 11, 'The Islamic Hospital', '$$', 'Hospital, General Care, Surgery', 'The Islamic Hospital offers general medical care, emergency services, and specialized surgical treatments.', 'Jordan', 'Amman', 'https://goo.gl/maps/example81', 'info@islamichospital.com', '0796161616', NULL, 'https://islamichospital.com', NULL, NULL, NULL, 'assets/images/places/health/h(12).jpg', '2025-03-15 11:46:39', NULL, NULL, NULL),
-(116, 26, 11, 'Royal Medical Services', '$$$', 'Military Hospital, General Care, Surgery', 'Royal Medical Services serves Jordan’s military personnel and offers general medical care, emergency services, and specialized surgeries.', 'Jordan', 'Amman', 'https://goo.gl/maps/example82', 'info@royalmedservices.jo', '0796262626', '0797676767', 'https://royalmedservices.jo', NULL, NULL, NULL, 'assets/images/places/health/h(13).jpg', '2025-03-15 11:46:39', NULL, NULL, NULL);
+(115, 24, 11, 'The Islamic Hospital', '$$', 'Hospital, General Care, Surgery', 'The Islamic Hospital offers general medical care, emergency services, and specialized surgical treatments.', 'Jordan', 'Amman', 'https://goo.gl/maps/example81', 'info@islamichospital.com', '0796161616', NULL, 'https://islamichospital.com', NULL, NULL, NULL, 'assets/images/places/health/h(12).jpg', '2025-03-15 11:46:39', NULL, NULL, NULL);
 INSERT INTO `places` (`id`, `user_id`, `category_id`, `name`, `price`, `tags`, `description`, `country`, `city`, `google_map_location`, `email`, `phone_1`, `phone_2`, `website`, `facebook_url`, `instagram_url`, `twitter_url`, `featured_image`, `created_at`, `latitude`, `longitude`, `address`) VALUES
+(116, 26, 11, 'Royal Medical Services', '$$$', 'Military Hospital, General Care, Surgery', 'Royal Medical Services serves Jordan’s military personnel and offers general medical care, emergency services, and specialized surgeries.', 'Jordan', 'Amman', 'https://goo.gl/maps/example82', 'info@royalmedservices.jo', '0796262626', '0797676767', 'https://royalmedservices.jo', NULL, NULL, NULL, 'assets/images/places/health/h(13).jpg', '2025-03-15 11:46:39', NULL, NULL, NULL),
 (117, 28, 11, 'Al-Bashir Health Center', '$$', 'Health Center, Public, Family Medicine', 'A health center offering a wide range of public healthcare services, including family medicine, vaccinations, and general checkups.', 'Jordan', 'Amman', 'https://goo.gl/maps/example83', 'info@bashirhealthcenter.jo', '0796363636', NULL, 'https://bashirhealthcenter.jo', NULL, NULL, NULL, 'assets/images/places/health/h(14).jpg', '2025-03-15 11:46:39', NULL, NULL, NULL),
-(118, 1, 12, 'Co-Work Hub', '$$', 'Workspace, Co-Working, Offices', 'Co-Work Hub is a modern co-working space offering flexible office solutions, meeting rooms, and collaboration opportunities for startups and entrepreneurs.', 'Jordan', 'Amman', 'https://goo.gl/maps/example84', 'info@coworkhub.jo', '0796464646', NULL, 'https://coworkhub.jo', NULL, NULL, NULL, 'assets/images/places/workspace/work(1).jpg', '2025-03-15 11:47:35', NULL, NULL, NULL),
+(118, 1, 12, 'Co-Work Hub', '$$', 'Workspace, Co-Working, Offices', 'Co-Work Hub is a modern co-working space offering flexible office solutions, meeting rooms, and collaboration opportunities for startups and entrepreneurs.', 'Jordan', 'Amman', 'https://www.google.com/maps/place/%D9%85%D8%B7%D8%B9%D9%85+%D9%87%D8%A7%D8%B4%D9%85%E2%80%AD/@31.9599837,35.938552,16z/data=!4m6!3m5!1s0x151b5f99a48f39f3:0xe7dab884a8b945e2!8m2!3d31.9523139!4d35.9319277!16s%2Fg%2F1tx12qpd?entry=ttu&g_ep=EgoyMDI1MDUxNS4wIK', 'info@coworkhub.jo', '0796464646', '', 'https://coworkhub.jo', '', '', '', 'assets/images/places/workspace/work(1).jpg', '2025-03-15 11:47:35', 31.949540, 35.924700, 'Mohammad Rashid Ridha Street, منطقة المدينة'),
 (119, 3, 12, 'The Office', '$$$', 'Workspace, Premium Offices, Events', 'The Office offers premium office spaces with advanced facilities, ideal for businesses looking for a professional and creative environment.', 'Jordan', 'Amman', 'https://goo.gl/maps/example85', 'contact@theoffice.jo', '0796565656', NULL, 'https://theoffice.jo', 'https://facebook.com/theoffice.jo', 'https://instagram.com/theoffice.jo', NULL, 'assets/images/places/workspace/work(2).jpg', '2025-03-15 11:47:35', NULL, NULL, NULL),
 (120, 7, 12, 'Flexi Spaces', '$$', 'Workspace, Shared Offices, Flexible Plans', 'Flexi Spaces offers shared offices with flexible plans, giving companies the ability to scale their workspace according to needs.', 'Jordan', 'Amman', 'https://goo.gl/maps/example86', 'info@flexispaces.jo', '0796666666', NULL, 'https://flexispaces.jo', NULL, NULL, NULL, 'assets/images/places/workspace/work(3).jpg', '2025-03-15 11:47:35', NULL, NULL, NULL),
 (121, 9, 12, 'Startup Space', '$$', 'Workspace, Co-Working, Networking', 'Startup Space is designed for startups and small businesses, providing co-working areas, networking opportunities, and business support services.', 'Jordan', 'Amman', 'https://goo.gl/maps/example87', 'info@startupspace.jo', '0796767676', NULL, 'https://startupspace.jo', NULL, NULL, 'https://x.com/home', 'assets/images/places/workspace/work(4).jpg', '2025-03-15 11:47:35', NULL, NULL, NULL),
@@ -2214,6 +2221,12 @@ ALTER TABLE `blogs`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `blog_comments`
+--
+ALTER TABLE `blog_comments`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `categories`
 --
 ALTER TABLE `categories`
@@ -2309,7 +2322,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `blogs`
 --
 ALTER TABLE `blogs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+
+--
+-- AUTO_INCREMENT for table `blog_comments`
+--
+ALTER TABLE `blog_comments`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
 
 --
 -- AUTO_INCREMENT for table `categories`
@@ -2333,13 +2352,13 @@ ALTER TABLE `menu_items`
 -- AUTO_INCREMENT for table `opening_hours`
 --
 ALTER TABLE `opening_hours`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2858;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2914;
 
 --
 -- AUTO_INCREMENT for table `places`
 --
 ALTER TABLE `places`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=213;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=216;
 
 --
 -- AUTO_INCREMENT for table `place_gallery`
@@ -2369,7 +2388,7 @@ ALTER TABLE `review_images`
 -- AUTO_INCREMENT for table `review_likes`
 --
 ALTER TABLE `review_likes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=252;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=253;
 
 --
 -- AUTO_INCREMENT for table `saved_places`
@@ -2381,7 +2400,7 @@ ALTER TABLE `saved_places`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=87;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=88;
 
 --
 -- Constraints for dumped tables
