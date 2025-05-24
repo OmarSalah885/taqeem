@@ -130,3 +130,22 @@
 2025-05-22 09:38:43 - submit_comment.php started, method: GET, action: delete
 2025-05-22 09:38:43 - Deleting comment ID: 76
 2025-05-22 09:38:43 - Comment ID: 76 deleted successfully
+2025-05-24 09:56:02 - submit_comment.php started, method: POST, action: add
+2025-05-24 09:56:02 - Adding comment for blog ID: 4, parent_comment_id: null
+2025-05-24 09:56:02 - Comment added successfully for blog ID: 4
+2025-05-24 09:56:06 - submit_comment.php started, method: POST, action: add
+2025-05-24 09:56:06 - Adding comment for blog ID: 4, parent_comment_id: null
+2025-05-24 09:56:06 - Comment added successfully for blog ID: 4
+2025-05-24 09:56:21 - submit_comment.php started, method: POST, action: add
+2025-05-24 09:56:21 - Adding comment for blog ID: 4, parent_comment_id: 74
+2025-05-24 09:56:21 - Comment added successfully for blog ID: 4
+2025-05-24 09:56:31 - submit_comment.php started, method: POST, action: add
+2025-05-24 09:56:31 - Adding comment for blog ID: 4, parent_comment_id: 75
+2025-05-24 09:56:31 - Comment added successfully for blog ID: 4
+2025-05-24 09:56:37 - submit_comment.php started, method: POST, action: edit
+2025-05-24 09:56:37 - Editing comment ID: 76
+2025-05-24 09:56:37 - Comment ID: 76 edited successfully
+2025-05-24 09:56:42 - submit_comment.php started, method: GET, action: delete
+2025-05-24 09:56:42 - Deleting comment ID: 76
+2025-05-24 09:56:42 - Comment ID: 76 deleted successfully
+2025-05-24 09:57:00 - submit_comment.php started, method: POST, action: add
