@@ -156,7 +156,7 @@ if (empty($_SESSION['csrf_token'])) {
                         'pets' => 'PETS',
                         'plants' => 'PLANTS SHOP',
                         'art' => 'ART',
-                        'hotal' => 'HOTELS',
+                        'hotel' => 'HOTELS',
                         'edu' => 'EDUCATION',
                         'health' => 'HEALTH',
                         'workspace' => 'WORKSPACE'
@@ -210,9 +210,27 @@ if (empty($_SESSION['csrf_token'])) {
     $menu_query->execute();
     $menu_result = $menu_query->get_result();
     if ($menu_result->num_rows > 0):
+        // Determine section title based on category
+        $section_title = 'MENU';
+        $category_raw = strtolower($category_row['name'] ?? '');
+        $section_titles = [
+            'restaurants' => 'MENU',
+            'coffee' => 'MENU',
+            'active-life' => 'ACTIVITIES',
+            'shopping' => 'PRODUCTS',
+            'home s' => 'SERVICES',
+            'pets' => 'PET SERVICES',
+            'plants' => 'PLANTS',
+            'art' => 'ARTWORKS',
+            'hotel' => 'AMENITIES',
+            'edu' => 'COURSES',
+            'health' => 'SERVICES',
+            'workspace' => 'FACILITIES'
+        ];
+        $section_title = $section_titles[$category_raw] ?? 'MENU';
     ?>
     <div class="place_menu">
-        <h2 class="place-title">MENU</h2>
+        <h2 class="place-title"><?= htmlspecialchars($section_title) ?></h2>
         <div class="place_menu--grid">
             <?php while ($menu_item = $menu_result->fetch_assoc()): ?>
             <div class="place_menu--item">
@@ -257,7 +275,16 @@ if (empty($_SESSION['csrf_token'])) {
             <tr>
                 <td class="place_time--table-day"><?= htmlspecialchars($hours['day']) ?>:</td>
                 <td class="place_time--table-hour">
-                    <?= $hours['open_time'] && $hours['close_time'] ? htmlspecialchars($hours['open_time'] . ' - ' . $hours['close_time']) : 'Closed' ?>
+                    <?php
+                    if ($hours['open_time'] && $hours['close_time']) {
+                        // Convert to 12-hour format with AM/PM
+                        $open_time = date("h:i A", strtotime($hours['open_time']));
+                        $close_time = date("h:i A", strtotime($hours['close_time']));
+                        echo htmlspecialchars("$open_time - $close_time");
+                    } else {
+                        echo 'Closed';
+                    }
+                    ?>
                 </td>
             </tr>
             <?php endwhile; ?>
