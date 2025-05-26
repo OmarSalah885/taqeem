@@ -108,12 +108,12 @@ if (empty($_SESSION['csrf_token'])) {
         <div class="place_info-cont">
             <div class="place_info--tages">
                 <?php
-    $tags = !empty($place['tags']) ? explode(',', $place['tags']) : [];
-    foreach ($tags as $tag) {
-        $trimmed_tag = htmlspecialchars(trim($tag));
-        echo '<a href="listing.php?search=' . urlencode($trimmed_tag) . '">' . $trimmed_tag . '</a>';
-    }
-    ?>
+                $tags = !empty($place['tags']) ? explode(',', $place['tags']) : [];
+                foreach ($tags as $tag) {
+                    $trimmed_tag = htmlspecialchars(trim($tag));
+                    echo '<a href="listing.php?search=' . urlencode($trimmed_tag) . '">' . $trimmed_tag . '</a>';
+                }
+                ?>
             </div>
             <h1 class="place_info--name"><?= htmlspecialchars($place['name']) ?></h1>
             <div class="place_info--extra">
@@ -121,21 +121,21 @@ if (empty($_SESSION['csrf_token'])) {
                 $rating_query = $conn->prepare("SELECT AVG(rating) AS avg_rating, COUNT(*) AS total_reviews FROM reviews WHERE place_id = ?");
                 $rating_query->bind_param("i", $place_id);
                 $rating_query->execute();
-                $rating_result = $rating_query->get_result();
+                $rating_result = $rating_query->get_result(); // Fixed: Use $rating_query instead of $conn
                 $rating_data = $rating_result->fetch_assoc();
                 $avg_rating = $rating_data['avg_rating'] ?? 0;
                 $total_reviews = $rating_data['total_reviews'] ?? 0;
                 $percentage = ($avg_rating / 5) * 100;
                 $rating_query->close();
                 ?>
-                <div class="extra_stars_container">
+                <div class="extra_stars_container" id="extra-stars-container">
                     <div class="extra_stars"
                         style="background: linear-gradient(90deg, #A21111 <?= $percentage ?>%, #D0D0D0 <?= $percentage ?>%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
                         <?php for ($i = 0; $i < 5; $i++): ?>
                         <i class="fa-solid fa-star star-rating"></i>
                         <?php endfor; ?>
                     </div>
-                    <span class="extra_rating"><?= number_format($avg_rating, 1) ?></span>
+                    <span class="extra_rating" id="extra-rating"><?= number_format($avg_rating, 1) ?></span>
                 </div>
                 <h3 class="extra_price"><?= htmlspecialchars($place['price']) ?></h3>
                 <a href="#" class="extra_category">
@@ -166,7 +166,6 @@ if (empty($_SESSION['csrf_token'])) {
                 </a>
             </div>
         </div>
-
     </div>
 
     <?php if (!empty($place['email']) || !empty($place['phone_1']) || !empty($place['phone_2']) || !empty($place['website']) || !empty($place['facebook_url']) || !empty($place['instagram_url']) || !empty($place['twitter_url'])): ?>
@@ -174,32 +173,32 @@ if (empty($_SESSION['csrf_token'])) {
         <h2 class="place-title">CONTACT INFO</h2>
         <div class="place_CONTACT--info">
             <?php
-                if (!empty($place['email'])) {
-                    echo '<div class="place_CONTACT--info-item">EMAIL: <a href="mailto:' . htmlspecialchars($place['email']) . '">' . htmlspecialchars($place['email']) . '</a></div>';
-                }
-                if (!empty($place['website'])) {
-                    echo '<div class="place_CONTACT--info-item">WEBSITE: <a href="' . htmlspecialchars($place['website']) . '" target="_blank">' . htmlspecialchars($place['website']) . '</a></div>';
-                }
-                if (!empty($place['phone_1'])) {
-                    echo '<div class="place_CONTACT--info-item">PHONE(1): <a href="tel:' . htmlspecialchars($place['phone_1']) . '">' . htmlspecialchars($place['phone_1']) . '</a></div>';
-                }
-                if (!empty($place['phone_2'])) {
-                    echo '<div class="place_CONTACT--info-item">PHONE(2): <a href="tel:' . htmlspecialchars($place['phone_2']) . '">' . htmlspecialchars($place['phone_2']) . '</a></div>';
-                }
-                ?>
+            if (!empty($place['email'])) {
+                echo '<div class="place_CONTACT--info-item">EMAIL: <a href="mailto:' . htmlspecialchars($place['email']) . '">' . htmlspecialchars($place['email']) . '</a></div>';
+            }
+            if (!empty($place['website'])) {
+                echo '<div class="place_CONTACT--info-item">WEBSITE: <a href="' . htmlspecialchars($place['website']) . '" target="_blank">' . htmlspecialchars($place['website']) . '</a></div>';
+            }
+            if (!empty($place['phone_1'])) {
+                echo '<div class="place_CONTACT--info-item">PHONE(1): <a href="tel:' . htmlspecialchars($place['phone_1']) . '">' . htmlspecialchars($place['phone_1']) . '</a></div>';
+            }
+            if (!empty($place['phone_2'])) {
+                echo '<div class="place_CONTACT--info-item">PHONE(2): <a href="tel:' . htmlspecialchars($place['phone_2']) . '">' . htmlspecialchars($place['phone_2']) . '</a></div>';
+            }
+            ?>
         </div>
         <div class="place_CONTACT--social">
             <?php
-                if (!empty($place['facebook_url'])) {
-                    echo '<a href="' . htmlspecialchars($place['facebook_url']) . '" target="_blank"><i class="fa-brands fa-square-facebook"></i></a>';
-                }
-                if (!empty($place['instagram_url'])) {
-                    echo '<a href="' . htmlspecialchars($place['instagram_url']) . '" target="_blank"><i class="fa-brands fa-instagram"></i></a>';
-                }
-                if (!empty($place['twitter_url'])) {
-                    echo '<a href="' . htmlspecialchars($place['twitter_url']) . '" target="_blank"><i class="fa-brands fa-square-x-twitter"></i></a>';
-                }
-                ?>
+            if (!empty($place['facebook_url'])) {
+                echo '<a href="' . htmlspecialchars($place['facebook_url']) . '" target="_blank"><i class="fa-brands fa-square-facebook"></i></a>';
+            }
+            if (!empty($place['instagram_url'])) {
+                echo '<a href="' . htmlspecialchars($place['instagram_url']) . '" target="_blank"><i class="fa-brands fa-instagram"></i></a>';
+            }
+            if (!empty($place['twitter_url'])) {
+                echo '<a href="' . htmlspecialchars($place['twitter_url']) . '" target="_blank"><i class="fa-brands fa-square-x-twitter"></i></a>';
+            }
+            ?>
         </div>
     </div>
     <?php endif; ?>
@@ -210,7 +209,6 @@ if (empty($_SESSION['csrf_token'])) {
     $menu_query->execute();
     $menu_result = $menu_query->get_result();
     if ($menu_result->num_rows > 0):
-        // Determine section title based on category
         $section_title = 'MENU';
         $category_raw = strtolower($category_row['name'] ?? '');
         $section_titles = [
@@ -277,7 +275,6 @@ if (empty($_SESSION['csrf_token'])) {
                 <td class="place_time--table-hour">
                     <?php
                     if ($hours['open_time'] && $hours['close_time']) {
-                        // Convert to 12-hour format with AM/PM
                         $open_time = date("h:i A", strtotime($hours['open_time']));
                         $close_time = date("h:i A", strtotime($hours['close_time']));
                         echo htmlspecialchars("$open_time - $close_time");
@@ -323,7 +320,7 @@ if (empty($_SESSION['csrf_token'])) {
     <div class="reviews" id="reviews">
         <h2 class="place-title">REVIEWS</h2>
         <div class="reviews_overall">
-            <div class="reviews_overall--L">
+            <div class="reviews_overall--L" id="reviews-overall-l">
                 <h2>Overall rating</h2>
                 <?php
                 $rating_query = $conn->prepare("SELECT AVG(rating) AS avg_rating, COUNT(*) AS total_reviews FROM reviews WHERE place_id = ?");
@@ -336,16 +333,16 @@ if (empty($_SESSION['csrf_token'])) {
                 $percentage = ($avg_rating / 5) * 100;
                 $rating_query->close();
                 ?>
-                <div class="overall_stars"
+                <div class="overall_stars" id="overall-stars"
                     style="background: linear-gradient(90deg, #A21111 <?= $percentage ?>%, #D0D0D0 <?= $percentage ?>%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
                     <?php for ($i = 0; $i < 5; $i++): ?>
                     <i class="fa-solid fa-star star-rating"></i>
                     <?php endfor; ?>
                 </div>
-                <p><?= number_format($avg_rating, 1) ?> out of 5</p>
-                <p><?= $total_reviews ?> reviews</p>
+                <p id="overall-rating"><?= number_format($avg_rating, 1) ?> out of 5</p>
+                <p id="total-reviews"><?= $total_reviews ?> reviews</p>
             </div>
-            <div class="reviews_overall--R">
+            <div class="reviews_overall--R" id="reviews-overall-r">
                 <?php
                 $ratings_counts = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0];
                 $ratings_query = $conn->prepare("SELECT rating, COUNT(*) AS count FROM reviews WHERE place_id = ? GROUP BY rating");
@@ -359,7 +356,7 @@ if (empty($_SESSION['csrf_token'])) {
                 foreach (array_reverse(range(1, 5)) as $i):
                     $percent = $total_reviews > 0 ? ($ratings_counts[$i] / $total_reviews) * 100 : 0;
                 ?>
-                <div class="stars_p">
+                <div class="stars_p" id="stars-p-<?= $i ?>">
                     <p><?= $i ?> STARS</p>
                     <div class="stars_p--<?= $i ?>">
                         <div class="stars_p--color" style="width: <?= $percent ?>%;"></div>
@@ -383,7 +380,6 @@ if (empty($_SESSION['csrf_token'])) {
             if ($reviews_result->num_rows > 0):
                 while ($review = $reviews_result->fetch_assoc()):
                     $review_id = $review['id'];
-                    // Fetch images
                     $gallery_query = $conn->prepare("SELECT image_url FROM review_images WHERE review_id = ?");
                     $gallery_query->bind_param("i", $review_id);
                     $gallery_query->execute();
@@ -393,10 +389,8 @@ if (empty($_SESSION['csrf_token'])) {
                         $images[] = $image;
                     }
                     $gallery_query->close();
-                    // Set permissions
                     $can_edit = (isset($_SESSION['user_id']) && ($_SESSION['user_id'] == $review['user_id'] || $is_admin));
                     $is_liked = in_array($review_id, $is_liked_reviews);
-                    // Include review template
                     include 'review_template.php';
             ?>
                     <?php if ($can_edit): ?>
@@ -436,7 +430,6 @@ if (empty($_SESSION['csrf_token'])) {
                         <button type="submit" name="edit_review" class="btn__red--s btn__red btn">Save Changes</button>
                     </form>
                     <?php endif; ?>
-                    <!-- Keep existing comments and comment form sections -->
                     <?php
                     $comments_query = $conn->prepare("SELECT id, user_id, comment, created_at FROM review_comments WHERE review_id = ?");
                     $comments_query->bind_param("i", $review_id);
@@ -513,6 +506,7 @@ if (empty($_SESSION['csrf_token'])) {
 
 <?php include 'footer.php'; ?>
 
+<!-- Replace only the <script> section at the end of single-place.php -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // FAQ toggle
@@ -575,22 +569,48 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch('delete_review.php', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest'
             },
-            body: `review_id=${reviewId}&csrf_token=<?= urlencode($_SESSION['csrf_token']) ?>`
+            body: `review_id=${encodeURIComponent(reviewId)}&csrf_token=${encodeURIComponent('<?= htmlspecialchars($_SESSION['csrf_token']) ?>')}`
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 const reviewElem = document.querySelector(`#review_${reviewId}`);
                 if (reviewElem) reviewElem.remove();
+                // Fetch updated ratings
+                fetch(`get_ratings.php?place_id=<?= htmlspecialchars($place_id) ?>`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                    .then(res => {
+                        if (!res.ok) {
+                            throw new Error(`HTTP error! status: ${res.status}`);
+                        }
+                        return res.json();
+                    })
+                    .then(ratings => {
+                        if (ratings.success) {
+                            updateRatings(ratings.avg_rating, ratings.total_reviews, ratings.ratings_counts);
+                        } else {
+                            console.error('Failed to fetch ratings:', ratings.error);
+                        }
+                    })
+                    .catch(err => console.error('Error fetching ratings:', err));
             } else {
                 alert("Failed to delete review: " + (data.error || 'Unknown error'));
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert("An error occurred while deleting the review.");
+            alert('An error occurred while deleting the review: ' + error.message);
         });
     }
 
@@ -625,7 +645,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         };
         xhr.send(
-            `comment_id=${commentId}&comment_text=${encodeURIComponent(commentText)}&csrf_token=<?= urlencode($_SESSION['csrf_token']) ?>`
+            `comment_id=${encodeURIComponent(commentId)}&comment_text=${encodeURIComponent(commentText)}&csrf_token=${encodeURIComponent('<?= htmlspecialchars($_SESSION['csrf_token']) ?>')}`
         );
     }
 
@@ -633,8 +653,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!confirm("Are you sure you want to delete this comment?")) return;
         const xhr = new XMLHttpRequest();
         xhr.open("POST", "delete_owner_comment.php", true);
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhr.send(`comment_id=${commentId}&csrf_token=<?= urlencode($_SESSION['csrf_token']) ?>`);
+        xhr.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
+        xhr.send(`comment_id=${encodeURIComponent(commentId)}&csrf_token=${encodeURIComponent('<?= htmlspecialchars($_SESSION['csrf_token']) ?>')}`);
         xhr.onload = function() {
             try {
                 const response = JSON.parse(xhr.responseText);
@@ -649,6 +669,50 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error("Invalid JSON response", xhr.responseText);
             }
         };
+    }
+
+    // Update ratings function (for AJAX updates)
+    function updateRatings(avgRating, totalReviews, ratingsCounts) {
+        const safeAvgRating = typeof avgRating === 'number' ? avgRating : parseFloat(avgRating) || 0;
+        console.log('updateRatings:', safeAvgRating, totalReviews, ratingsCounts); // Debug
+
+        // Update extra_stars_container
+        const extraStarsContainer = document.getElementById('extra-stars-container');
+        if (extraStarsContainer) {
+            const extraStars = extraStarsContainer.querySelector('.extra_stars');
+            const extraRating = extraStarsContainer.querySelector('.extra_rating');
+            const percentage = (safeAvgRating / 5) * 100;
+            extraStars.style.background = `linear-gradient(90deg, #A21111 ${percentage}%, #D0D0D0 ${percentage}%)`;
+            extraStars.style.webkitBackgroundClip = 'text';
+            extraStars.style.webkitTextFillColor = 'transparent';
+            if (extraRating) extraRating.textContent = safeAvgRating.toFixed(1);
+        }
+
+        // Update reviews_overall--L
+        const overallStarsContainer = document.getElementById('reviews-overall-l');
+        if (overallStarsContainer) {
+            const overallStars = overallStarsContainer.querySelector('#overall-stars');
+            const overallRating = overallStarsContainer.querySelector('#overall-rating');
+            const totalReviewsEl = overallStarsContainer.querySelector('#total-reviews');
+            const percentage = (safeAvgRating / 5) * 100;
+            overallStars.style.background = `linear-gradient(90deg, #A21111 ${percentage}%, #D0D0D0 ${percentage}%)`;
+            overallStars.style.webkitBackgroundClip = 'text';
+            overallStars.style.webkitTextFillColor = 'transparent';
+            if (overallRating) overallRating.textContent = `${safeAvgRating.toFixed(1)} out of 5`;
+            if (totalReviewsEl) totalReviewsEl.textContent = `${totalReviews} reviews`;
+        }
+
+        // Update reviews_overall--R
+        const overallR = document.getElementById('reviews-overall-r');
+        if (overallR) {
+            for (let i = 5; i >= 1; i--) {
+                const starsP = document.getElementById(`stars-p-${i}`);
+                if (starsP) {
+                    const percent = totalReviews > 0 ? ((ratingsCounts[i] || 0) / totalReviews) * 100 : 0;
+                    starsP.querySelector('.stars_p--color').style.width = `${percent}%`;
+                }
+            }
+        }
     }
 });
 </script>

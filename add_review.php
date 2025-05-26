@@ -60,6 +60,27 @@ if ($insert_query->execute()) {
     $images_result = $images_query->get_result();
     $images = $images_result->fetch_all(MYSQLI_ASSOC);
     
+    // Fetch updated rating data
+    $rating_query = $conn->prepare("SELECT AVG(rating) AS avg_rating, COUNT(*) AS total_reviews FROM reviews WHERE place_id = ?");
+    $rating_query->bind_param("i", $place_id);
+    $rating_query->execute();
+    $rating_result = $rating_query->get_result();
+    $rating_data = $rating_result->fetch_assoc();
+    $avg_rating = (float)($rating_data['avg_rating'] ?? 0); // Ensure number
+    $total_reviews = (int)($rating_data['total_reviews'] ?? 0);
+    $rating_query->close();
+    error_log("add_review.php: place_id=$place_id, avg_rating=$avg_rating, total_reviews=$total_reviews"); // Debug
+
+    $ratings_counts = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0];
+    $ratings_query = $conn->prepare("SELECT rating, COUNT(*) AS count FROM reviews WHERE place_id = ? GROUP BY rating");
+    $ratings_query->bind_param("i", $place_id);
+    $ratings_query->execute();
+    $ratings_result = $ratings_query->get_result();
+    while ($row = $ratings_result->fetch_assoc()) {
+        $ratings_counts[(int)$row['rating']] = (int)$row['count'];
+    }
+    $ratings_query->close();
+    
     // Determine permissions
     $can_edit = true;
     $is_liked = false;
@@ -106,10 +127,16 @@ if ($insert_query->execute()) {
         <?php
         $edit_form_html = ob_get_clean();
         
-        // Combine review and edit form HTML
         $combined_html = $review_html . $edit_form_html;
         
-        echo json_encode(['success' => true, 'html' => $combined_html, 'review_id' => $new_review_id]);
+        echo json_encode([
+            'success' => true,
+            'html' => $combined_html,
+            'review_id' => $new_review_id,
+            'avg_rating' => $avg_rating,
+            'total_reviews' => $total_reviews,
+            'ratings_counts' => $ratings_counts
+        ]);
         exit;
     } else {
         header("Location: single-place.php?place_id=$place_id#review_$new_review_id");

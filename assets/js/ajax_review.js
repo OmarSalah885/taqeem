@@ -36,10 +36,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                     document.getElementById('imagePreview').innerHTML = '';
                     newFiles = [];
-                    // Rebind star rating and edit form events for new edit form
+                    // Rebind star rating and edit form events
                     bindStarRating(`#editForm-${data.review_id} .addReview_stars`);
                     const newEditForm = document.getElementById(`editForm-${data.review_id}`);
                     if (newEditForm) bindEditForm(newEditForm);
+                    // Update ratings
+                    console.log('Updating ratings with:', data.avg_rating, data.total_reviews, data.ratings_counts); // Debug
+                    updateRatings(data.avg_rating, data.total_reviews, data.ratings_counts);
                 } else {
                     alert('Failed to add review: ' + data.error);
                 }
@@ -100,6 +103,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const fileInput = document.getElementById(`imageInput-${reviewId}`);
         let newFiles = [];
 
+        console.log('Binding edit form for review:', reviewId, 'File input:', fileInput, 'Preview:', preview); // Debug
+
         // Remove existing images
         preview.addEventListener('click', e => {
             if (!e.target.matches('.remove-image.existing')) return;
@@ -151,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
         form.addEventListener('submit', function(e) {
             e.preventDefault();
             const formData = new FormData(this);
-            console.log([...formData.entries()]); // Debug form data
+            console.log([...formData.entries()]); // Debug
             fetch('edit_review.php', {
                 method: 'POST',
                 body: formData,
@@ -177,12 +182,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     const reviewElem = document.querySelector('#review_' + reviewId);
                     if (reviewElem) {
                         reviewElem.outerHTML = data.html;
-                        // Rebind edit form events for the updated review
                         const newForm = document.getElementById(`editForm-${reviewId}`);
                         if (newForm) bindEditForm(newForm);
                         bindStarRating(`#editForm-${reviewId} .addReview_stars`);
                     }
                     form.style.display = 'none';
+                    console.log('Editing ratings with:', data.avg_rating, data.total_reviews, data.ratings_counts); // Debug
+                    updateRatings(data.avg_rating, data.total_reviews, data.ratings_counts);
                 } else {
                     alert('Failed to edit review: ' + data.error);
                 }
@@ -216,5 +222,49 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             });
         });
+    }
+
+    // Function to update ratings sections
+    function updateRatings(avgRating, totalReviews, ratingsCounts) {
+        const safeAvgRating = typeof avgRating === 'number' ? avgRating : parseFloat(avgRating) || 0;
+        console.log('updateRatings: safeAvgRating=', safeAvgRating, 'totalReviews=', totalReviews, 'ratingsCounts=', ratingsCounts); // Debug
+
+        // Update extra_stars_container
+        const extraStarsContainer = document.getElementById('extra-stars-container');
+        if (extraStarsContainer) {
+            const extraStars = extraStarsContainer.querySelector('.extra_stars');
+            const extraRating = extraStarsContainer.querySelector('.extra_rating');
+            const percentage = (safeAvgRating / 5) * 100;
+            extraStars.style.background = `linear-gradient(90deg, #A21111 ${percentage}%, #D0D0D0 ${percentage}%)`;
+            extraStars.style.webkitBackgroundClip = 'text';
+            extraStars.style.webkitTextFillColor = 'transparent';
+            if (extraRating) extraRating.textContent = safeAvgRating.toFixed(1);
+        }
+
+        // Update reviews_overall--L
+        const overallStarsContainer = document.getElementById('reviews-overall-l');
+        if (overallStarsContainer) {
+            const overallStars = overallStarsContainer.querySelector('#overall-stars');
+            const overallRating = overallStarsContainer.querySelector('#overall-rating');
+            const totalReviewsEl = overallStarsContainer.querySelector('#total-reviews');
+            const percentage = (safeAvgRating / 5) * 100;
+            overallStars.style.background = `linear-gradient(90deg, #A21111 ${percentage}%, #D0D0D0 ${percentage}%)`;
+            overallStars.style.webkitBackgroundClip = 'text';
+            overallStars.style.webkitTextFillColor = 'transparent';
+            if (overallRating) overallRating.textContent = `${safeAvgRating.toFixed(1)} out of 5`;
+            if (totalReviewsEl) totalReviewsEl.textContent = `${totalReviews} reviews`;
+        }
+
+        // Update reviews_overall--R
+        const overallR = document.getElementById('reviews-overall-r');
+        if (overallR) {
+            for (let i = 5; i >= 1; i--) {
+                const starsP = document.getElementById(`stars-p-${i}`);
+                if (starsP) {
+                    const percent = totalReviews > 0 ? ((ratingsCounts[i] || 0) / totalReviews) * 100 : 0;
+                    starsP.querySelector('.stars_p--color').style.width = `${percent}%`;
+                }
+            }
+        }
     }
 });

@@ -3,7 +3,6 @@ session_start();
 require_once 'config.php';
 require_once 'db_connect.php';
 
-// Ensure POST request and required fields
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['review_id']) || !is_numeric($_POST['review_id']) || !isset($_SESSION['user_id'])) {
     if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
         ob_clean();
@@ -15,7 +14,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['review_id']) || !is_
     exit;
 }
 
-// Validate CSRF token
 if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
     if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
         ob_clean();
@@ -31,7 +29,6 @@ $review_id = (int)$_POST['review_id'];
 $user_id = $_SESSION['user_id'];
 $is_admin = $_SESSION['is_admin'] ?? false;
 
-// Verify user permissions
 $review_query = $conn->prepare("SELECT user_id, place_id FROM reviews WHERE id = ?");
 $review_query->bind_param("i", $review_id);
 $review_query->execute();
@@ -62,7 +59,6 @@ if (!$is_admin && $review['user_id'] !== $user_id) {
     exit;
 }
 
-// Validate input
 $rating = isset($_POST['rating']) ? max(1, min(5, (int)$_POST['rating'])) : 0;
 $review_text = trim($_POST['review_text'] ?? '');
 
@@ -77,7 +73,6 @@ if ($rating < 1 || empty($review_text)) {
     exit;
 }
 
-// Update review
 $update_query = $conn->prepare("UPDATE reviews SET rating = ?, review_text = ?, updated_at = NOW() WHERE id = ?");
 $update_query->bind_param("isi", $rating, $review_text, $review_id);
 
@@ -150,6 +145,27 @@ if ($update_query->execute()) {
     $images_result = $images_query->get_result();
     $images = $images_result->fetch_all(MYSQLI_ASSOC);
 
+    // Fetch updated rating data
+    $rating_query = $conn->prepare("SELECT AVG(rating) AS avg_rating, COUNT(*) AS total_reviews FROM reviews WHERE place_id = ?");
+    $rating_query->bind_param("i", $place_id);
+    $rating_query->execute();
+    $rating_result = $rating_query->get_result();
+    $rating_data = $rating_result->fetch_assoc();
+    $avg_rating = (float)($rating_data['avg_rating'] ?? 0); // Ensure number
+    $total_reviews = (int)($rating_data['total_reviews'] ?? 0);
+    $rating_query->close();
+    error_log("edit_review.php: place_id=$place_id, avg_rating=$avg_rating, total_reviews=$total_reviews"); // Debug
+
+    $ratings_counts = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0];
+    $ratings_query = $conn->prepare("SELECT rating, COUNT(*) AS count FROM reviews WHERE place_id = ? GROUP BY rating");
+    $ratings_query->bind_param("i", $place_id);
+    $ratings_query->execute();
+    $ratings_result = $ratings_query->get_result();
+    while ($row = $ratings_result->fetch_assoc()) {
+        $ratings_counts[(int)$row['rating']] = (int)$row['count'];
+    }
+    $ratings_query->close();
+
     // Determine permissions
     $can_edit = true;
     $is_liked = false;
@@ -160,7 +176,6 @@ if ($update_query->execute()) {
     $owner_result = $owner_query->get_result();
     $is_owner = $owner_result->num_rows > 0 && $owner_result->fetch_assoc()['owner_id'] == $user_id;
 
-    // Generate AJAX response
     if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
         ob_clean();
         header('Content-Type: application/json');
@@ -168,7 +183,6 @@ if ($update_query->execute()) {
         include 'review_template.php';
         $review_html = ob_get_clean();
 
-        // Generate edit form HTML
         ob_start();
         ?>
         <form id="editForm-<?= $review_id ?>" method="POST" action="edit_review.php" enctype="multipart/form-data" style="display: none;" class="edit-review-form">
@@ -185,7 +199,7 @@ if ($update_query->execute()) {
             <input type="file" name="review_images[]" id="imageInput-<?= $review_id ?>" multiple accept="image/*" style="display: none;">
             <div class="image-preview" id="imagePreview-<?= $review_id ?>">
                 <?php foreach ($images as $image): ?>
-                <div class="image-thumb" data-img-id="<?= $image['id'] ?>">
+                <div class="image-thumb" data-img-id="<?= htmlspecialchars($image['id']) ?>">
                     <img src="<?= htmlspecialchars($image['image_url']) ?>" alt="Review Image">
                     <span class="remove-image existing">×</span>
                 </div>
@@ -197,9 +211,15 @@ if ($update_query->execute()) {
         <?php
         $edit_form_html = ob_get_clean();
 
-        // Combine HTML
         $combined_html = $review_html . $edit_form_html;
-        echo json_encode(['success' => true, 'html' => $combined_html, 'review_id' => $review_id]);
+        echo json_encode([
+            'success' => true,
+            'html' => $combined_html,
+            'review_id' => $review_id,
+            'avg_rating' => $avg_rating,
+            'total_reviews' => $total_reviews,
+            'ratings_counts' => $ratings_counts
+        ]);
         exit;
     } else {
         header("Location: single-place.php?place_id=$place_id#review_$review_id");
