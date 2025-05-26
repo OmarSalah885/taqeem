@@ -325,6 +325,17 @@ if (empty($_SESSION['csrf_token'])) {
         <div class="reviews_overall">
             <div class="reviews_overall--L">
                 <h2>Overall rating</h2>
+                <?php
+                $rating_query = $conn->prepare("SELECT AVG(rating) AS avg_rating, COUNT(*) AS total_reviews FROM reviews WHERE place_id = ?");
+                $rating_query->bind_param("i", $place_id);
+                $rating_query->execute();
+                $rating_result = $rating_query->get_result();
+                $rating_data = $rating_result->fetch_assoc();
+                $avg_rating = $rating_data['avg_rating'] ?? 0;
+                $total_reviews = $rating_data['total_reviews'] ?? 0;
+                $percentage = ($avg_rating / 5) * 100;
+                $rating_query->close();
+                ?>
                 <div class="overall_stars"
                     style="background: linear-gradient(90deg, #A21111 <?= $percentage ?>%, #D0D0D0 <?= $percentage ?>%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
                     <?php for ($i = 0; $i < 5; $i++): ?>
@@ -360,7 +371,7 @@ if (empty($_SESSION['csrf_token'])) {
         <div class="reviews_container">
             <?php
             $reviews_query = $conn->prepare("
-                SELECT r.id AS review_id, r.user_id, r.rating, r.review_text, r.created_at,
+                SELECT r.id, r.user_id, r.rating, r.review_text, r.created_at,
                        CONCAT(u.first_name, ' ', u.last_name) AS user_name, u.profile_image
                 FROM reviews r JOIN users u ON r.user_id = u.id
                 WHERE r.place_id = ?
@@ -371,106 +382,62 @@ if (empty($_SESSION['csrf_token'])) {
             $reviews_result = $reviews_query->get_result();
             if ($reviews_result->num_rows > 0):
                 while ($review = $reviews_result->fetch_assoc()):
-                    $review_id = $review['review_id'];
-                    $rating = (int)$review['rating'];
-                    $percentage = ($rating / 5) * 100;
-                    $created_at = date("M j, Y", strtotime($review['created_at']));
-                    $profile_image = $review['profile_image'] ?: 'assets/images/profiles/pro_null.png';
+                    $review_id = $review['id'];
+                    // Fetch images
+                    $gallery_query = $conn->prepare("SELECT image_url FROM review_images WHERE review_id = ?");
+                    $gallery_query->bind_param("i", $review_id);
+                    $gallery_query->execute();
+                    $gallery_result = $gallery_query->get_result();
+                    $images = [];
+                    while ($image = $gallery_result->fetch_assoc()) {
+                        $images[] = $image;
+                    }
+                    $gallery_query->close();
+                    // Set permissions
                     $can_edit = (isset($_SESSION['user_id']) && ($_SESSION['user_id'] == $review['user_id'] || $is_admin));
+                    $is_liked = in_array($review_id, $is_liked_reviews);
+                    // Include review template
+                    include 'review_template.php';
             ?>
-            <div class="review" id="review_<?= $review_id ?>">
-                <div class="review_profile">
-                    <a href="profile.php?user_id=<?= urlencode($review['user_id']) ?>" class="review_profile--img">
-                        <img src="<?= htmlspecialchars($profile_image) ?>" alt="User Profile">
-                    </a>
-                    <div class="review_profile--info">
-                        <a href="profile.php?user_id=<?= urlencode($review['user_id']) ?>"
-                            class="review_profile--info-name">
-                            <?= htmlspecialchars($review['user_name']) ?>
-                        </a>
-                        <div class="review_profile--info-stars">
-                            <div class="review_stars"
-                                style="background: linear-gradient(90deg, #A21111 <?= $percentage ?>%, #D0D0D0 <?= $percentage ?>%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-                                <?php for ($i = 0; $i < 5; $i++): ?>
-                                <i class="fa-solid fa-star star-rating"></i>
-                                <?php endfor; ?>
-                            </div>
-                            <p class="review-date"><?= $created_at ?></p>
-                        </div>
-                    </div>
-                </div>
-                <div class="review_text">
-                    <p><?= htmlspecialchars($review['review_text']) ?></p>
-                </div>
-                <div class="review_gallery">
-                    <?php
-                        $gallery_query = $conn->prepare("SELECT image_url FROM review_images WHERE review_id = ?");
-                        $gallery_query->bind_param("i", $review_id);
-                        $gallery_query->execute();
-                        $gallery_result = $gallery_query->get_result();
-                        while ($image = $gallery_result->fetch_assoc()):
-                        ?>
-                    <a href="<?= htmlspecialchars($image['image_url']) ?>" class="review_gallery-img" target="_blank">
-                        <img src="<?= htmlspecialchars($image['image_url']) ?>" alt="Review Image">
-                    </a>
-                    <?php endwhile; $gallery_query->close(); ?>
-                </div>
-                <div class="review_btns">
-                    <button class="btn__transparent--s btn__transparent btn"
-                        onclick="toggleLike(event, <?= $review_id ?>)">
-                        <i
-                            class="<?= in_array($review_id, $is_liked_reviews) ? 'fa-solid fa-heart' : 'fa-regular fa-heart' ?>"></i>
-                        Like
-                    </button>
                     <?php if ($can_edit): ?>
-                    <button type="button" class="btn__red--s btn__red btn"
-                        onclick="showEditForm(<?= $review_id ?>)">edit review</button>
-                    <button type="button" class="btn__red--s btn__red btn"
-                        onclick="deleteReview(<?= $review_id ?>)">delete review</button>
-                    <?php endif; ?>
-                    <?php if ($is_owner || $is_admin): ?>
-                    <button type="button" class="btn__transparent--s btn__transparent btn"
-                        onclick="showCommentForm(<?= $review_id ?>)">comment on review</button>
-                    <?php endif; ?>
-                </div>
-                <?php if ($can_edit): ?>
-                <form id="editForm-<?= $review_id ?>" method="POST" action="edit_review.php"
-                    enctype="multipart/form-data" style="display: none;" class="edit-review-form">
-                    <input type="hidden" name="review_id" value="<?= $review_id ?>">
-                    <input type="hidden" name="place_id" value="<?= $place_id ?>">
-                    <input type="hidden" name="rating" id="rating-<?= $review_id ?>" value="<?= $rating ?>">
-                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-                    <div class="addReview_stars" data-review-id="<?= $review_id ?>">
-                        <?php for ($i = 1; $i <= 5; $i++): ?>
-                        <i class="fa-solid fa-star <?= $i <= $rating ? 'selected' : '' ?>" data-value="<?= $i ?>"></i>
-                        <?php endfor; ?>
-                    </div>
-                    <a class="btn__transparent--s btn__transparent btn" href="#"
-                        onclick="document.getElementById('imageInput-<?= $review_id ?>').click(); return false;">add
-                        photos</a>
-                    <input type="file" name="review_images[]" id="imageInput-<?= $review_id ?>" multiple
-                        accept="image/*" style="display: none;">
-                    <div class="image-preview" id="imagePreview-<?= $review_id ?>">
-                        <?php
-                                $img_q = $conn->prepare("SELECT id, image_url FROM review_images WHERE review_id = ?");
-                                $img_q->bind_param("i", $review_id);
-                                $img_q->execute();
-                                $img_r = $img_q->get_result();
-                                while ($img = $img_r->fetch_assoc()):
-                                    $img_id = (int)$img['id'];
-                                    $img_url = htmlspecialchars($img['image_url']);
-                                ?>
-                        <div class="image-thumb" data-img-id="<?= $img_id ?>">
-                            <img src="<?= $img_url ?>" alt="">
-                            <span class="remove-image existing">×</span>
+                    <form id="editForm-<?= $review_id ?>" method="POST" action="edit_review.php"
+                        enctype="multipart/form-data" style="display: none;" class="edit-review-form">
+                        <input type="hidden" name="review_id" value="<?= $review_id ?>">
+                        <input type="hidden" name="place_id" value="<?= $place_id ?>">
+                        <input type="hidden" name="rating" id="rating-<?= $review_id ?>" value="<?= $review['rating'] ?>">
+                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                        <div class="addReview_stars" data-review-id="<?= $review_id ?>">
+                            <?php for ($i = 1; $i <= 5; $i++): ?>
+                            <i class="fa-solid fa-star <?= $i <= $review['rating'] ? 'selected' : '' ?>" data-value="<?= $i ?>"></i>
+                            <?php endfor; ?>
                         </div>
-                        <?php endwhile; $img_q->close(); ?>
-                    </div>
-                    <textarea name="review_text" required><?= htmlspecialchars($review['review_text']) ?></textarea>
-                    <button type="submit" name="edit_review" class="btn__red--s btn__red btn">Save Changes</button>
-                </form>
-                <?php endif; ?>
-                <?php
+                        <a class="btn__transparent--s btn__transparent btn" href="#"
+                            onclick="document.getElementById('imageInput-<?= $review_id ?>').click(); return false;">add
+                            photos</a>
+                        <input type="file" name="review_images[]" id="imageInput-<?= $review_id ?>" multiple
+                            accept="image/*" style="display: none;">
+                        <div class="image-preview" id="imagePreview-<?= $review_id ?>">
+                            <?php
+                            $img_q = $conn->prepare("SELECT id, image_url FROM review_images WHERE review_id = ?");
+                            $img_q->bind_param("i", $review_id);
+                            $img_q->execute();
+                            $img_r = $img_q->get_result();
+                            while ($img = $img_r->fetch_assoc()):
+                                $img_id = (int)$img['id'];
+                                $img_url = htmlspecialchars($img['image_url']);
+                            ?>
+                            <div class="image-thumb" data-img-id="<?= $img_id ?>">
+                                <img src="<?= $img_url ?>" alt="">
+                                <span class="remove-image existing">×</span>
+                            </div>
+                            <?php endwhile; $img_q->close(); ?>
+                        </div>
+                        <textarea name="review_text" required><?= htmlspecialchars($review['review_text']) ?></textarea>
+                        <button type="submit" name="edit_review" class="btn__red--s btn__red btn">Save Changes</button>
+                    </form>
+                    <?php endif; ?>
+                    <!-- Keep existing comments and comment form sections -->
+                    <?php
                     $comments_query = $conn->prepare("SELECT id, user_id, comment, created_at FROM review_comments WHERE review_id = ?");
                     $comments_query->bind_param("i", $review_id);
                     $comments_query->execute();
@@ -500,16 +467,15 @@ if (empty($_SESSION['csrf_token'])) {
                     endif;
                     $comments_query->close();
                     ?>
-                <?php if ($is_owner || $is_admin): ?>
-                <form id="commentForm-<?= $review_id ?>" method="POST" action="submit_owner_comment.php"
-                    style="display: none;" class="place--owner-comment-form">
-                    <input type="hidden" name="review_id" value="<?= $review_id ?>">
-                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-                    <textarea name="comment" placeholder="add comment on review" required></textarea>
-                    <button type="submit" class="btn__transparent--s btn__transparent btn">submit comment</button>
-                </form>
-                <?php endif; ?>
-            </div>
+                    <?php if ($is_owner || $is_admin): ?>
+                    <form id="commentForm-<?= $review_id ?>" method="POST" action="submit_owner_comment.php"
+                        style="display: none;" class="place--owner-comment-form">
+                        <input type="hidden" name="review_id" value="<?= $review_id ?>">
+                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                        <textarea name="comment" placeholder="add comment on review" required></textarea>
+                        <button type="submit" class="btn__transparent--s btn__transparent btn">submit comment</button>
+                    </form>
+                    <?php endif; ?>
             <?php endwhile; ?>
             <?php else: ?>
             <p>No reviews available.</p>
@@ -520,7 +486,7 @@ if (empty($_SESSION['csrf_token'])) {
     <div class="addReview">
         <h2 class="place-title">WRITE A REVIEW</h2>
         <?php if (isset($_SESSION['user_id'])): ?>
-        <form method="POST" action="add_review.php" id="reviewForm" enctype="multipart/form-data">
+        <form method="POST" id="reviewForm" enctype="multipart/form-data">
             <div class="addReview_container">
                 <div class="addReview_stars">
                     <input type="hidden" name="rating" id="rating" value="0">
@@ -548,38 +514,6 @@ if (empty($_SESSION['csrf_token'])) {
 <?php include 'footer.php'; ?>
 
 <script>
-function showEditForm(reviewId) {
-    const form = document.getElementById(`editForm-${reviewId}`);
-    if (!form) {
-        console.warn(`Edit form for review ${reviewId} not found`);
-        return;
-    }
-    console.log(`Showing edit form for review ${reviewId}`);
-    form.style.display = 'block';
-    const rating = form.querySelector('input[name="rating"]').value;
-    form.querySelectorAll('.addReview_stars i').forEach(s => {
-        s.style.color = s.getAttribute('data-value') <= rating ? '#A21111' : '#D0D0D0';
-    });
-}
-
-function canEditReview(reviewId, currentUserId, reviewOwners, isAdmin) {
-    console.log('Checking edit permission:', {
-        reviewId,
-        currentUserId,
-        reviewOwner: reviewOwners[reviewId],
-        isAdmin
-    });
-    if (!currentUserId) {
-        console.log('No user logged in');
-        return false;
-    }
-    if (!reviewOwners[reviewId]) {
-        console.log('Review ID not found in reviewOwners');
-        return false;
-    }
-    return currentUserId === reviewOwners[reviewId] || isAdmin;
-}
-
 document.addEventListener('DOMContentLoaded', function() {
     // FAQ toggle
     document.querySelectorAll('.faq-question').forEach(btn => {
@@ -589,18 +523,25 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Star rating
-    document.querySelectorAll('.addReview_stars i').forEach(star => {
-        star.addEventListener('click', function() {
-            const rating = this.getAttribute('data-value');
-            const form = this.closest('form');
-            const ratingInput = form.querySelector('input[name="rating"]');
-            ratingInput.value = rating;
-            form.querySelectorAll('.addReview_stars i').forEach(s => {
-                s.style.color = s.getAttribute('data-value') <= rating ? '#A21111' :
-                    '#D0D0D0';
-            });
-        });
+    // Event delegation for review buttons
+    document.querySelector('.reviews_container').addEventListener('click', function(e) {
+        if (e.target.matches('.btn__red--s.btn__red.btn.edit-review')) {
+            const reviewId = e.target.getAttribute('data-review-id');
+            const form = document.getElementById(`editForm-${reviewId}`);
+            if (form) {
+                form.style.display = 'block';
+                const rating = form.querySelector('input[name="rating"]').value;
+                form.querySelectorAll('.addReview_stars i').forEach(s => {
+                    s.style.color = s.getAttribute('data-value') <= rating ? '#A21111' : '#D0D0D0';
+                });
+            }
+        } else if (e.target.matches('.btn__red--s.btn__red.btn.delete-review')) {
+            const reviewId = e.target.getAttribute('data-review-id');
+            deleteReview(reviewId);
+        } else if (e.target.matches('.btn__transparent--s.btn__transparent.btn.comment-review')) {
+            const reviewId = e.target.getAttribute('data-review-id');
+            showCommentForm(reviewId);
+        }
     });
 
     // Review navigation
@@ -611,76 +552,27 @@ document.addEventListener('DOMContentLoaded', function() {
     const rid = params.get('review_id');
     const action = params.get('action');
 
-    if (rid) {
-        console.log(`Processing review_id: ${rid}`);
-        const el = document.getElementById(`review_${rid}`);
-        if (el) {
-            console.log(`Scrolling to review_${rid}`);
-            el.scrollIntoView({
-                behavior: 'smooth'
-            });
-        } else {
-            console.warn(`Review element review_${rid} not found`);
-        }
+    if (rid && document.getElementById(`review_${rid}`)) {
+        document.getElementById(`review_${rid}`).scrollIntoView({ behavior: 'smooth' });
         if (action === 'edit' && canEditReview(rid, currentUserId, reviewOwners, isAdmin)) {
-            console.log(`User can edit review ${rid}, calling showEditForm`);
-            showEditForm(rid);
-        } else {
-            console.log(
-                `Edit form not shown for review ${rid}: action=${action}, canEdit=${canEditReview(rid, currentUserId, reviewOwners, isAdmin)}`
-            );
+            const form = document.getElementById(`editForm-${rid}`);
+            if (form) {
+                form.style.display = 'block';
+                const rating = form.querySelector('input[name="rating"]').value;
+                form.querySelectorAll('.addReview_stars i').forEach(s => {
+                    s.style.color = s.getAttribute('data-value') <= rating ? '#A21111' : '#D0D0D0';
+                });
+            }
         }
-    } else {
-        console.log('No review_id in URL');
     }
-});
 
-const imageInput = document.getElementById('imageInput');
-const imagePreview = document.getElementById('imagePreview');
-let selectedImages = [];
-
-imageInput.addEventListener('change', function(e) {
-    const files = Array.from(e.target.files);
-    const totalImages = selectedImages.length + files.length;
-    if (totalImages > 4) {
-        alert("You can upload a maximum of 4 images.");
-        return;
+    function canEditReview(reviewId, currentUserId, reviewOwners, isAdmin) {
+        return currentUserId && reviewOwners[reviewId] && (currentUserId === reviewOwners[reviewId] || isAdmin);
     }
-    files.forEach(file => {
-        if (selectedImages.length >= 4) return;
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            const previewContainer = document.createElement('div');
-            previewContainer.classList.add('image-thumb');
-            const img = document.createElement('img');
-            img.src = event.target.result;
-            const removeBtn = document.createElement('span');
-            removeBtn.classList.add('remove-image');
-            removeBtn.innerHTML = '×';
-            removeBtn.onclick = function() {
-                imagePreview.removeChild(previewContainer);
-                selectedImages = selectedImages.filter(i => i !== file);
-                updateFileList();
-            };
-            previewContainer.appendChild(img);
-            previewContainer.appendChild(removeBtn);
-            imagePreview.appendChild(previewContainer);
-        };
-        reader.readAsDataURL(file);
-        selectedImages.push(file);
-    });
-    updateFileList();
-});
 
-function updateFileList() {
-    const dataTransfer = new DataTransfer();
-    selectedImages.forEach(file => dataTransfer.items.add(file));
-    imageInput.files = dataTransfer.files;
-}
-
-function deleteReview(reviewId) {
-    if (!confirm("Are you sure you want to delete your review?")) return;
-    fetch('delete_review.php', {
+    function deleteReview(reviewId) {
+        if (!confirm("Are you sure you want to delete your review?")) return;
+        fetch('delete_review.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -700,121 +592,63 @@ function deleteReview(reviewId) {
             console.error('Error:', error);
             alert("An error occurred while deleting the review.");
         });
-}
+    }
 
-function showCommentForm(reviewId) {
-    const form = document.getElementById(`commentForm-${reviewId}`);
-    if (form) form.style.display = 'flex';
-}
+    function showCommentForm(reviewId) {
+        const form = document.getElementById(`commentForm-${reviewId}`);
+        if (form) form.style.display = 'flex';
+    }
 
-function editComment(commentId) {
-    const commentText = document.getElementById(`comment-${commentId}`);
-    const editButton = document.querySelector(`button[onclick="editComment(${commentId})"]`);
-    const saveButton = document.querySelector(`button[onclick="saveComment(${commentId})"]`);
-    commentText.contentEditable = 'true';
-    commentText.style.backgroundColor = '#f0f0f0';
-    editButton.style.display = 'none';
-    saveButton.style.display = 'inline';
-}
+    function editComment(commentId) {
+        const commentText = document.getElementById(`comment-${commentId}`);
+        const editButton = document.querySelector(`button[onclick="editComment(${commentId})"]`);
+        const saveButton = document.querySelector(`button[onclick="saveComment(${commentId})"]`);
+        commentText.contentEditable = 'true';
+        commentText.style.backgroundColor = '#f0f0f0';
+        editButton.style.display = 'none';
+        saveButton.style.display = 'inline';
+    }
 
-function saveComment(commentId) {
-    const commentText = document.getElementById(`comment-${commentId}`).innerText;
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'save_comment.php', true);
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            document.getElementById(`comment-${commentId}`).contentEditable = 'false';
-            document.getElementById(`comment-${commentId}`).style.backgroundColor = 'transparent';
-            document.querySelector(`button[onclick="saveComment(${commentId})"]`).style.display = 'none';
-            document.querySelector(`button[onclick="editComment(${commentId})"]`).style.display = 'inline';
-        } else {
-            alert('Error saving the comment.');
-        }
-    };
-    xhr.send(
-        `comment_id=${commentId}&comment_text=${encodeURIComponent(commentText)}&csrf_token=<?= urlencode($_SESSION['csrf_token']) ?>`
-    );
-}
-
-function deleteComment(commentId) {
-    if (!confirm("Are you sure you want to delete this comment?")) return;
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", "delete_owner_comment.php", true);
-    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-    xhr.send(`comment_id=${commentId}&csrf_token=<?= urlencode($_SESSION['csrf_token']) ?>`);
-    xhr.onload = function() {
-        try {
-            const response = JSON.parse(xhr.responseText);
-            if (response.status === 'success') {
-                const commentDiv = document.getElementById(`comment-${commentId}`);
-                const reviewPlaceCommentDiv = commentDiv.closest('.review_placeComment');
-                reviewPlaceCommentDiv.style.display = 'none';
+    function saveComment(commentId) {
+        const commentText = document.getElementById(`comment-${commentId}`).innerText;
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', 'save_comment.php', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                document.getElementById(`comment-${commentId}`).contentEditable = 'false';
+                document.getElementById(`comment-${commentId}`).style.backgroundColor = 'transparent';
+                document.querySelector(`button[onclick="saveComment(${commentId})"]`).style.display = 'none';
+                document.querySelector(`button[onclick="editComment(${commentId})"]`).style.display = 'inline';
             } else {
-                alert(response.message);
+                alert('Error saving the comment.');
             }
-        } catch (e) {
-            console.error("Invalid JSON response", xhr.responseText);
-        }
-    };
-}
+        };
+        xhr.send(
+            `comment_id=${commentId}&comment_text=${encodeURIComponent(commentText)}&csrf_token=<?= urlencode($_SESSION['csrf_token']) ?>`
+        );
+    }
 
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.edit-review-form').forEach(form => {
-        const reviewId = form.querySelector('input[name="review_id"]').value;
-        const preview = document.getElementById(`imagePreview-${reviewId}`);
-        const fileInput = document.getElementById(`imageInput-${reviewId}`);
-        let newFiles = [];
-        preview.addEventListener('click', e => {
-            if (!e.target.matches('.remove-image.existing')) return;
-            const thumb = e.target.closest('.image-thumb');
-            const imgId = thumb.getAttribute('data-img-id');
-            thumb.remove();
-            const delInp = document.createElement('input');
-            delInp.type = 'hidden';
-            delInp.name = 'delete_images[]';
-            delInp.value = imgId;
-            form.appendChild(delInp);
-        });
-        fileInput.addEventListener('change', () => {
-            const existingCount = preview.querySelectorAll('.image-thumb').length;
-            const files = Array.from(fileInput.files);
-            if (existingCount + newFiles.length + files.length > 4) {
-                alert("Max 4 images total");
-                fileInput.value = '';
-                return;
+    function deleteComment(commentId) {
+        if (!confirm("Are you sure you want to delete this comment?")) return;
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "delete_owner_comment.php", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.send(`comment_id=${commentId}&csrf_token=<?= urlencode($_SESSION['csrf_token']) ?>`);
+        xhr.onload = function() {
+            try {
+                const response = JSON.parse(xhr.responseText);
+                if (response.status === 'success') {
+                    const commentDiv = document.getElementById(`comment-${commentId}`);
+                    const reviewPlaceCommentDiv = commentDiv.closest('.review_placeComment');
+                    reviewPlaceCommentDiv.style.display = 'none';
+                } else {
+                    alert(response.message);
+                }
+            } catch (e) {
+                console.error("Invalid JSON response", xhr.responseText);
             }
-            files.forEach(file => {
-                if (newFiles.length >= 4 - existingCount) return;
-                const reader = new FileReader();
-                reader.onload = ev => {
-                    const thumb = document.createElement('div');
-                    thumb.className = 'image-thumb';
-                    thumb.innerHTML =
-                        `<img src="${ev.target.result}"><span class="remove-image new">×</span>`;
-                    thumb.querySelector('.remove-image.new').onclick = () => {
-                        thumb.remove();
-                        newFiles = newFiles.filter(f => f !== file);
-                        syncFiles();
-                    };
-                    preview.appendChild(thumb);
-                };
-                reader.readAsDataURL(file);
-                newFiles.push(file);
-            });
-            syncFiles();
-        });
-
-        function syncFiles() {
-            const dt = new DataTransfer();
-            newFiles.forEach(f => dt.items.add(f));
-            fileInput.files = dt.files;
-        }
-    });
-    document.querySelectorAll('form[id^="commentForm-"]').forEach(form => {
-        form.addEventListener('submit', () => {
-            form.style.display = 'none';
-        });
-    });
+        };
+    }
 });
 </script>

@@ -1,98 +1,158 @@
 <?php
+session_start();
 require_once 'config.php';
 require_once 'db_connect.php';
-session_start();
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!isset($_POST['place_id']) || !is_numeric($_POST['place_id'])) {
-        header("Location: single-place.php?error=invalid_place_id");
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header("Location: single-place.php?error=invalid_request");
+    exit;
+}
+
+if (!isset($_POST['place_id']) || !is_numeric($_POST['place_id'])) {
+    header("Location: single-place.php?error=invalid_place_id");
+    exit;
+}
+
+$place_id = (int)$_POST['place_id'];
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: single-place.php?place_id=$place_id&error=not_logged_in");
+    exit;
+}
+
+$user_id = $_SESSION['user_id'];
+$rating = isset($_POST['rating']) ? (int)$_POST['rating'] : 0;
+$review_text = trim($_POST['review_text'] ?? '');
+
+if ($rating < 1 || $rating > 5) {
+    header("Location: single-place.php?place_id=$place_id&error=invalid_rating");
+    exit;
+}
+
+if (empty($review_text)) {
+    header("Location: single-place.php?place_id=$place_id&error=empty_review");
+    exit;
+}
+
+$insert_query = $conn->prepare("INSERT INTO reviews (place_id, user_id, rating, review_text, created_at) VALUES (?, ?, ?, ?, NOW())");
+$insert_query->bind_param("iiis", $place_id, $user_id, $rating, $review_text);
+
+if ($insert_query->execute()) {
+    $new_review_id = $conn->insert_id;
+    handleImageUploads($new_review_id, $place_id, $conn);
+    
+    // Fetch review data
+    $review_query = $conn->prepare("
+        SELECT r.id, r.user_id, r.rating, r.review_text, r.created_at, 
+               CONCAT(u.first_name, ' ', u.last_name) AS user_name, u.profile_image
+        FROM reviews r JOIN users u ON r.user_id = u.id 
+        WHERE r.id = ?
+    ");
+    $review_query->bind_param("i", $new_review_id);
+    $review_query->execute();
+    $review_result = $review_query->get_result();
+    $review = $review_result->fetch_assoc();
+    
+    // Fetch images
+    $images_query = $conn->prepare("SELECT id, image_url FROM review_images WHERE review_id = ?");
+    $images_query->bind_param("i", $new_review_id);
+    $images_query->execute();
+    $images_result = $images_query->get_result();
+    $images = $images_result->fetch_all(MYSQLI_ASSOC);
+    
+    // Determine permissions
+    $can_edit = true;
+    $is_liked = false;
+    $is_admin = $_SESSION['is_admin'] ?? false;
+    $owner_query = $conn->prepare("SELECT user_id AS owner_id FROM places WHERE id = ?");
+    $owner_query->bind_param("i", $place_id);
+    $owner_query->execute();
+    $owner_result = $owner_query->get_result();
+    $is_owner = $owner_result->num_rows > 0 && $owner_result->fetch_assoc()['owner_id'] == $user_id;
+    
+    if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+        ob_clean();
+        header('Content-Type: application/json');
+        ob_start();
+        include 'review_template.php';
+        $review_html = ob_get_clean();
+        
+        // Generate edit form HTML
+        ob_start();
+        ?>
+        <form id="editForm-<?= $new_review_id ?>" method="POST" action="edit_review.php" enctype="multipart/form-data" style="display: none;" class="edit-review-form">
+            <input type="hidden" name="review_id" value="<?= $new_review_id ?>">
+            <input type="hidden" name="place_id" value="<?= $place_id ?>">
+            <input type="hidden" name="rating" id="rating-<?= $new_review_id ?>" value="<?= $review['rating'] ?>">
+            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+            <div class="addReview_stars" data-review-id="<?= $new_review_id ?>">
+                <?php for ($i = 1; $i <= 5; $i++): ?>
+                <i class="fa-solid fa-star <?= $i <= $review['rating'] ? 'selected' : '' ?>" data-value="<?= $i ?>"></i>
+                <?php endfor; ?>
+            </div>
+            <a class="btn__transparent--s btn__transparent btn" href="#" onclick="document.getElementById('imageInput-<?= $new_review_id ?>').click(); return false;">add photos</a>
+            <input type="file" name="review_images[]" id="imageInput-<?= $new_review_id ?>" multiple accept="image/*" style="display: none;">
+            <div class="image-preview" id="imagePreview-<?= $new_review_id ?>">
+                <?php foreach ($images as $image): ?>
+                <div class="image-thumb" data-img-id="<?= htmlspecialchars($image['id']) ?>">
+                    <img src="<?= htmlspecialchars($image['image_url']) ?>" alt="Review Image">
+                    <span class="remove-image existing">×</span>
+                </div>
+                <?php endforeach; ?>
+            </div>
+            <textarea name="review_text" required><?= htmlspecialchars($review['review_text']) ?></textarea>
+            <button type="submit" class="btn__red--s btn__red btn">Save Changes</button>
+        </form>
+        <?php
+        $edit_form_html = ob_get_clean();
+        
+        // Combine review and edit form HTML
+        $combined_html = $review_html . $edit_form_html;
+        
+        echo json_encode(['success' => true, 'html' => $combined_html, 'review_id' => $new_review_id]);
+        exit;
+    } else {
+        header("Location: single-place.php?place_id=$place_id#review_$new_review_id");
         exit;
     }
-
-    $place_id = (int)$_POST['place_id'];
-
-    if (isset($_SESSION['user_id'])) {
-        $user_id = $_SESSION['user_id'];
-        $rating = (int)$_POST['rating'];
-        $review_text = trim($_POST['review_text']);
-        $review_id = isset($_POST['review_id']) && is_numeric($_POST['review_id']) ? (int)$_POST['review_id'] : null;
-
-        // Validate input
-        if ($rating < 1 || $rating > 5) {
-            header("Location: single-place.php?error=invalid_rating&place_id=$place_id");
-            exit;
-        } elseif (empty($review_text)) {
-            header("Location: single-place.php?error=empty_review&place_id=$place_id");
-            exit;
-        }
-
-        if ($review_id) {
-            // Update the existing review
-            $update_query = $conn->prepare("
-                UPDATE reviews
-                SET rating = ?, review_text = ?, updated_at = NOW()
-                WHERE id = ? AND user_id = ?
-            ");
-            $update_query->bind_param("isii", $rating, $review_text, $review_id, $user_id);
-
-            if ($update_query->execute()) {
-                handleImageUploads($review_id, $conn);
-                header("Location: single-place.php?place_id=$place_id#review_$new_review_id");
-                exit;
-            } else {
-                header("Location: single-place.php?error=update_failed&place_id=$place_id");
-                exit;
-            }
-        } else {
-            // Insert new review
-            $insert_query = $conn->prepare("
-                INSERT INTO reviews (place_id, user_id, rating, review_text, created_at)
-                VALUES (?, ?, ?, ?, NOW())
-            ");
-            $insert_query->bind_param("iiis", $place_id, $user_id, $rating, $review_text);
-
-            if ($insert_query->execute()) {
-                $new_review_id = $conn->insert_id;
-                handleImageUploads($new_review_id, $conn);
-                header("Location: single-place.php?place_id=$place_id#review_$new_review_id");
-                exit;
-            } else {
-                header("Location: single-place.php?error=insert_failed&place_id=$place_id");
-                exit;
-            }
-        }
+} else {
+    if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+        ob_clean();
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'error' => 'Failed to add review']);
+        exit;
     } else {
-        header("Location: single-place.php?error=not_logged_in&place_id=$place_id");
+        header("Location: single-place.php?place_id=$place_id&error=insert_failed");
         exit;
     }
 }
 
-// Upload function as before...
-function handleImageUploads($review_id, $conn) {
-    if (!empty($_FILES['images']['name'][0])) {
-        $upload_dir = 'assets/images/review_images/';
-        if (!is_dir($upload_dir)) {
-            mkdir($upload_dir, 0777, true);
-        }
-
-        $file_count = count($_FILES['images']['name']);
-        if ($file_count > 4) {
-            header("Location: single-place.php?error=too_many_images");
-            exit;
-        }
-
-        foreach ($_FILES['images']['tmp_name'] as $key => $tmp_name) {
-            $file_name = basename($_FILES['images']['name'][$key]);
-            $target_file = $upload_dir . uniqid() . '_' . $file_name;
-
-            if (move_uploaded_file($tmp_name, $target_file)) {
-                $image_query = $conn->prepare("
-                    INSERT INTO review_images (review_id, image_url, uploaded_at)
-                    VALUES (?, ?, NOW())
-                ");
-                $image_query->bind_param("is", $review_id, $target_file);
+function handleImageUploads($review_id, $place_id, $conn) {
+    if (!isset($_FILES['images']) || empty($_FILES['images']['name'][0])) {
+        return;
+    }
+    
+    $upload_dir = 'assets/images/review_images/';
+    if (!is_dir($upload_dir)) {
+        mkdir($upload_dir, 0755, true);
+    }
+    
+    $files = $_FILES['images'];
+    $file_count = count($files['name']);
+    
+    if ($file_count > 4) {
+        header("Location: single-place.php?place_id=$place_id&error=too_many_images");
+        exit;
+    }
+    
+    for ($i = 0; $i < $file_count; $i++) {
+        if ($files['error'][$i] === UPLOAD_ERR_OK) {
+            $file_name = uniqid() . '_' . basename($files['name'][$i]);
+            $file_path = $upload_dir . $file_name;
+            if (move_uploaded_file($files['tmp_name'][$i], $file_path)) {
+                $image_query = $conn->prepare("INSERT INTO review_images (review_id, image_url) VALUES (?, ?)");
+                $image_query->bind_param("is", $review_id, $file_path);
                 $image_query->execute();
-                $image_query->close();
             }
         }
     }

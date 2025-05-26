@@ -7,8 +7,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (galleryItems && leftButton && rightButton && items.length) {
         let currentScroll = 0;
-        const galleryWidth = galleryItems.scrollWidth; // Total width
-        const visibleWidth = galleryItems.clientWidth; // Visible part
+        const galleryWidth = galleryItems.scrollWidth;
+        const visibleWidth = galleryItems.clientWidth;
 
         function getNextItemWidth() {
             for (let item of items) {
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     return item.clientWidth + parseFloat(style.marginRight);
                 }
             }
-            return 100; // Default scroll step
+            return 100;
         }
 
         function updateGallery() {
@@ -58,38 +58,6 @@ document.addEventListener('DOMContentLoaded', function () {
             question.addEventListener("click", () => {
                 item.classList.toggle("active");
             });
-        });
-    }
-
-    // --- Add Review Stars ---
-    const stars = document.querySelectorAll(".addReview_stars i");
-    let selectedRating = 0;
-
-    if (stars.length) {
-        stars.forEach(star => {
-            star.addEventListener("mouseover", function () {
-                highlightStars(this.getAttribute("data-value"));
-            });
-
-            star.addEventListener("mouseout", function () {
-                highlightStars(selectedRating);
-            });
-
-            star.addEventListener("click", function () {
-                selectedRating = this.getAttribute("data-value");
-                highlightStars(selectedRating);
-                console.log("Selected Rating:", selectedRating);
-            });
-        });
-    }
-
-    function highlightStars(value) {
-        stars.forEach(star => {
-            if (star.getAttribute("data-value") <= value) {
-                star.classList.add("hover");
-            } else {
-                star.classList.remove("hover");
-            }
         });
     }
 });
