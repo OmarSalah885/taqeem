@@ -28,7 +28,12 @@ document.addEventListener("DOMContentLoaded", function () {
         loginLinkOverlayDiv.classList.remove("active");
     }
 
-    // Check for login errors, signup errors, or session timeout on page load
+    function clearFormsAndErrors() {
+        loginForm?.reset();
+        signupForm?.reset();
+        document.querySelectorAll('.error-container').forEach(container => container.remove());
+    }
+
     const urlParams = new URLSearchParams(window.location.search);
     if (typeof hasLoginErrors !== 'undefined' && hasLoginErrors) {
         showLogin();
@@ -40,47 +45,45 @@ document.addEventListener("DOMContentLoaded", function () {
 
     loginLinkNavbar?.addEventListener("click", (e) => {
         e.preventDefault();
+        clearFormsAndErrors();
         showLogin();
     });
 
     signupLinkNavbar?.addEventListener("click", (e) => {
         e.preventDefault();
+        clearFormsAndErrors();
         showSignup();
     });
 
     loginLinkNavbarM?.addEventListener("click", (e) => {
         e.preventDefault();
+        clearFormsAndErrors();
         showLogin();
     });
 
     signupLinkNavbarM?.addEventListener("click", (e) => {
         e.preventDefault();
+        clearFormsAndErrors();
         showSignup();
     });
 
     loginLinkOverlay?.addEventListener("click", (e) => {
         e.preventDefault();
+        clearFormsAndErrors();
         showLogin();
     });
 
     signupLinkOverlay?.addEventListener("click", (e) => {
         e.preventDefault();
+        clearFormsAndErrors();
         showSignup();
     });
 
     LogCloseBtn?.addEventListener("click", (e) => {
         e.preventDefault();
         logOverlay.classList.remove("show");
-        // Clear both login and signup session errors when closing the overlay
-        fetch('clear_login_errors.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'clear_errors=true'
-        }).catch(error => console.error('Error clearing login session:', error));
-        fetch('clear_signup_errors.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'clear_errors=true'
-        }).catch(error => console.error('Error clearing signup session:', error));
+        sessionStorage.removeItem('isCommentTriggeredLogin');
+        sessionStorage.removeItem('isReviewTriggeredLogin');
+        clearFormsAndErrors();
     });
 });

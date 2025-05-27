@@ -39,26 +39,26 @@
 
 <script src="assets/js/load_more.js"></script>
 <script src="assets/js/place.js"></script>
-<!-- <script src="assets/js/script.js"></script> -->
 <script src="assets/js/map.js"></script>
 <script src="assets/js/review_interactions.js"></script>
 <script src="assets/js/save_interactions.js"></script>
 <script src="assets/js/reply_functionality.js"></script>
 <script src="assets/js/search.js"></script>
-<script src="assets/js/auth.js"></script>
 <script src="assets/js/mobile-menu.js"></script>
 <script src="assets/js/carousel.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/ajax_review.js"></script>
+<script src="assets/js/star_rating.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
 <script>
 AOS.init({
-    // Global settings:
-    offset: 120, // offset (in px) from the original trigger point
-    delay: 0, // values from 0 to 3000, with step 50ms
-    duration: 400, // values from 0 to 3000, with step 50ms
-    easing: 'ease', // default easing for AOS animations
-    once: true, // whether animation should happen only once while scrolling down
-    mirror: false, // whether elements should animate out while scrolling past them
+    offset: 120,
+    delay: 0,
+    duration: 400,
+    easing: 'ease',
+    once: true,
+    mirror: false,
 });
 </script>
 

@@ -1,110 +1,107 @@
 <?php
-// filepath: c:xampphtdocstaqeemsignup_handler.php
-
 require_once 'config.php';
 require_once 'db_connect.php';
 session_start();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Retrieve and sanitize inputs
-    $first_name = trim($_POST['first_name']);
-    $last_name = trim($_POST['last_name']);
-    $email = trim(strtolower($_POST['email'])); // Convert email to lowercase
-    $password = trim($_POST['password']);
-    $confirm_password = trim($_POST['confirm_password']);
+    $first_name = trim($_POST['first_name'] ?? '');
+    $last_name = trim($_POST['last_name'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $password = $_POST['password'] ?? '';
+    $confirm_password = $_POST['confirm_password'] ?? '';
+    $redirect_url = $_POST['redirect_url'] ?? 'index.php';
+    $csrf_token = $_POST['csrf_token'] ?? '';
 
-    // Initialize an array to store error messages
-    $errors = [];
+    // Validate CSRF token
+    if (!verify_csrf_token($csrf_token)) {
+        $_SESSION['signup_errors'] = ['general' => 'Invalid CSRF token.'];
+        header("Location: $redirect_url");
+        exit;
+    }
 
     // Validate inputs
+    $errors = [];
     if (empty($first_name)) {
         $errors['first_name'] = 'First name is required.';
+    } elseif (strlen($first_name) > 50) {
+        $errors['first_name'] = 'First name cannot exceed 50 characters.';
     }
-
     if (empty($last_name)) {
         $errors['last_name'] = 'Last name is required.';
+    } elseif (strlen($last_name) > 50) {
+        $errors['last_name'] = 'Last name cannot exceed 50 characters.';
     }
-
     if (empty($email)) {
         $errors['email'] = 'Email is required.';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $errors['email'] = 'Invalid email format.';
+    } elseif (strlen($email) > 100) {
+        $errors['email'] = 'Email cannot exceed 100 characters.';
     }
-
     if (empty($password)) {
         $errors['password'] = 'Password is required.';
-    } else {
-        // Password strength validation
-        if (strlen($password) < 8) {
-            $errors['password'] = 'Password must be at least 8 characters long.';
-        } elseif (!preg_match('/[A-Z]/', $password)) {
-            $errors['password'] = 'Password must contain at least one uppercase letter.';
-        } elseif (!preg_match('/[a-z]/', $password)) {
-            $errors['password'] = 'Password must contain at least one lowercase letter.';
-        } elseif (!preg_match('/[0-9]/', $password)) {
-            $errors['password'] = 'Password must contain at least one number.';
-        } elseif (!preg_match('/[!@#$%^&*(),.?":{}|<>]/', $password)) {
-            $errors['password'] = 'Password must contain at least one special character.';
-        }
+    } elseif (strlen($password) < 8) {
+        $errors['password'] = 'Password must be at least 8 characters long.';
+    } elseif (!preg_match('/[A-Z]/', $password) || !preg_match('/[a-z]/', $password) || 
+             !preg_match('/[0-9]/', $password) || !preg_match('/[^A-Za-z0-9]/', $password)) {
+        $errors['password'] = 'Password must include uppercase, lowercase, number, and special character.';
     }
-
-    if (empty($confirm_password)) {
-        $errors['confirm_password'] = 'Confirm password is required.';
-    } elseif ($password !== $confirm_password) {
+    if ($password !== $confirm_password) {
         $errors['confirm_password'] = 'Passwords do not match.';
     }
 
-    // If there are errors, store them in the session and redirect back
+    // Check if email already exists
+    if (empty($errors)) {
+        $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        if ($stmt->get_result()->fetch_assoc()) {
+            $errors['email'] = 'This email is already registered.';
+        }
+        $stmt->close();
+    }
+
     if (!empty($errors)) {
         $_SESSION['signup_errors'] = $errors;
         $_SESSION['signup_data'] = $_POST;
-        header('Location: ' . ($_POST['redirect_url'] ?? 'index.php'));
+        header("Location: $redirect_url");
         exit;
     }
 
-    // Check if the email already exists (case-insensitive)
-    $stmt = $conn->prepare("SELECT id FROM users WHERE LOWER(email) = ?");
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $stmt->store_result();
-    if ($stmt->num_rows > 0) {
-        $_SESSION['signup_errors']['email'] = 'This email is already registered. Please use a different email or log in.';
-        $_SESSION['signup_data'] = $_POST;
-        $stmt->close();
-        $conn->close();
-        header('Location: ' . ($_POST['redirect_url'] ?? 'index.php'));
-        exit;
-    }
-    $stmt->close();
-
-    // Hash the password securely
-    $hashed_password = password_hash($password, PASSWORD_BCRYPT);
-
-    // Insert the user into the database
-    $stmt = $conn->prepare("INSERT INTO users (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, 'Guest')");
-    $stmt->bind_param("ssss", $first_name, $last_name, $email, $hashed_password);
-
+    // Hash password and insert user
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+    $default_profile_image = 'assets/images/profiles/pro_null.png';
+    $stmt = $conn->prepare("INSERT INTO users (first_name, last_name, email, password, profile_image, role, created_at) VALUES (?, ?, ?, ?, ?, 'user', NOW())");
+    $stmt->bind_param("sssss", $first_name, $last_name, $email, $hashed_password, $default_profile_image);
+    
     if ($stmt->execute()) {
-        $_SESSION['user_id'] = $stmt->insert_id;
+        $user_id = $stmt->insert_id;
+        // Log in the new user
+        $_SESSION['user_id'] = $user_id;
         $_SESSION['first_name'] = $first_name;
         $_SESSION['last_name'] = $last_name;
         $_SESSION['email'] = $email;
-        $_SESSION['role'] = 'Guest';
+        $_SESSION['role'] = 'user';
+        $_SESSION['profile_image'] = $default_profile_image;
+
         unset($_SESSION['signup_errors']);
-        header('Location: ' . ($_POST['redirect_url'] ?? 'index.php'));
-        $stmt->close();
-        $conn->close();
+        unset($_SESSION['signup_data']);
+        unset($_SESSION['login_errors']);
+        unset($_SESSION['login_data']);
+
+        header("Location: $redirect_url");
         exit;
     } else {
-        $_SESSION['signup_errors']['general'] = 'Failed to register. Please try again.';
-        $_SESSION['signup_errors']['mysql'] = $stmt->error;
+        $errors['general'] = 'Error creating account: ' . $stmt->error;
+        $_SESSION['signup_errors'] = $errors;
         $_SESSION['signup_data'] = $_POST;
         $stmt->close();
-        $conn->close();
-        header('Location: ' . ($_POST['redirect_url'] ?? 'index.php'));
+        header("Location: $redirect_url");
         exit;
     }
 } else {
     header('Location: index.php');
     exit;
 }
+?>

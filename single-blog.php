@@ -5,55 +5,6 @@ session_start();
 
 include 'header.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['comment'])) {
-    $first_name = trim($_POST['first_name']);
-    $last_name = trim($_POST['last_name']);
-    $email = trim($_POST['email']);
-    $password = trim($_POST['password']);
-    $confirm_password = trim($_POST['confirm_password']);
-
-    if (empty($first_name) || empty($last_name) || empty($email) || empty($password) || empty($confirm_password)) {
-        die('All fields are required.');
-    }
-
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        die('Invalid email format.');
-    }
-
-    if ($password !== $confirm_password) {
-        die('Passwords do not match.');
-    }
-
-    $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $stmt->store_result();
-    if ($stmt->num_rows > 0) {
-        die('This email is already registered.');
-    }
-    $stmt->close();
-
-    $hashed_password = password_hash($password, PASSWORD_BCRYPT);
-
-    $stmt = $conn->prepare("INSERT INTO users (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, 'Guest')");
-    $stmt->bind_param("ssss", $first_name, $last_name, $email, $hashed_password);
-
-    if ($stmt->execute()) {
-        $_SESSION['user_id'] = $stmt->insert_id;
-        $_SESSION['first_name'] = $first_name;
-        $_SESSION['last_name'] = $last_name;
-        $_SESSION['email'] = $email;
-        $_SESSION['role'] = 'Guest';
-        header('Location: index.php?signup=success');
-        exit;
-    } else {
-        echo 'Error: ' . $stmt->error;
-    }
-
-    $stmt->close();
-    $conn->close();
-}
-
 $blog_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 $query = "SELECT * FROM blogs WHERE id = ?";
@@ -91,10 +42,7 @@ foreach ($comments as $comment) {
 ?>
 
 <main class="single-blog">
-    <?php if (isset($_SESSION['error'])): ?>
-    <p style="color: red;"><?php echo htmlspecialchars($_SESSION['error']); ?></p>
-    <?php unset($_SESSION['error']); ?>
-    <?php endif; ?>
+    
     <div class="single-blog_img">
         <img src="<?php echo htmlspecialchars($blog['image']); ?>" alt>
     </div>
@@ -129,6 +77,7 @@ foreach ($comments as $comment) {
             </h2>
             <div class="comments_container">
                 <?php
+                $GLOBALS['blog_id'] = $blog_id;
                 function display_comments($grouped_comments, $parent_id = 0) {
                     if (!empty($grouped_comments[$parent_id])) {
                         foreach ($grouped_comments[$parent_id] as $comment):
@@ -148,24 +97,24 @@ foreach ($comments as $comment) {
                             </h4>
                             <p class="comment_content--date">
                                 <?php
-                                            $comment_date = new DateTime($comment['created_at']);
-                                            $current_date = new DateTime();
-                                            $interval = $comment_date->diff($current_date);
+                                $comment_date = new DateTime($comment['created_at']);
+                                $current_date = new DateTime();
+                                $interval = $comment_date->diff($current_date);
 
-                                            if ($interval->y > 0) {
-                                                echo $interval->y . ' year' . ($interval->y > 1 ? 's' : '') . ' ago';
-                                            } elseif ($interval->m > 0) {
-                                                echo $interval->m . ' month' . ($interval->m > 1 ? 's' : '') . ' ago';
-                                            } elseif ($interval->d > 0) {
-                                                echo $interval->d . ' day' . ($interval->d > 1 ? 's' : '') . ' ago';
-                                            } elseif ($interval->h > 0) {
-                                                echo $interval->h . ' hour' . ($interval->h > 1 ? 's' : '') . ' ago';
-                                            } elseif ($interval->i > 0) {
-                                                echo $interval->i . ' minute' . ($interval->i > 1 ? 's' : '') . ' ago';
-                                            } else {
-                                                echo 'Just now';
-                                            }
-                                            ?>
+                                if ($interval->y > 0) {
+                                    echo $interval->y . ' year' . ($interval->y > 1 ? 's' : '') . ' ago';
+                                } elseif ($interval->m > 0) {
+                                    echo $interval->m . ' month' . ($interval->m > 1 ? 's' : '') . ' ago';
+                                } elseif ($interval->d > 0) {
+                                    echo $interval->d . ' day' . ($interval->d > 1 ? 's' : '') . ' ago';
+                                } elseif ($interval->h > 0) {
+                                    echo $interval->h . ' hour' . ($interval->h > 1 ? 's' : '') . ' ago';
+                                } elseif ($interval->i > 0) {
+                                    echo $interval->i . ' minute' . ($interval->i > 1 ? 's' : '') . ' ago';
+                                } else {
+                                    echo 'Just now';
+                                }
+                                ?>
                             </p>
                             <p class="comment_content--text"><?php echo htmlspecialchars($comment['comment']); ?></p>
                             <div class="comment_actions">
@@ -182,7 +131,7 @@ foreach ($comments as $comment) {
                         </div>
                     </div>
                     <?php
-                                if (!empty($grouped_comments[$comment['id']])): ?>
+                    if (!empty($grouped_comments[$comment['id']])): ?>
                     <div class="replies">
                         <?php display_comments($grouped_comments, $comment['id']); ?>
                     </div>
@@ -204,6 +153,10 @@ foreach ($comments as $comment) {
         <input type="hidden" name="parent_comment_id" id="parent_comment_id" value="">
         <input type="hidden" name="comment_id" id="comment_id" value="">
         <input type="hidden" name="action" id="action" value="add">
+        <input type="hidden" name="redirect_url" value="<?php echo htmlspecialchars($_SERVER['REQUEST_URI']); ?>">
+        <?php if (isset($_SESSION['csrf_token'])): ?>
+        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
+        <?php endif; ?>
         <button type="submit" class="btn__red--l btn__red btn" id="submit_button">Submit</button>
         <button type="button" class="btn__red--l btn__red btn" id="cancel_button" style="display: none;">Cancel</button>
     </form>
@@ -215,6 +168,12 @@ document.addEventListener('DOMContentLoaded', () => {
     let isSubmitting = false;
 
     form.addEventListener('submit', (e) => {
+        if (!<?php echo json_encode(isset($_SESSION['user_id'])); ?>) {
+            e.preventDefault();
+            sessionStorage.setItem('isCommentTriggeredLogin', 'true');
+            document.querySelector('#login-nav')?.click();
+            return;
+        }
         if (isSubmitting) {
             e.preventDefault();
             return;
@@ -224,6 +183,13 @@ document.addEventListener('DOMContentLoaded', () => {
         submitButton.disabled = true;
         submitButton.textContent = 'Submitting...';
     });
+
+    // Focus comment form if login was triggered
+    if (sessionStorage.getItem('isCommentTriggeredLogin') === 'true' && <?php echo json_encode(isset($_SESSION['user_id'])); ?>) {
+        const textarea = form.querySelector('textarea[name="comment"]');
+        textarea.focus();
+        sessionStorage.removeItem('isCommentTriggeredLogin');
+    }
 
     document.querySelectorAll('.comment_content--edit').forEach(link => {
         link.addEventListener('click', (e) => {
@@ -246,9 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
             cancelButton.style.display = 'inline-block';
             parentCommentIdInput.value = '';
 
-            form.scrollIntoView({
-                behavior: 'smooth'
-            });
+            form.scrollIntoView({ behavior: 'smooth' });
         });
     });
 
@@ -272,8 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.comment_content--reply').forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
-            const commentId = link.closest('.comments_container--single').getAttribute(
-                'data-comment-id');
+            const commentId = link.closest('.comments_container--single').getAttribute('data-comment-id');
             const parentCommentIdInput = form.querySelector('#parent_comment_id');
             const actionInput = form.querySelector('#action');
             const submitButton = form.querySelector('#submit_button');
@@ -284,9 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
             submitButton.textContent = 'Submit';
             submitButton.disabled = false;
             cancelButton.style.display = 'none';
-            form.scrollIntoView({
-                behavior: 'smooth'
-            });
+            form.scrollIntoView({ behavior: 'smooth' });
         });
     });
 });
