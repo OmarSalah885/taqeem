@@ -1,55 +1,52 @@
+// ajax_review.js
 document.addEventListener('DOMContentLoaded', () => {
     // Add Review Form Submission
     const reviewForm = document.getElementById('reviewForm');
     if (reviewForm) {
-        reviewForm.addEventListener('submit', function(e) {
-            e.preventDefault();
+        reviewForm.addEventListener('submit', function(event) {
+            event.preventDefault();
             const formData = new FormData(this);
             fetch('add_review.php', {
                 method: 'POST',
                 body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
             })
             .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return response.text();
+            })
+            .then(text => {
+                console.log('Add Review Raw Response:', text); // Debug log
+                if (!text.trim()) throw new Error('Empty response from server');
+                try {
+                    return JSON.parse(text);
+                } catch (e) {
+                    console.error('Invalid JSON response:', text);
+                    throw new Error('Failed to parse JSON response');
                 }
-                return response.text().then(text => {
-                    try {
-                        return JSON.parse(text);
-                    } catch (e) {
-                        console.error('Invalid JSON:', text);
-                        throw new Error('Failed to parse JSON response');
-                    }
-                });
             })
             .then(data => {
                 if (data.success) {
                     const reviewsContainer = document.querySelector('.reviews_container');
-                    reviewsContainer.insertAdjacentHTML('afterbegin', data.html);
-                    document.querySelector('#review_' + data.review_id).scrollIntoView({ behavior: 'smooth' });
+                    reviewsContainer.insertAdjacentHTML('beforeend', data.html);
+                    document.getElementById(`review_${data.review_id}`).scrollIntoView({ behavior: 'smooth' });
                     this.reset();
                     this.querySelectorAll('.addReview_stars i').forEach(star => {
-                        star.style.color = '#D0D0D0';
+                        star.classList.remove('selected');
                     });
                     document.getElementById('imagePreview').innerHTML = '';
                     newFiles = [];
-                    // Rebind star rating and edit form events
                     bindStarRating(`#editForm-${data.review_id} .addReview_stars`);
                     const newEditForm = document.getElementById(`editForm-${data.review_id}`);
                     if (newEditForm) bindEditForm(newEditForm);
-                    // Update ratings
-                    console.log('Updating ratings with:', data.avg_rating, data.total_reviews, data.ratings_counts); // Debug
                     updateRatings(data.avg_rating, data.total_reviews, data.ratings_counts);
                 } else {
-                    alert('Failed to add review: ' + data.error);
+                    alert('Failed to add review: ' + (data.error || 'Unknown error'));
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred while adding the review: ' + error.message);
+                alert('Error occurred while adding review: ' + error.message);
             });
         });
 
@@ -58,38 +55,40 @@ document.addEventListener('DOMContentLoaded', () => {
         const imagePreview = document.getElementById('imagePreview');
         let newFiles = [];
 
-        imageInput.addEventListener('change', () => {
-            const currentCount = imagePreview.querySelectorAll('.image-thumb').length;
-            const files = Array.from(imageInput.files).slice(0, 4 - currentCount);
-            if (currentCount + files.length > 4) {
-                alert("Maximum 4 images allowed");
-                imageInput.value = '';
-                return;
-            }
-            files.forEach(file => {
-                const reader = new FileReader();
-                reader.onload = ev => {
-                    const thumb = document.createElement('div');
-                    thumb.className = 'image-thumb';
-                    thumb.innerHTML = `<img src="${ev.target.result}"><span class="remove-image new">×</span>`;
-                    thumb.querySelector('.remove-image.new').onclick = () => {
-                        thumb.remove();
-                        newFiles = newFiles.filter(f => f !== file);
-                        syncFiles();
-                    };
-                    imagePreview.appendChild(thumb);
-                };
-                reader.readAsDataURL(file);
-                newFiles.push(file);
-            });
-            syncFiles();
-        });
-
-        function syncFiles() {
-            const dt = new DataTransfer();
-            newFiles.forEach(f => dt.items.add(f));
-            imageInput.files = dt.files;
+        if (imageInput && imagePreview) {
+    imageInput.addEventListener('change', () => {
+        const currentCount = imagePreview.querySelectorAll('.image-thumb').length;
+        const files = Array.from(imageInput.files);
+        if (currentCount + files.length > 4) {
+            alert('Maximum 4 images allowed');
+            imageInput.value = '';
+            return;
         }
+        files.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = event => {
+                const thumb = document.createElement('div');
+                thumb.className = 'image-thumb';
+                thumb.innerHTML = `<img src="${event.target.result}" alt="Preview"><span class="remove-image new">×</span>`;
+                thumb.querySelector('.remove-image.new').onclick = () => {
+                    thumb.remove();
+                    newFiles = newFiles.filter(f => f !== file);
+                    syncFiles();
+                };
+                imagePreview.appendChild(thumb);
+            };
+            reader.readAsDataURL(file);
+            newFiles.push(file);
+        });
+        syncFiles();
+    });
+
+    function syncFiles() {
+        const dataTransfer = new DataTransfer();
+        newFiles.forEach(f => dataTransfer.items.add(f));
+        imageInput.files = dataTransfer.files;
+    }
+}
     }
 
     // Edit Review Form Submission
@@ -98,171 +97,162 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function bindEditForm(form) {
-        const reviewId = form.querySelector('input[name="review_id"]').value;
+        const reviewId = parseInt(form.querySelector('input[name="review_id"]').value);
         const preview = document.getElementById(`imagePreview-${reviewId}`);
         const fileInput = document.getElementById(`imageInput-${reviewId}`);
         let newFiles = [];
 
-        console.log('Binding edit form for review:', reviewId, 'File input:', fileInput, 'Preview:', preview); // Debug
-
-        // Remove existing images
-        preview.addEventListener('click', e => {
-            if (!e.target.matches('.remove-image.existing')) return;
-            const thumb = e.target.closest('.image-thumb');
-            const imgId = thumb.getAttribute('data-img-id');
-            thumb.remove();
-            const delInp = document.createElement('input');
-            delInp.type = 'hidden';
-            delInp.name = 'delete_images[]';
-            delInp.value = imgId;
-            form.appendChild(delInp);
-            syncFiles();
-        });
-
-        // Add new images
-        fileInput.addEventListener('change', () => {
-            const currentCount = preview.querySelectorAll('.image-thumb').length;
-            const files = Array.from(fileInput.files).slice(0, 4 - currentCount);
-            if (currentCount + files.length > 4) {
-                alert("Maximum 4 images allowed");
-                fileInput.value = '';
-                return;
-            }
-            files.forEach(file => {
-                const reader = new FileReader();
-                reader.onload = ev => {
-                    const thumb = document.createElement('div');
-                    thumb.className = 'image-thumb';
-                    thumb.innerHTML = `<img src="${ev.target.result}"><span class="remove-image new">×</span>`;
-                    thumb.querySelector('.remove-image.new').onclick = () => {
-                        thumb.remove();
-                        newFiles = newFiles.filter(f => f !== file);
-                        syncFiles();
-                    };
-                    preview.appendChild(thumb);
-                };
-                reader.readAsDataURL(file);
-                newFiles.push(file);
+        if (preview) {
+            preview.addEventListener('click', e => {
+                if (!e.target.matches('.remove-image.existing')) return;
+                const thumb = e.target.closest('.image-thumb');
+                const imgId = thumb.getAttribute('data-img-id');
+                thumb.remove();
+                const delInput = document.createElement('input');
+                delInput.type = 'hidden';
+                delInput.name = 'delete_images[]';
+                delInput.value = imgId;
+                form.appendChild(delInput);
+                syncFiles();
             });
-            syncFiles();
-        });
-
-        function syncFiles() {
-            const dt = new DataTransfer();
-            newFiles.forEach(f => dt.items.add(f));
-            fileInput.files = dt.files;
         }
 
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
+        if (fileInput) {
+    fileInput.addEventListener('change', () => {
+        const currentCount = preview.querySelectorAll('.image-thumb').length;
+        const files = Array.from(fileInput.files);
+        if (currentCount + files.length > 4) {
+            alert('Maximum 4 images allowed');
+            fileInput.value = '';
+            return;
+        }
+        files.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = event => {
+                const thumb = document.createElement('div');
+                thumb.className = 'image-thumb';
+                thumb.innerHTML = `<img src="${event.target.result}" alt="Preview"><span class="remove-image new">×</span>`;
+                thumb.querySelector('.remove-image.new').onclick = () => {
+                    thumb.remove();
+                    newFiles = newFiles.filter(f => f !== file);
+                    syncFiles();
+                };
+                preview.appendChild(thumb);
+            };
+            reader.readAsDataURL(file);
+            newFiles.push(file);
+        });
+        syncFiles();
+    });
+}
+
+        function syncFiles() {
+            const dataTransfer = new DataTransfer();
+            newFiles.forEach(f => dataTransfer.items.add(f));
+            if (fileInput) fileInput.files = dataTransfer.files;
+        }
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
             const formData = new FormData(this);
-            console.log([...formData.entries()]); // Debug
             fetch('edit_review.php', {
                 method: 'POST',
                 body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
             })
             .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return response.text();
+            })
+            .then(text => {
+                console.log('Edit Review Raw Response:', text); // Debug log
+                if (!text.trim()) throw new Error('Empty response from server');
+                try {
+                    return JSON.parse(text);
+                } catch (e) {
+                    console.error('Invalid JSON response:', text);
+                    throw new Error('Failed to parse JSON response');
                 }
-                return response.text().then(text => {
-                    try {
-                        return JSON.parse(text);
-                    } catch (e) {
-                        console.error('Invalid JSON:', text);
-                        throw new Error('Failed to parse JSON response');
-                    }
-                });
             })
             .then(data => {
                 if (data.success) {
-                    const reviewElem = document.querySelector('#review_' + reviewId);
-                    if (reviewElem) {
-                        reviewElem.outerHTML = data.html;
-                        const newForm = document.getElementById(`editForm-${reviewId}`);
-                        if (newForm) bindEditForm(newForm);
-                        bindStarRating(`#editForm-${reviewId} .addReview_stars`);
+                    const reviewElement = document.getElementById(`review_${data.review_id}`);
+                    if (reviewElement) {
+                        reviewElement.outerHTML = data.html;
                     }
+                    const newEditForm = document.getElementById(`editForm-${data.review_id}`);
+                    if (newEditForm) bindEditForm(newEditForm);
+                    bindStarRating(`#editForm-${data.review_id} .addReview_stars`);
                     form.style.display = 'none';
-                    console.log('Editing ratings with:', data.avg_rating, data.total_reviews, data.ratings_counts); // Debug
                     updateRatings(data.avg_rating, data.total_reviews, data.ratings_counts);
                 } else {
-                    alert('Failed to edit review: ' + data.error);
+                    alert('Failed to edit review: ' + (data.error || 'Unknown error'));
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred while editing the review: ' + error.message);
+                alert('Error occurred while editing review: ' + error.message);
             });
         });
     }
 
-    // Function to bind star rating events
     function bindStarRating(selector) {
         const container = document.querySelector(selector);
         if (!container) return;
         const stars = container.querySelectorAll('i');
         const reviewId = container.getAttribute('data-review-id');
         const ratingInput = reviewId ? document.getElementById(`rating-${reviewId}`) : container.querySelector('input[name="rating"]');
-        
-        if (!ratingInput) {
-            console.warn('Rating input not found for container:', container);
-            return;
-        }
+        if (!ratingInput) return;
 
         stars.forEach(star => {
             star.addEventListener('click', function() {
                 const value = parseInt(this.getAttribute('data-value'));
                 ratingInput.value = value;
                 stars.forEach(s => {
-                    s.style.color = s.getAttribute('data-value') <= value ? '#A21111' : '#D0D0D0';
+                    s.classList.toggle('selected', parseInt(s.getAttribute('data-value')) <= value);
                 });
             });
         });
     }
 
-    // Function to update ratings sections
     function updateRatings(avgRating, totalReviews, ratingsCounts) {
         const safeAvgRating = typeof avgRating === 'number' ? avgRating : parseFloat(avgRating) || 0;
-        console.log('updateRatings: safeAvgRating=', safeAvgRating, 'totalReviews=', totalReviews, 'ratingsCounts=', ratingsCounts); // Debug
-
-        // Update extra_stars_container
         const extraStarsContainer = document.getElementById('extra-stars-container');
         if (extraStarsContainer) {
             const extraStars = extraStarsContainer.querySelector('.extra_stars');
             const extraRating = extraStarsContainer.querySelector('.extra_rating');
             const percentage = (safeAvgRating / 5) * 100;
-            extraStars.style.background = `linear-gradient(90deg, #A21111 ${percentage}%, #D0D0D0 ${percentage}%)`;
-            extraStars.style.webkitBackgroundClip = 'text';
-            extraStars.style.webkitTextFillColor = 'transparent';
+            if (extraStars) {
+                extraStars.style.background = `linear-gradient(90deg, #A21111 ${percentage}%, #D0D0D0 ${percentage}%)`;
+                extraStars.style.webkitBackgroundClip = 'text';
+                extraStars.style.webkitTextFillColor = 'transparent';
+            }
             if (extraRating) extraRating.textContent = safeAvgRating.toFixed(1);
         }
 
-        // Update reviews_overall--L
         const overallStarsContainer = document.getElementById('reviews-overall-l');
         if (overallStarsContainer) {
             const overallStars = overallStarsContainer.querySelector('#overall-stars');
             const overallRating = overallStarsContainer.querySelector('#overall-rating');
-            const totalReviewsEl = overallStarsContainer.querySelector('#total-reviews');
+            const totalReviewsContainer = overallStarsContainer.querySelector('#total-reviews');
             const percentage = (safeAvgRating / 5) * 100;
-            overallStars.style.background = `linear-gradient(90deg, #A21111 ${percentage}%, #D0D0D0 ${percentage}%)`;
-            overallStars.style.webkitBackgroundClip = 'text';
-            overallStars.style.webkitTextFillColor = 'transparent';
+            if (overallStars) {
+                overallStars.style.background = `linear-gradient(90deg, #A21111 ${percentage}%, #D0D0D0 ${percentage}%)`;
+                overallStars.style.webkitBackgroundClip = 'text';
+                overallStars.style.webkitTextFillColor = 'transparent';
+            }
             if (overallRating) overallRating.textContent = `${safeAvgRating.toFixed(1)} out of 5`;
-            if (totalReviewsEl) totalReviewsEl.textContent = `${totalReviews} reviews`;
+            if (totalReviewsContainer) totalReviewsContainer.textContent = `${totalReviews} reviews`;
         }
 
-        // Update reviews_overall--R
         const overallR = document.getElementById('reviews-overall-r');
         if (overallR) {
             for (let i = 5; i >= 1; i--) {
                 const starsP = document.getElementById(`stars-p-${i}`);
                 if (starsP) {
                     const percent = totalReviews > 0 ? ((ratingsCounts[i] || 0) / totalReviews) * 100 : 0;
-                    starsP.querySelector('.stars_p--color').style.width = `${percent}%`;
+                    const colorBar = starsP.querySelector('.stars_p--color');
+                    if (colorBar) colorBar.style.width = `${percent}%`;
                 }
             }
         }
