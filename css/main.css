@@ -28,7 +28,7 @@ html {
 body {
   box-sizing: border-box;
   background-color: white;
-  min-height: 55vh;
+  min-height: 65vh;
 }
 body p {
   font-size: 16px;
@@ -138,12 +138,12 @@ body p {
   cursor: pointer;
   width: -moz-fit-content;
   width: fit-content;
-  transition: all 0.3s;
   text-decoration: none;
   text-transform: uppercase;
   text-align: center;
   line-height: 1.1;
   font-weight: 600;
+  transition: all 0.3s;
 }
 .btn__transparent {
   background-color: transparent;
