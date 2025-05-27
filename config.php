@@ -4,8 +4,8 @@ ini_set('session.cookie_httponly', 1); // Prevent JavaScript access to session c
 ini_set('session.cookie_secure', 0);  // Use secure cookies (requires HTTPS)
 ini_set('session.use_strict_mode', 1); // Prevent session fixation attacks
 // Enable error reporting for debugging
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
 error_reporting(E_ALL);
 
 // CSRF Token Validation
