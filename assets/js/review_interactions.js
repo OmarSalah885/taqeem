@@ -23,9 +23,10 @@ document.addEventListener("DOMContentLoaded", function () {
             if (xhr.readyState === 4 && xhr.status === 200) {
                 const response = JSON.parse(xhr.responseText);
                 if (response.success) {
-                    // Update the icon based on the new like state
-                    const icon = event.target.tagName === "I" ? event.target : event.target.querySelector("i");
-                    icon.className = response.is_liked ? "fa-solid fa-heart" : "fa-regular fa-heart";
+                    // Update ALL like icons for this review everywhere on the page
+                    document.querySelectorAll(`button.like-btn[data-review-id="${reviewId}"] i`).forEach(icon => {
+                        icon.className = response.is_liked ? "fa-solid fa-heart" : "fa-regular fa-heart";
+                    });
                 } else {
                     alert(response.message);
                 }
@@ -37,4 +38,4 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Expose the function globally
     window.toggleLike = toggleLike;
-});
+})

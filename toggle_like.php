@@ -29,17 +29,18 @@ $check_like_query->bind_param("ii", $user_id, $review_id);
 $check_like_query->execute();
 $check_like_result = $check_like_query->get_result();
 
+
 if ($check_like_result->num_rows > 0) {
     // Unlike the review
     $delete_like_query = $conn->prepare("DELETE FROM review_likes WHERE user_id = ? AND review_id = ?");
     $delete_like_query->bind_param("ii", $user_id, $review_id);
     $delete_like_query->execute();
-    echo json_encode(['success' => true, 'liked' => false]);
+    echo json_encode(['success' => true, 'liked' => false, 'is_liked' => false]);
 } else {
     // Like the review
     $insert_like_query = $conn->prepare("INSERT INTO review_likes (user_id, review_id, created_at) VALUES (?, ?, NOW())");
     $insert_like_query->bind_param("ii", $user_id, $review_id);
     $insert_like_query->execute();
-    echo json_encode(['success' => true, 'liked' => true]);
+    echo json_encode(['success' => true, 'liked' => true, 'is_liked' => true]);
 }
 ?>
