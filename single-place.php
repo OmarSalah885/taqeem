@@ -402,7 +402,7 @@ if (empty($_SESSION['csrf_token'])) {
 
     <div class="addReview">
         <h2 class="place-title">WRITE A REVIEW</h2>
-        <?php if (isset($_SESSION['user_id'])): ?>
+        
         <form method="POST" id="reviewForm" enctype="multipart/form-data">
             <div class="addReview_container">
                 <div class="addReview_stars">
@@ -422,9 +422,7 @@ if (empty($_SESSION['csrf_token'])) {
                     REVIEW</button>
             </div>
         </form>
-        <?php else: ?>
-        <p>You must be logged in to write a review.</p>
-        <?php endif; ?>
+        
     </div>
 </main>
 

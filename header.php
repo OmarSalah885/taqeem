@@ -1,6 +1,4 @@
 <?php
-
-
 // Regenerate session ID to prevent fixation attacks
 if (!isset($_SESSION['CREATED'])) {
     $_SESSION['CREATED'] = time();
@@ -66,7 +64,7 @@ if (isset($_SESSION['user_id']) && (!isset($_SESSION['profile_image']) || !isset
         const hasLoginErrors = <?php echo !empty($_SESSION['login_errors']) ? 'true' : 'false'; ?>;
         const hasSignupErrors = <?php echo !empty($_SESSION['signup_errors']) ? 'true' : 'false'; ?>;
     </script>
-    <script src="js/auth.js"></script>
+    
 </head>
 <body>
     <nav>
@@ -80,7 +78,6 @@ if (isset($_SESSION['user_id']) && (!isset($_SESSION['profile_image']) || !isset
                 </div>
                 <div class="navbar_container--logo">
                     <a href="index.php"><img src="assets/images/logo.png" alt="logo"></a>
-                    
                 </div>
                 <div class="navbar_container--menu-R">
                     <a class="btn__red--m btn__red btn" id="search-btn" href="#"><i class="fa-solid fa-magnifying-glass"></i></a>
@@ -159,14 +156,15 @@ if (isset($_SESSION['user_id']) && (!isset($_SESSION['profile_image']) || !isset
                     <?php $login_errors = $_SESSION['login_errors'] ?? []; $login_data = $_SESSION['login_data'] ?? []; ?>
                     <input type="hidden" name="redirect_url" value="<?php echo htmlspecialchars($_SERVER['REQUEST_URI']); ?>">
                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
+                    <?php if (!empty($login_errors)): ?>
+                    <div class="error-container">
+                        <?php foreach ($login_errors as $error): ?>
+                        <p class="error"><?php echo htmlspecialchars($error); ?></p>
+                        <?php endforeach; ?>
+                    </div>
+                    <?php endif; ?>
                     <input type="email" name="email" placeholder="EMAIL" value="<?php echo htmlspecialchars($login_data['email'] ?? ''); ?>" required>
-                    <?php if (isset($login_errors['email'])): ?>
-                    <p class="error"><?php echo htmlspecialchars($login_errors['email']); ?></p>
-                    <?php endif; ?>
                     <input type="password" name="password" placeholder="PASSWORD" required>
-                    <?php if (isset($login_errors['password'])): ?>
-                    <p class="error"><?php echo htmlspecialchars($login_errors['password']); ?></p>
-                    <?php endif; ?>
                     <p>Forgot your password? <a href="#">RESET PASSWORD.</a></p>
                     <button type="submit" class="btn__red--l btn__red btn">Sign In</button>
                 </form>
@@ -175,32 +173,21 @@ if (isset($_SESSION['user_id']) && (!isset($_SESSION['profile_image']) || !isset
                     <?php $signup_errors = $_SESSION['signup_errors'] ?? []; $signup_data = $_SESSION['signup_data'] ?? []; ?>
                     <input type="hidden" name="redirect_url" value="<?php echo htmlspecialchars($_SERVER['REQUEST_URI']); ?>">
                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
+                    <?php if (!empty($signup_errors)): ?>
+                    <div class="error-container">
+                        <?php foreach ($signup_errors as $error): ?>
+                        <p class="error"><?php echo htmlspecialchars($error); ?></p>
+                        <?php endforeach; ?>
+                    </div>
+                    <?php endif; ?>
                     <div class="LogOverlay__content--signup_name">
                         <input type="text" name="first_name" placeholder="FIRST NAME" value="<?php echo htmlspecialchars($signup_data['first_name'] ?? ''); ?>" required>
-                        <?php if (isset($signup_errors['first_name'])): ?>
-                        <p class="error"><?php echo htmlspecialchars($signup_errors['first_name']); ?></p>
-                        <?php endif; ?>
                         <input type="text" name="last_name" placeholder="LAST NAME" value="<?php echo htmlspecialchars($signup_data['last_name'] ?? ''); ?>" required>
-                        <?php if (isset($signup_errors['last_name'])): ?>
-                        <p class="error"><?php echo htmlspecialchars($signup_errors['last_name']); ?></p>
-                        <?php endif; ?>
                     </div>
                     <input type="email" name="email" placeholder="EMAIL" value="<?php echo htmlspecialchars($signup_data['email'] ?? ''); ?>" required>
-                    <?php if (isset($signup_errors['email'])): ?>
-                    <p class="error"><?php echo htmlspecialchars($signup_errors['email']); ?></p>
-                    <?php endif; ?>
                     <input type="password" name="password" placeholder="PASSWORD" required>
-                    <?php if (isset($signup_errors['password'])): ?>
-                    <p class="error"><?php echo htmlspecialchars($signup_errors['password']); ?></p>
-                    <?php endif; ?>
                     <input type="password" name="confirm_password" placeholder="CONFIRM PASSWORD" required>
-                    <?php if (isset($signup_errors['confirm_password'])): ?>
-                    <p class="error"><?php echo htmlspecialchars($signup_errors['confirm_password']); ?></p>
-                    <?php endif; ?>
                     <button type="submit" class="btn__red--l btn__red btn">Sign up</button>
-                    <?php if (isset($signup_errors['general'])): ?>
-                    <p class="error"><?php echo htmlspecialchars($signup_errors['general']); ?></p>
-                    <?php endif; ?>
                 </form>
             </div>
         </div>

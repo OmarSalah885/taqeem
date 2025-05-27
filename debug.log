@@ -149,3 +149,10 @@
 2025-05-24 09:56:42 - Deleting comment ID: 76
 2025-05-24 09:56:42 - Comment ID: 76 deleted successfully
 2025-05-24 09:57:00 - submit_comment.php started, method: POST, action: add
+2025-05-27 13:10:08 - submit_comment.php started, method: POST, action: add
+2025-05-27 13:10:08 - Adding comment for blog ID: 12, parent_comment_id: null
+2025-05-27 13:10:08 - Comment added successfully for blog ID: 12
+2025-05-27 13:10:13 - submit_comment.php started, method: GET, action: delete
+2025-05-27 13:10:13 - Deleting comment ID: 84
+2025-05-27 13:10:13 - Comment ID: 84 deleted successfully
+2025-05-27 13:10:47 - submit_comment.php started, method: POST, action: add

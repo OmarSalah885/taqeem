@@ -1,10 +1,36 @@
-// ajax_review.js
 document.addEventListener('DOMContentLoaded', () => {
     // Add Review Form Submission
     const reviewForm = document.getElementById('reviewForm');
     if (reviewForm) {
         reviewForm.addEventListener('submit', function(event) {
             event.preventDefault();
+
+            // Check login status from global variable set in header.php
+            const isLoggedIn = window.isLoggedIn === true;
+            if (!isLoggedIn) {
+                if (typeof showLogin === 'function') {
+                    showLogin(); // Trigger the login overlay and show login form
+                } else {
+                    console.error('showLogin function is not defined. Ensure auth.js is loaded.');
+                    const overlay = document.querySelector('.LogOverlay');
+                    const loginForm = document.querySelector('.LogOverlay__content--login');
+                    const signupForm = document.querySelector('.LogOverlay__content--signup');
+                    const loginLinkDiv = document.getElementById('login-overlay__div');
+                    const signupLinkDiv = document.getElementById('signup-overlay__div');
+                    if (overlay && loginForm && signupForm && loginLinkDiv && signupLinkDiv) {
+                        overlay.classList.add('show');
+                        loginForm.classList.add('show');
+                        signupForm.classList.remove('show');
+                        loginLinkDiv.classList.add('active');
+                        signupLinkDiv.classList.remove('active');
+                    } else {
+                        console.error('Login overlay elements not found in DOM.');
+                    }
+                }
+                return false; // Stop form submission
+            }
+
+            // Proceed with form submission if logged in
             const formData = new FormData(this);
             fetch('add_review.php', {
                 method: 'POST',
@@ -45,7 +71,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
                 alert('Error occurred while adding review: ' + error.message);
             });
         });
@@ -56,39 +81,39 @@ document.addEventListener('DOMContentLoaded', () => {
         let newFiles = [];
 
         if (imageInput && imagePreview) {
-    imageInput.addEventListener('change', () => {
-        const currentCount = imagePreview.querySelectorAll('.image-thumb').length;
-        const files = Array.from(imageInput.files);
-        if (currentCount + files.length > 4) {
-            alert('Maximum 4 images allowed');
-            imageInput.value = '';
-            return;
-        }
-        files.forEach(file => {
-            const reader = new FileReader();
-            reader.onload = event => {
-                const thumb = document.createElement('div');
-                thumb.className = 'image-thumb';
-                thumb.innerHTML = `<img src="${event.target.result}" alt="Preview"><span class="remove-image new">×</span>`;
-                thumb.querySelector('.remove-image.new').onclick = () => {
-                    thumb.remove();
-                    newFiles = newFiles.filter(f => f !== file);
-                    syncFiles();
-                };
-                imagePreview.appendChild(thumb);
-            };
-            reader.readAsDataURL(file);
-            newFiles.push(file);
-        });
-        syncFiles();
-    });
+            imageInput.addEventListener('change', () => {
+                const currentCount = imagePreview.querySelectorAll('.image-thumb').length;
+                const files = Array.from(imageInput.files);
+                if (currentCount + files.length > 4) {
+                    alert('Maximum 4 images allowed');
+                    imageInput.value = '';
+                    return;
+                }
+                files.forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = event => {
+                        const thumb = document.createElement('div');
+                        thumb.className = 'image-thumb';
+                        thumb.innerHTML = `<img src="${event.target.result}" alt="Preview"><span class="remove-image new">×</span>`;
+                        thumb.querySelector('.remove-image.new').onclick = () => {
+                            thumb.remove();
+                            newFiles = newFiles.filter(f => f !== file);
+                            syncFiles();
+                        };
+                        imagePreview.appendChild(thumb);
+                    };
+                    reader.readAsDataURL(file);
+                    newFiles.push(file);
+                });
+                syncFiles();
+            });
 
-    function syncFiles() {
-        const dataTransfer = new DataTransfer();
-        newFiles.forEach(f => dataTransfer.items.add(f));
-        imageInput.files = dataTransfer.files;
-    }
-}
+            function syncFiles() {
+                const dataTransfer = new DataTransfer();
+                newFiles.forEach(f => dataTransfer.items.add(f));
+                imageInput.files = dataTransfer.files;
+            }
+        }
     }
 
     // Edit Review Form Submission
@@ -118,33 +143,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (fileInput) {
-    fileInput.addEventListener('change', () => {
-        const currentCount = preview.querySelectorAll('.image-thumb').length;
-        const files = Array.from(fileInput.files);
-        if (currentCount + files.length > 4) {
-            alert('Maximum 4 images allowed');
-            fileInput.value = '';
-            return;
+            fileInput.addEventListener('change', () => {
+                const currentCount = preview.querySelectorAll('.image-thumb').length;
+                const files = Array.from(fileInput.files);
+                if (currentCount + files.length > 4) {
+                    alert('Maximum 4 images allowed');
+                    fileInput.value = '';
+                    return;
+                }
+                files.forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = event => {
+                        const thumb = document.createElement('div');
+                        thumb.className = 'image-thumb';
+                        thumb.innerHTML = `<img src="${event.target.result}" alt="Preview"><span class="remove-image new">×</span>`;
+                        thumb.querySelector('.remove-image.new').onclick = () => {
+                            thumb.remove();
+                            newFiles = newFiles.filter(f => f !== file);
+                            syncFiles();
+                        };
+                        preview.appendChild(thumb);
+                    };
+                    reader.readAsDataURL(file);
+                    newFiles.push(file);
+                });
+                syncFiles();
+            });
         }
-        files.forEach(file => {
-            const reader = new FileReader();
-            reader.onload = event => {
-                const thumb = document.createElement('div');
-                thumb.className = 'image-thumb';
-                thumb.innerHTML = `<img src="${event.target.result}" alt="Preview"><span class="remove-image new">×</span>`;
-                thumb.querySelector('.remove-image.new').onclick = () => {
-                    thumb.remove();
-                    newFiles = newFiles.filter(f => f !== file);
-                    syncFiles();
-                };
-                preview.appendChild(thumb);
-            };
-            reader.readAsDataURL(file);
-            newFiles.push(file);
-        });
-        syncFiles();
-    });
-}
 
         function syncFiles() {
             const dataTransfer = new DataTransfer();

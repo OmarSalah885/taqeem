@@ -3,9 +3,6 @@ require_once 'config.php';
 require_once 'db_connect.php';
 session_start();
 
-$is_ajax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
-$response = ['success' => false, 'message' => '', 'errors' => []];
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Retrieve and sanitize inputs
     $first_name = trim($_POST['first_name'] ?? '');
@@ -18,12 +15,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Validate CSRF token
     if (!verify_csrf_token($csrf_token)) {
-        $response['message'] = 'Invalid CSRF token.';
-        if ($is_ajax) {
-            header('Content-Type: application/json');
-            echo json_encode($response);
-            exit;
-        }
         $_SESSION['signup_errors'] = ['general' => 'Invalid CSRF token.'];
         header("Location: $redirect_url");
         exit;
@@ -72,12 +63,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (!empty($errors)) {
-        $response['errors'] = $errors;
-        if ($is_ajax) {
-            header('Content-Type: application/json');
-            echo json_encode($response);
-            exit;
-        }
         $_SESSION['signup_errors'] = $errors;
         $_SESSION['signup_data'] = $_POST;
         header("Location: $redirect_url");
@@ -105,33 +90,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         unset($_SESSION['login_errors']);
         unset($_SESSION['login_data']);
 
-        $response['success'] = true;
-        $response['user'] = [
-            'id' => $user_id,
-            'first_name' => $first_name,
-            'last_name' => $last_name,
-            'profile_image' => $default_profile_image,
-            'role' => 'user'
-        ];
-        $response['redirect_url'] = $redirect_url;
-
-        if ($is_ajax) {
-            header('Content-Type: application/json');
-            echo json_encode($response);
-            exit;
-        }
-
         header("Location: $redirect_url");
         exit;
     } else {
         $errors['general'] = 'Error creating account: ' . $stmt->error;
-        $response['errors'] = $errors;
-        if ($is_ajax) {
-            header('Content-Type: application/json');
-            echo json_encode($response);
-            $stmt->close();
-            exit;
-        }
         $_SESSION['signup_errors'] = $errors;
         $_SESSION['signup_data'] = $_POST;
         $stmt->close();
@@ -139,12 +101,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 } else {
-    $response['message'] = 'Invalid request method.';
-    if ($is_ajax) {
-        header('Content-Type: application/json');
-        echo json_encode($response);
-        exit;
-    }
     header('Location: index.php');
     exit;
 }

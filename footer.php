@@ -44,9 +44,9 @@
 <script src="assets/js/save_interactions.js"></script>
 <script src="assets/js/reply_functionality.js"></script>
 <script src="assets/js/search.js"></script>
-<script src="assets/js/auth.js"></script>
 <script src="assets/js/mobile-menu.js"></script>
 <script src="assets/js/carousel.js"></script>
+<script src="assets/js/auth.js"></script>
 <script src="assets/js/ajax_review.js"></script>
 <script src="assets/js/star_rating.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
