@@ -11,7 +11,8 @@ if (!isset($_SESSION['CREATED'])) {
 if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 1800)) {
     session_unset();
     session_destroy();
-    header('Location: index.php?timeout=true');
+    $redirect_url = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] . (parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY) ? '&' : '?') . 'timeout=true' : 'index.php?timeout=true';
+    header("Location: $redirect_url");
     exit;
 }
 $_SESSION['LAST_ACTIVITY'] = time();
@@ -61,10 +62,9 @@ if (isset($_SESSION['user_id']) && (!isset($_SESSION['profile_image']) || !isset
     <title>Taqeem</title>
     <script>
         const isLoggedIn = <?php echo isset($_SESSION['user_id']) ? 'true' : 'false'; ?>;
-        const hasLoginErrors = <?php echo !empty($_SESSION['login_errors']) ? 'true' : 'false'; ?>;
-        const hasSignupErrors = <?php echo !empty($_SESSION['signup_errors']) ? 'true' : 'false'; ?>;
+        const hasLoginErrors = <?php echo !empty($_SESSION['login_errors']) && !isset($_SESSION['user_id']) ? 'true' : 'false'; ?>;
+        const hasSignupErrors = <?php echo !empty($_SESSION['signup_errors']) && !isset($_SESSION['user_id']) ? 'true' : 'false'; ?>;
     </script>
-    
 </head>
 <body>
     <nav>
