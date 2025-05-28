@@ -431,7 +431,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             $conn->commit();
-            header("Location: edit_place.php?place_id=$place_id&updated=1");
+            header("Location: single-place.php?place_id=" . $place_id);
             exit;
         } catch (Exception $e) {
             $conn->rollback();

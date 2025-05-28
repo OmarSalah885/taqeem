@@ -1,15 +1,12 @@
 <?php
+ob_start();
 require_once 'config.php';
 require_once 'db_connect.php';
-
-
-
 
 // Check if user is logged in
 $logged_in = isset($_SESSION['user_id']);
 
 if (!$logged_in) {
-    // Redirect to index.php with a parameter to show login overlay
     $redirect_url = 'index.php?show_login=true&redirect_url=' . urlencode('add-place.php');
     header("Location: $redirect_url");
     exit;
@@ -64,146 +61,174 @@ function normalizeName($name) {
     return strtolower(trim(preg_replace('/[^a-zA-Z0-9]+/', '_', $name)));
 }
 
+// Fetch categories
+$cat_stmt = $conn->prepare("SELECT id, name FROM categories ORDER BY name ASC");
+$cat_stmt->execute();
+$cat_result = $cat_stmt->get_result();
+while ($cat = $cat_result->fetch_assoc()) {
+    $cats[] = $cat;
+}
+$cat_stmt->close();
 
-    // Fetch categories
-    $cat_stmt = $conn->prepare("SELECT id, name FROM categories ORDER BY name ASC");
-    $cat_stmt->execute();
-    $cat_result = $cat_stmt->get_result();
-    while ($cat = $cat_result->fetch_assoc()) {
-        $cats[] = $cat;
+// Handle POST
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        error_log("CSRF token validation failed");
+        die("Invalid CSRF token");
     }
-    $cat_stmt->close();
 
-    // Handle POST
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-            die("Invalid CSRF token");
-        }
+    // Sanitize inputs
+    $place['name'] = trim($_POST['name'] ?? '');
+    $place['price'] = $_POST['price'] ?? '';
+    $place['tags'] = trim($_POST['tags'] ?? '');
+    $place['description'] = trim($_POST['description'] ?? '');
+    $place['category_id'] = intval($_POST['category_id'] ?? 0);
+    $place['email'] = trim($_POST['email'] ?? '');
+    $place['phone_1'] = trim($_POST['phone_1'] ?? '');
+    $place['phone_2'] = trim($_POST['phone_2'] ?? '');
+    $place['website'] = trim($_POST['website'] ?? '');
+    $place['facebook_url'] = trim($_POST['facebook_url'] ?? '');
+    $place['instagram_url'] = trim($_POST['instagram_url'] ?? '');
+    $place['twitter_url'] = trim($_POST['twitter_url'] ?? '');
+    $place['country'] = trim($_POST['country'] ?? '');
+    $place['city'] = trim($_POST['city'] ?? '');
+    $place['address'] = trim($_POST['address'] ?? '');
+    $place['latitude'] = floatval($_POST['latitude'] ?? '31.9539');
+    $place['longitude'] = floatval($_POST['longitude'] ?? '35.9106');
+    $place['google_map_location'] = trim($_POST['google_map_location'] ?? '');
+    $open_time = $_POST['open_time'] ?? [];
+    $close_time = $_POST['close_time'] ?? [];
 
-        // Sanitize inputs
-        $place['name'] = trim($_POST['name'] ?? '');
-        $place['price'] = $_POST['price'] ?? '';
-        $place['tags'] = trim($_POST['tags'] ?? '');
-        $place['description'] = trim($_POST['description'] ?? '');
-        $place['category_id'] = intval($_POST['category_id'] ?? 0);
-        $place['email'] = trim($_POST['email'] ?? '');
-        $place['phone_1'] = trim($_POST['phone_1'] ?? '');
-        $place['phone_2'] = trim($_POST['phone_2'] ?? '');
-        $place['website'] = trim($_POST['website'] ?? '');
-        $place['facebook_url'] = trim($_POST['facebook_url'] ?? '');
-        $place['instagram_url'] = trim($_POST['instagram_url'] ?? '');
-        $place['twitter_url'] = trim($_POST['twitter_url'] ?? '');
-        $place['country'] = trim($_POST['country'] ?? '');
-        $place['city'] = trim($_POST['city'] ?? '');
-        $place['address'] = trim($_POST['address'] ?? '');
-        $place['latitude'] = floatval($_POST['latitude'] ?? '31.9539');
-        $place['longitude'] = floatval($_POST['longitude'] ?? '35.9106');
-        $place['google_map_location'] = trim($_POST['google_map_location'] ?? '');
-        $open_time = $_POST['open_time'] ?? [];
-        $close_time = $_POST['close_time'] ?? [];
+    // Validation
+    if ($place['name'] === '') {
+        $errors[] = "Place name is required.";
+    }
+    if (!in_array($place['price'], ['$', '$$', '$$$'])) {
+        $errors[] = "Invalid price selected.";
+    }
+    if ($place['category_id'] <= 0) {
+        $errors[] = "Category must be selected.";
+    }
+    if ($place['email'] !== '' && !filter_var($place['email'], FILTER_VALIDATE_EMAIL)) {
+        $errors[] = "Invalid email address.";
+    }
+    if ($place['latitude'] < -90 || $place['latitude'] > 90 || $place['longitude'] < -180 || $place['longitude'] > 180) {
+        $errors[] = "Invalid coordinates.";
+    }
+    if (strlen($place['address']) > 100) {
+        $errors[] = "Address is too long (max 100 characters).";
+    }
 
-        // Validation
-        if ($place['name'] === '') {
-            $errors[] = "Place name is required.";
+    // Validate JSON inputs
+    error_log("menu_items_data received: " . ($_POST['menu_items_data'] ?? 'none'));
+    $menu_items_data = $_POST['menu_items_data'] ?? '[]';
+    if (trim($menu_items_data) === '') {
+        $menu_items = [];
+    } else {
+        $menu_items = json_decode($menu_items_data, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $errors[] = "Invalid menu items data.";
+            error_log("JSON Decode Error for menu_items_data: " . json_last_error_msg() . ", Raw data: " . $menu_items_data);
         }
-        if (!in_array($place['price'], ['$', '$$', '$$$'])) {
-            $errors[] = "Invalid price selected.";
-        }
-        if ($place['category_id'] <= 0) {
-            $errors[] = "Category must be selected.";
-        }
-        if ($place['email'] !== '' && !filter_var($place['email'], FILTER_VALIDATE_EMAIL)) {
-            $errors[] = "Invalid email address.";
-        }
-        if ($place['latitude'] < -90 || $place['latitude'] > 90 || $place['longitude'] < -180 || $place['longitude'] > 180) {
-            $errors[] = "Invalid coordinates.";
-        }
-        if (strlen($place['address']) > 100) {
-            $errors[] = "Address is too long (max 100 characters).";
-        }
+    }
+    error_log("Parsed menu_items: " . print_r($menu_items, true));
 
-        if (empty($errors)) {
-            $conn->begin_transaction();
-            try {
-                // Get category name
-                $cat_stmt = $conn->prepare("SELECT name FROM categories WHERE id = ?");
-                $cat_stmt->bind_param("i", $place['category_id']);
-                $cat_stmt->execute();
-                $cat_result = $cat_stmt->get_result();
-                $category_row = $cat_result->fetch_assoc();
-                $cat_stmt->close();
-                $category_name_safe = $category_row['name'] ?? '';
-                $place_name_safe = normalizeName($place['name']);
+    // Handle faqs_data gracefully
+    error_log("faqs_data received: " . ($_POST['faqs_data'] ?? 'none'));
+    $faqs_data = $_POST['faqs_data'] ?? '[]';
+    if (trim($faqs_data) === '') {
+        $faqs = [];
+    } else {
+        $faqs = json_decode($faqs_data, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $errors[] = "Invalid FAQs data.";
+            error_log("JSON Decode Error for faqs_data: " . json_last_error_msg() . ", Raw data: " . $faqs_data);
+        }
+    }
+    error_log("Parsed FAQs: " . print_r($faqs, true));
 
-                // Insert place
-                $insert_stmt = $conn->prepare("
-                    INSERT INTO places (
-                        name, price, tags, description, category_id, user_id, email, phone_1, phone_2, website, created_at,
-                        facebook_url, instagram_url, twitter_url, country, city, address, latitude, longitude, google_map_location
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ");
-                $insert_stmt->bind_param(
-                    "sssssissssssssssdds",
-                    $place['name'], $place['price'], $place['tags'], $place['description'], $place['category_id'], $_SESSION['user_id'],
-                    $place['email'], $place['phone_1'], $place['phone_2'], $place['website'],
-                    $place['facebook_url'], $place['instagram_url'], $place['twitter_url'],
-                    $place['country'], $place['city'], $place['address'], $place['latitude'], $place['longitude'], $place['google_map_location']
-                );
-                $insert_stmt->execute();
-                $place_id = $conn->insert_id;
-                $insert_stmt->close();
+    if (empty($errors)) {
+        $conn->begin_transaction();
+        try {
+            // Get category name
+            $cat_stmt = $conn->prepare("SELECT name FROM categories WHERE id = ?");
+            $cat_stmt->bind_param("i", $place['category_id']);
+            $cat_stmt->execute();
+            $cat_result = $cat_stmt->get_result();
+            $category_row = $cat_result->fetch_assoc();
+            $cat_stmt->close();
+            $category_name_safe = $category_row['name'] ?? '';
+            $place_name_safe = normalizeName($place['name']);
 
-                // Insert opening hours
-                $oh_stmt = $conn->prepare("INSERT INTO opening_hours (place_id, day, open_time, close_time) VALUES (?, ?, ?, ?)");
-                foreach ($open_time as $day => $open) {
-                    $close = $close_time[$day] ?? '';
-                    $oh_stmt->bind_param("isss", $place_id, $day, $open, $close);
-                    $oh_stmt->execute();
+            // Insert place
+            $insert_stmt = $conn->prepare("
+                INSERT INTO places (
+                    name, price, tags, description, category_id, user_id, email, phone_1, phone_2, website, created_at,
+                    facebook_url, instagram_url, twitter_url, country, city, address, latitude, longitude, google_map_location
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ");
+            $insert_stmt->bind_param(
+                "sssssissssssssssdds",
+                $place['name'], $place['price'], $place['tags'], $place['description'], $place['category_id'], $_SESSION['user_id'],
+                $place['email'], $place['phone_1'], $place['phone_2'], $place['website'],
+                $place['facebook_url'], $place['instagram_url'], $place['twitter_url'],
+                $place['country'], $place['city'], $place['address'], $place['latitude'], $place['longitude'], $place['google_map_location']
+            );
+            $insert_stmt->execute();
+            $place_id = $conn->insert_id;
+            $insert_stmt->close();
+
+            // Insert opening hours
+            $oh_stmt = $conn->prepare("INSERT INTO opening_hours (place_id, day, open_time, close_time) VALUES (?, ?, ?, ?)");
+            foreach ($open_time as $day => $open) {
+                $close = $close_time[$day] ?? '';
+                $oh_stmt->bind_param("isss", $place_id, $day, $open, $close);
+                $oh_stmt->execute();
+            }
+            $oh_stmt->close();
+
+            // Handle featured image
+            if (!empty($_FILES['featured_image']['tmp_name'])) {
+                $featured_dir = __DIR__ . "/assets/images/places/{$category_name_safe}/{$place_name_safe}/featured/";
+                if (!is_dir($featured_dir)) {
+                    mkdir($featured_dir, 0755, true);
                 }
-                $oh_stmt->close();
-
-                // Handle featured image
-                if (!empty($_FILES['featured_image']['tmp_name'])) {
-                    $featured_dir = __DIR__ . "/assets/images/places/{$category_name_safe}/{$place_name_safe}/featured/";
-                    if (!is_dir($featured_dir)) {
-                        mkdir($featured_dir, 0755, true);
-                    }
-                    $filename = uniqid('feat_', true) . '_' . basename($_FILES['featured_image']['name']);
-                    $targetFile = $featured_dir . $filename;
-                    if (!move_uploaded_file($_FILES['featured_image']['tmp_name'], $targetFile)) {
-                        throw new Exception("Failed to upload featured image.");
-                    }
-                    $path = "assets/images/places/{$category_name_safe}/{$place_name_safe}/featured/" . $filename;
-                    $updateStmt = $conn->prepare("UPDATE places SET featured_image = ? WHERE id = ?");
-                    $updateStmt->bind_param("si", $path, $place_id);
-                    $updateStmt->execute();
-                    $updateStmt->close();
+                $filename = uniqid('feat_', true) . '_' . basename($_FILES['featured_image']['name']);
+                $targetFile = $featured_dir . $filename;
+                if (!move_uploaded_file($_FILES['featured_image']['tmp_name'], $targetFile)) {
+                    throw new Exception("Failed to upload featured image.");
                 }
+                $path = "assets/images/places/{$category_name_safe}/{$place_name_safe}/featured/" . $filename;
+                $updateStmt = $conn->prepare("UPDATE places SET featured_image = ? WHERE id = ?");
+                $updateStmt->bind_param("si", $path, $place_id);
+                $updateStmt->execute();
+                $updateStmt->close();
+            }
 
-                // Handle gallery images
-                if (!empty($_FILES['gallery_images']['tmp_name'][0])) {
-                    $gallery_dir = __DIR__ . "/assets/images/places/{$category_name_safe}/{$place_name_safe}/gallery/";
-                    if (!is_dir($gallery_dir)) {
-                        mkdir($gallery_dir, 0755, true);
-                    }
-                    foreach ($_FILES['gallery_images']['tmp_name'] as $i => $tmpName) {
-                        if ($_FILES['gallery_images']['error'][$i] === UPLOAD_ERR_OK) {
-                            $filename = uniqid('gal_', true) . '_' . basename($_FILES['gallery_images']['name'][$i]);
-                            $targetFile = $gallery_dir . $filename;
-                            if (!move_uploaded_file($tmpName, $targetFile)) {
-                                throw new Exception("Failed to upload gallery image: $filename");
-                            }
-                            $path = "assets/images/places/{$category_name_safe}/{$place_name_safe}/gallery/" . $filename;
-                            $ins_stmt = $conn->prepare("INSERT INTO place_gallery (place_id, image_url) VALUES (?, ?)");
-                            $ins_stmt->bind_param("is", $place_id, $path);
-                            $ins_stmt->execute();
-                            $ins_stmt->close();
+            // Handle gallery images
+            if (!empty($_FILES['gallery_images']['tmp_name'][0])) {
+                $gallery_dir = __DIR__ . "/assets/images/places/{$category_name_safe}/{$place_name_safe}/gallery/";
+                if (!is_dir($gallery_dir)) {
+                    mkdir($gallery_dir, 0755, true);
+                }
+                foreach ($_FILES['gallery_images']['tmp_name'] as $i => $tmpName) {
+                    if ($_FILES['gallery_images']['error'][$i] === UPLOAD_ERR_OK) {
+                        $filename = uniqid('gal_', true) . '_' . basename($_FILES['gallery_images']['name'][$i]);
+                        $targetFile = $gallery_dir . $filename;
+                        if (!move_uploaded_file($tmpName, $targetFile)) {
+                            throw new Exception("Failed to upload gallery image: $filename");
                         }
+                        $path = "assets/images/places/{$category_name_safe}/{$place_name_safe}/gallery/" . $filename;
+                        $ins_stmt = $conn->prepare("INSERT INTO place_gallery (place_id, image_url) VALUES (?, ?)");
+                        $ins_stmt->bind_param("is", $place_id, $path);
+                        $ins_stmt->execute();
+                        $ins_stmt->close();
                     }
                 }
+            }
 
-                // Handle menu items
-                $menu_items = json_decode($_POST['menu_items_data'] ?? '[]', true);
+            // Handle menu items
+            if (!empty($menu_items)) {
                 $menu_dir = __DIR__ . "/assets/images/places/{$category_name_safe}/{$place_name_safe}/menu/";
                 if (!is_dir($menu_dir)) {
                     mkdir($menu_dir, 0755, true);
@@ -229,26 +254,39 @@ function normalizeName($name) {
                         $stmt->close();
                     }
                 }
+            }
 
-                // Handle FAQs
-                $faqs = json_decode($_POST['faqs_data'] ?? '[]', true);
-                foreach ($faqs as $faq) {
+            // Handle FAQs
+            if (!empty($faqs)) {
+                foreach ($faqs as $index => $faq) {
+                    if (empty($faq['question']) || empty($faq['answer'])) {
+                        error_log("Skipping FAQ at index $index: Empty question or answer");
+                        continue;
+                    }
                     $stmt = $conn->prepare("INSERT INTO faqs (place_id, question, answer) VALUES (?, ?, ?)");
                     $stmt->bind_param("iss", $place_id, $faq['question'], $faq['answer']);
-                    $stmt->execute();
+                    if (!$stmt->execute()) {
+                        error_log("Failed to insert FAQ at index $index: " . $stmt->error);
+                        throw new Exception("Failed to insert FAQ: " . $stmt->error);
+                    }
                     $stmt->close();
                 }
-
-                $conn->commit();
-                header("Location: single-place.php?place_id=" . $place_id);
-                exit;
-            } catch (Exception $e) {
-                $conn->rollback();
-                $errors[] = "Error: " . $e->getMessage();
+            } else {
+                error_log("No FAQs to insert for place_id=$place_id");
             }
+
+            $conn->commit();
+            error_log("Place added successfully, redirecting to place_id=$place_id");
+            header("Location: single-place.php?place_id=" . $place_id);
+            ob_end_flush();
+            exit;
+        } catch (Exception $e) {
+            $conn->rollback();
+            $errors[] = "Error: " . $e->getMessage();
+            error_log("Add Place Error: " . $e->getMessage());
         }
     }
-
+}
 ?>
 
 <?php if ($logged_in): ?>
@@ -272,7 +310,6 @@ function normalizeName($name) {
                 </ul>
             </div>
         <?php endif; ?>
-
         <div class="add-place_sidebar">
             <a href="#add-place-general">GENERAL</a>
             <a href="#add-place-location">LOCATION</a>
@@ -398,8 +435,7 @@ function normalizeName($name) {
                 </div>
             </div>
 
-            <!-- MENU SECTION -->
-            <div class="add-place_main--item add-place_main--menu" id="add-place-menu">
+            <div id="add-place-menu" class="add-place_main--item add-place_main--menu">
                 <h2 class="add-place_title">MENU</h2>
                 <div class="add-menu_item">
                     <div class="add-menu_item--img">
@@ -436,15 +472,22 @@ function normalizeName($name) {
                 <div class="added-faqs">
                     <div class="added-faqs-grid" id="faqs-container"></div>
                 </div>
-                <input type="hidden" name="faqs_data" id="faqsInput">
+                <input type="hidden" name="faqs_data" id="faqsInput" value="[]">
             </div>
 
             <button type="submit" class="btn__red--l btn__red btn">ADD PLACE</button>
         </form>
     </main>
 
-    <!-- JavaScript for handling media, menu, and FAQs -->
     <script>
+    document.querySelector('.add-place_main').addEventListener('submit', (e) => {
+        console.log('Form submission triggered');
+        const faqsInput = document.getElementById('faqsInput');
+        const menuItemsInput = document.getElementById('menuItemsInput');
+        console.log('faqs_data:', faqsInput.value);
+        console.log('menu_items_data:', menuItemsInput.value);
+    });
+
     (() => {
         const dropArea = document.querySelector('.media-contanier_featured .drop-area');
         const fileInput1 = document.getElementById('fileInput1');
@@ -625,6 +668,9 @@ function normalizeName($name) {
         let menuItems = [];
         let editingIndex = null;
 
+        // Initialize menuItemsInput to empty array
+        menuItemsInput.value = JSON.stringify(menuItems);
+
         function updateMenuTitle() {
             let title = document.querySelector('.add-menu_added h3.media_added--title');
             const hasItems = menuItemsContainer.children.length > 0;
@@ -716,6 +762,7 @@ function normalizeName($name) {
 
         function updateHiddenInput() {
             menuItemsInput.value = JSON.stringify(menuItems);
+            console.log('Menu items updated:', menuItems);
         }
 
         function clearInputs() {
@@ -763,8 +810,11 @@ function normalizeName($name) {
         let faqs = [];
         let editingIndex = null;
 
+        // Initialize faqsInput to empty array
+        faqsInput.value = JSON.stringify(faqs);
+
         function updateFaqTitle() {
-            let title = document.querySelector('.added-faqs h3');
+            let title = document.querySelector('.added-faqs h3.media_added--title');
             const hasItems = faqsContainer.children.length > 0;
             if (hasItems && !title) {
                 faqsContainer.insertAdjacentHTML('beforebegin', '<h3 class="media_added--title">ADDED FAQS</h3>');
@@ -793,10 +843,12 @@ function normalizeName($name) {
                 faqsContainer.appendChild(div);
             });
             updateFaqTitle();
+            updateHiddenInput();
         }
 
         function updateHiddenInput() {
             faqsInput.value = JSON.stringify(faqs);
+            console.log('FAQs updated:', faqs);
         }
 
         addFaqBtn.addEventListener('click', (e) => {
@@ -813,6 +865,8 @@ function normalizeName($name) {
                 faqQuestionInput.value = '';
                 faqAnswerInput.value = '';
                 renderFaqs();
+            } else {
+                alert('Please fill both question and answer fields.');
             }
         });
 
@@ -835,10 +889,11 @@ function normalizeName($name) {
             }
         });
 
-        // Initialize FAQ title
+        // Initialize faqs
         updateFaqTitle();
     })();
-    </script>
+</script>
 <?php endif; ?>
 
 <?php include 'footer.php'; ?>
+<?php ob_end_flush(); ?>

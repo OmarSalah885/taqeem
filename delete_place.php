@@ -23,7 +23,7 @@ $place = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
 if (!$place || $place['user_id'] != $_SESSION['user_id']) {
-    header("Location: " . ($_POST['redirect_to'] ?? 'index.php'));
+    header("Location: profile.php?user_id=" . $_SESSION['user_id']);
     exit();
 }
 
@@ -95,7 +95,7 @@ $pdel->execute();
 $pdel->close();
 
 // 9) Redirect back
-header("Location: " . ($_POST['redirect_to'] ?? 'index.php'));
+header("Location: profile.php?user_id=" . $_SESSION['user_id']);
 exit();
 
 
