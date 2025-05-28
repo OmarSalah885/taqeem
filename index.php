@@ -2,7 +2,7 @@
 require_once 'config.php';
 require_once 'db_connect.php';
 
-include 'header.php'; // Include the header
+include 'header.php';
 ?>
 
 <main class="index-main">
@@ -10,9 +10,8 @@ include 'header.php'; // Include the header
     <!-- Carousel Section -->
     <div class="carousel">
         <div class="carousel-inner">
-
             <div class="carousel-item active">
-                <div class=" carousel-item_img">
+                <div class="carousel-item_img">
                     <img src="assets/images/eugene-zhyvchik-vad__5nCLJ8-unsplash.jpg" alt="carousel image">
                     <div class="carousel-item-overlay"></div>
                 </div>
@@ -24,9 +23,8 @@ include 'header.php'; // Include the header
                     </div>
                 </div>
             </div>
-
             <div class="carousel-item">
-                <div class=" carousel-item_img">
+                <div class="carousel-item_img">
                     <img src="assets/images/carousel(1).jpg" alt="carousel image">
                     <div class="carousel-item-overlay"></div>
                 </div>
@@ -38,22 +36,19 @@ include 'header.php'; // Include the header
                     </div>
                 </div>
             </div>
-
             <div class="carousel-item">
-                <div class=" carousel-item_img">
+                <div class="carousel-item_img">
                     <img src="assets/images/carousel(2).jpg" alt="carousel image">
                     <div class="carousel-item-overlay"></div>
                 </div>
                 <div class="carousel-item_content">
                     <div class="carousel-item_content-div">
-                        <h1 data-aos="fade-up" data-aos-duration="1500">Looking for greenery? Let’s find the best plant
-                            stores!</h1>
+                        <h1 data-aos="fade-up" data-aos-duration="1500">Looking for greenery? Let’s find the best plant stores!</h1>
                         <a href="listing.php?category_id=7" class="btn__red--l btn__red btn" data-aos="fade-up"
                             data-aos-delay="300" data-aos-duration="1500">See More</a>
                     </div>
                 </div>
             </div>
-
         </div>
         <button class="carousel-control prev">❮</button>
         <button class="carousel-control next">❯</button>
@@ -64,48 +59,46 @@ include 'header.php'; // Include the header
         </div>
     </div>
 
-
     <!-- Categories Section -->
     <div class="categories">
         <h2 class="home-title" data-aos="fade-up" data-aos-duration="1500">Categories</h2>
         <div class="categories_grid">
             <?php
-        $categories = [
-            1 => 'RESTAURANTS',
-            2 => 'SHOPPING',
-            3 => 'ACTIVE LIFE',
-            4 => 'HOME SERVICES',
-            5 => 'COFFEE',
-            6 => 'PETS',
-            7 => 'PLANTS SHOP',
-            8 => 'ART',
-            9 => 'HOTELS',
-            10 => 'EDUCATION',
-            11 => 'HEALTH',
-            12 => 'WORKSPACE'
-        ];
+            $categories = [
+                1 => 'RESTAURANTS',
+                2 => 'SHOPPING',
+                3 => 'ACTIVE LIFE',
+                4 => 'HOME SERVICES',
+                5 => 'COFFEE',
+                6 => 'PETS',
+                7 => 'PLANTS SHOP',
+                8 => 'ART',
+                9 => 'HOTELS',
+                10 => 'EDUCATION',
+                11 => 'HEALTH',
+                12 => 'WORKSPACE'
+            ];
 
-        $delay = 0; // start delay in ms
-        $maxDelay = 500; // max delay before reset
+            $delay = 0;
+            $maxDelay = 500;
 
-        foreach ($categories as $id => $name) {
-            $imagePath = "assets/images/categories/" . strtoupper($name) . " (1).jpg";
-            
-            echo '<div class="categories_grid--item" data-aos="fade-up" data-aos-delay="' . $delay . '" data-aos-duration="1500">
-                <a href="listing.php?category_id=' . $id . '">
-                    <img src="' . $imagePath . '" alt="' . htmlspecialchars($name) . '">
-                </a>
-                <a class="categories_grid--item_link" href="listing.php?category_id=' . $id . '">' . $name . '</a>
-            </div>';
-
-            $delay += 100;
-            if ($delay > $maxDelay) {
-                $delay = 0; // reset delay to 0 if over maxDelay
+            foreach ($categories as $id => $name) {
+                $imagePath = "assets/images/categories/" . strtoupper($name) . " (1).jpg";
+                echo '<div class="categories_grid--item" data-aos="fade-up" data-aos-delay="' . $delay . '" data-aos-duration="1500">
+                    <a href="listing.php?category_id=' . $id . '">
+                        <img src="' . $imagePath . '" alt="' . htmlspecialchars($name) . '">
+                    </a>
+                    <a class="categories_grid--item_link" href="listing.php?category_id=' . $id . '">' . $name . '</a>
+                </div>';
+                $delay += 100;
+                if ($delay > $maxDelay) {
+                    $delay = 0;
+                }
             }
-        }
-        ?>
+            ?>
         </div>
     </div>
+
     <!-- Recent Activity -->
     <div class="activity">
         <h2 class="home-title" data-aos="fade-up" data-aos-duration="1500">Recent Activity</h2>
@@ -133,13 +126,16 @@ include 'header.php'; // Include the header
             LIMIT $limit";
 
             $result = mysqli_query($conn, $query);
+            $initial_review_ids = [];
             if (mysqli_num_rows($result) > 0) {
                 while ($row = mysqli_fetch_assoc($result)) {
+                    $initial_review_ids[] = $row['review_id'];
                     include 'review_card.php';
                 }
             } else {
                 echo "<p>No reviews found.</p>";
             }
+            mysqli_free_result($result);
             ?>
         </div>
         <a class="btn__transparent--l btn__transparent btn" id="loadMore" data-aos="fade-up"
@@ -172,52 +168,83 @@ include 'header.php'; // Include the header
         <h2 class="home-title" data-aos="fade-up" data-aos-duration="1500">Our Blogs</h2>
         <div class="homeBlog_blogs">
             <?php
-        $query = "SELECT id, image, title, tags, content FROM blogs ORDER BY RAND() LIMIT 3";
-        $result = mysqli_query($conn, $query);
+            $query = "SELECT id, image, title, tags, content FROM blogs ORDER BY RAND() LIMIT 3";
+            $result = mysqli_query($conn, $query);
 
-        $aos_delay = 0;
+            $aos_delay = 0;
 
-        if (mysqli_num_rows($result) > 0) {
-            while ($row = mysqli_fetch_assoc($result)) {
-                $id = $row['id'];
-                $image = htmlspecialchars($row['image']);
-                $title = htmlspecialchars($row['title']);
-                $tags = explode(',', $row['tags']);
-                $content = strip_tags($row['content']);
-                $shortContent = (strlen($content) > 200) ? substr($content, 0, 200) . '...' : $content;
+            if (mysqli_num_rows($result) > 0) {
+                while ($row = mysqli_fetch_assoc($result)) {
+                    $id = $row['id'];
+                    $image = htmlspecialchars($row['image']);
+                    $title = htmlspecialchars($row['title']);
+                    $tags = explode(',', $row['tags']);
+                    $content = strip_tags($row['content']);
+                    $shortContent = (strlen($content) > 200) ? substr($content, 0, 200) . '...' : $content;
 
-                echo '<div class="homeBlog_blogs--item" data-aos="fade-up" data-aos-delay="' . $aos_delay . '" data-aos-duration="1500">
-                        <div class="homeBlog_blogs--item-img">
-                            <a href="single-blog.php?id=' . $id . '" class="homeBlog_blogs--item-img_img">
-                                <img src="' . $image . '" alt="Blog Image">
-                            </a>
-                            <div class="homeBlog_blogs--item-img_tags">';
-                foreach ($tags as $tag) {
-                    echo '<a href="blogs.php?search_term=' . urlencode(trim($tag)) . '">' . htmlspecialchars(trim($tag)) . '</a>';
+                    echo '<div class="homeBlog_blogs--item" data-aos="fade-up" data-aos-delay="' . $aos_delay . '" data-aos-duration="1500">
+                            <div class="homeBlog_blogs--item-img">
+                                <a href="single-blog.php?id=' . $id . '" class="homeBlog_blogs--item-img_img">
+                                    <img src="' . $image . '" alt="Blog Image">
+                                </a>
+                                <div class="homeBlog_blogs--item-img_tags">';
+                    foreach ($tags as $tag) {
+                        echo '<a href="blogs.php?search_term=' . urlencode(trim($tag)) . '">' . htmlspecialchars(trim($tag)) . '</a>';
+                    }
+                    echo '</div>
+                            </div>
+                            <div class="homeBlog_blogs--item-text">
+                                <a href="single-blog.php?id=' . $id . '" class="homeBlog_blogs--item-text_title">' . $title . '</a>
+                                <a href="single-blog.php?id=' . $id . '" style="text-decoration: none; color: inherit;">
+                                    <p>' . htmlspecialchars($shortContent) . '</p>
+                                </a>
+                            </div>
+                        </div>';
+
+                    $aos_delay += 300;
+                    if ($aos_delay > 800) {
+                        $aos_delay = 0;
+                    }
                 }
-                echo '</div>
-                        </div>
-                        <div class="homeBlog_blogs--item-text">
-                            <a href="single-blog.php?id=' . $id . '" class="homeBlog_blogs--item-text_title">' . $title . '</a>
-                            <a href="single-blog.php?id=' . $id . '" style="text-decoration: none; color: inherit;">
-                                <p>' . htmlspecialchars($shortContent) . '</p>
-                            </a>
-                        </div>
-                    </div>';
-
-                // Increment delay and reset after 800ms
-                $aos_delay += 300;
-                if ($aos_delay > 800) {
-                    $aos_delay = 0;
-                }
+            } else {
+                echo "<p>No blogs found.</p>";
             }
-        } else {
-            echo "<p>No blogs found.</p>";
-        }
-        ?>
+            mysqli_free_result($result);
+            ?>
         </div>
     </div>
 
 </main>
+
+<script>
+// Initial review IDs from PHP
+let displayedReviewIds = <?php echo json_encode($initial_review_ids); ?>;
+
+// Toggle like functionality
+function toggleLike(event, reviewId) {
+    event.preventDefault();
+    const heartIcon = event.currentTarget.querySelector('i');
+    const isLiked = heartIcon.classList.contains('fa-solid');
+
+    fetch('toggle_like.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `review_id=${reviewId}&action=${isLiked ? 'unlike' : 'like'}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            heartIcon.classList.toggle('fa-solid');
+            heartIcon.classList.toggle('fa-regular');
+        } else {
+            console.error('Error toggling like:', data.message);
+        }
+    })
+    .catch(error => console.error('Fetch error:', error));
+}
+</script>
+
 
 <?php include 'footer.php'; ?>

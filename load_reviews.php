@@ -4,14 +4,27 @@ require_once 'db_connect.php';
 $limit = 8;
 $pool_limit = 1000;
 
-// Step 1: Get IDs of recent reviews **that have images**
-$id_stmt = $conn->prepare("
+// Get excluded review IDs from POST
+$exclude_ids = [];
+if (isset($_POST['exclude_ids'])) {
+    $exclude_ids = json_decode($_POST['exclude_ids'], true);
+    if (!is_array($exclude_ids)) {
+        $exclude_ids = [];
+    }
+    // Sanitize IDs
+    $exclude_ids = array_map('intval', $exclude_ids);
+}
+
+// Step 1: Get IDs of recent reviews with images, excluding specified IDs
+$exclude_clause = empty($exclude_ids) ? '0' : implode(',', $exclude_ids);
+$query = "
     SELECT DISTINCT r.id 
     FROM reviews r
     JOIN review_images ri ON r.id = ri.review_id
+    WHERE r.id NOT IN ($exclude_clause)
     ORDER BY r.created_at DESC
-    LIMIT ?
-");
+    LIMIT ?";
+$id_stmt = $conn->prepare($query);
 $id_stmt->bind_param("i", $pool_limit);
 $id_stmt->execute();
 $id_result = $id_stmt->get_result();
@@ -40,19 +53,18 @@ $types = str_repeat('i', count($selected_ids));
 
 $stmt = $conn->prepare("
     SELECT 
-    r.id AS review_id, 
-    r.review_text, 
-    r.rating, 
-    r.created_at, 
-    p.id AS place_id, 
-    p.name AS place_name, 
-    ri.image_url AS review_image,
-    c.icon AS icon_class,
-    c.id AS category_id,  -- ✅ Add this line
-    u.id AS user_id, 
-    CONCAT(u.first_name, ' ', u.last_name) AS user_name, 
-    u.profile_image AS user_profile_image
-
+        r.id AS review_id, 
+        r.review_text, 
+        r.rating, 
+        r.created_at, 
+        p.id AS place_id, 
+        p.name AS place_name, 
+        ri.image_url AS review_image,
+        c.icon AS icon_class,
+        c.id AS category_id,
+        u.id AS user_id, 
+        CONCAT(u.first_name, ' ', u.last_name) AS user_name, 
+        u.profile_image AS user_profile_image
     FROM reviews r
     INNER JOIN review_images ri ON r.id = ri.review_id
     INNER JOIN places p ON r.place_id = p.id
