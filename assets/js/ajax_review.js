@@ -47,35 +47,44 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Initialize all edit forms on page load
+    function initializeEditForms() {
+        document.querySelectorAll('.edit-review-form').forEach(form => {
+            bindEditForm(form);
+        });
+    }
+
     // Handle add review form submission
     const reviewForm = document.getElementById('reviewForm');
-    let formDataCache = null;
     let newFiles = [];
 
     if (reviewForm) {
         reviewForm.addEventListener('submit', async event => {
             event.preventDefault();
 
-            formDataCache = new FormData(reviewForm);
+            const formData = new FormData(reviewForm);
+            newFiles.forEach(file => {
+                formData.append('review_images[]', file);
+            });
+
             sessionStorage.setItem('reviewFormData', JSON.stringify({
-                review_text: formDataCache.get('review_text'),
-                rating: formDataCache.get('rating'),
-                place_id: formDataCache.get('place_id'),
-                csrf_token: formDataCache.get('csrf_token'),
+                review_text: formData.get('review_text'),
+                rating: formData.get('rating'),
+                place_id: formData.get('place_id'),
+                csrf_token: formData.get('csrf_token'),
                 image_names: newFiles.map(f => f.name)
             }));
 
             console.log('Add review form data:', {
-                review_text: formDataCache.get('review_text'),
-                rating: formDataCache.get('rating'),
-                place_id: formDataCache.get('place_id'),
-                csrf_token: formDataCache.get('csrf_token'),
+                review_text: formData.get('review_text'),
+                rating: formData.get('rating'),
+                place_id: formData.get('place_id'),
+                csrf_token: formData.get('csrf_token'),
                 images: newFiles.map(f => f.name)
             });
 
             if (isLoggedIn) {
-                syncFormData();
-                submitReviewForm();
+                submitReviewForm(formData);
             } else {
                 window.reviewImagesTemp = newFiles;
                 sessionStorage.setItem('isReviewTriggeredLogin', 'true');
@@ -85,23 +94,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Submit add review form via AJAX
-    function submitReviewForm() {
-        if (!formDataCache) {
-            console.error('No form data to submit');
-            alert('Error: No form data. Please try again.');
-            return;
-        }
-
-        if (!formDataCache.get('csrf_token')) {
+    function submitReviewForm(formData) {
+        if (!formData.get('csrf_token')) {
             console.error('CSRF token missing');
             alert('CSRF token missing. Please refresh the page.');
             return;
         }
 
-        console.log('Submitting review to add_review.php:', newFiles.map(f => f.name));
+        console.log('Submitting review to add_review.php:', Array.from(formData.getAll('review_images[]')).map(f => f.name));
         fetch('add_review.php', {
             method: 'POST',
-            body: formDataCache,
+            body: formData,
             headers: { 'X-Requested-With': 'XMLHttpRequest' },
             credentials: 'same-origin'
         })
@@ -170,25 +173,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     thumb.innerHTML = `<img src="${event.target.result}" alt="Preview"><span class="remove-image new">×</span>`;
                     thumb.querySelector('.remove-image').addEventListener('click', () => {
                         thumb.remove();
-                        newFiles = newFiles.filter(f => f !== file);
-                        syncFormData();
+                        newFiles = newFiles.filter(f => f.name !== file.name);
+                        imageInput.files = createFileList(newFiles);
                     });
                     imagePreview.appendChild(thumb);
                 };
                 reader.readAsDataURL(file);
                 newFiles.push(file);
             });
-            syncFormData();
+            imageInput.files = createFileList(newFiles);
         });
     }
 
-    function syncFormData() {
-        if (!imageInput) return;
+    function createFileList(files) {
         const dataTransfer = new DataTransfer();
-        newFiles.forEach(f => dataTransfer.items.add(f));
-        imageInput.files = dataTransfer.files;
-        console.log('Synced files:', newFiles.map(f => f.name));
-        window.reviewImagesTemp = newFiles;
+        files.forEach(f => dataTransfer.items.add(f));
+        return dataTransfer.files;
     }
 
     // Handle edit review form submissions
@@ -198,7 +198,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const form = event.target;
         const reviewId = parseInt(form.querySelector('input[name="review_id"]').value) || 0;
         const formData = new FormData(form);
-        console.log('Submitting edit form for review:', reviewId, 'with delete_images:', formData.getAll('delete_images[]'));
+        // Collect and deduplicate delete_images
+        const deleteImages = new Set();
+        form.querySelectorAll('input[name="delete_images[]"]').forEach(input => {
+            deleteImages.add(input.value);
+        });
+        // Clear existing delete_images[] to avoid duplicates
+        formData.delete('delete_images[]');
+        // Re-add deduplicated delete_images[]
+        deleteImages.forEach(imgId => {
+            formData.append('delete_images[]', imgId);
+        });
+        console.log('Submitting edit form for review:', reviewId, 'with delete_images:', Array.from(deleteImages));
         fetch('edit_review.php', {
             method: 'POST',
             body: formData,
@@ -240,7 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 form.style.display = 'none';
                 updateRatings(data.avg_rating, data.total_reviews, data.ratings_counts);
             } else {
-                alert(`Failed to edit review: ${data.error || 'Unknown error'}`);
+                alert(`Failed to add review: ${data.error || 'Unknown error'}`);
             }
         })
         .catch(error => {
@@ -252,48 +263,68 @@ document.addEventListener('DOMContentLoaded', () => {
     // Bind edit form functionality
     function bindEditForm(form) {
         const reviewId = parseInt(form.querySelector('input[name="review_id"]').value) || 0;
-        const preview = document.getElementById(`imagePreview-${reviewId}`);
+        let preview = document.getElementById(`imagePreview-${reviewId}`);
         const fileInput = document.getElementById(`imageInput-${reviewId}`);
         let newEditFiles = [];
+        let deleteImages = new Set(); // Track images to delete
 
-        // Remove existing listeners to prevent duplication
-        if (preview) {
-            const newPreview = preview.cloneNode(true);
-            preview.parentNode.replaceChild(newPreview, preview);
+        // Clear existing delete_images[] inputs
+        form.querySelectorAll('input[name="delete_images[]"]').forEach(input => input.remove());
+        deleteImages.clear();
+
+        // Bind remove-image event listener
+        function bindRemoveImageListener() {
+            if (!preview) {
+                console.error(`Image preview not found for review ID: ${reviewId}`);
+                preview = document.getElementById(`imagePreview-${reviewId}`); // Retry after DOM update
+                if (!preview) return;
+            }
+            // Remove existing listener by redefining the handler
+            preview.removeEventListener('click', handleRemoveImage);
+            preview.addEventListener('click', handleRemoveImage);
+            console.log(`Bound remove-image listener for review ID: ${reviewId}`);
         }
 
-        const updatedPreview = document.getElementById(`imagePreview-${reviewId}`);
-        bindStarRating(`#editForm-${reviewId} .addReview_stars`);
-
-        if (updatedPreview) {
-            updatedPreview.addEventListener('click', e => {
-                if (!e.target.matches('.remove-image')) return;
-                const thumb = e.target.closest('.image-thumb');
-                if (!thumb) return;
-                const imgId = thumb.getAttribute('data-img-id');
-                thumb.remove();
-                if (imgId) {
-                    const existingInputs = form.querySelectorAll('input[name="delete_images[]"]');
-                    let inputExists = false;
-                    existingInputs.forEach(input => {
-                        if (input.value === imgId) inputExists = true;
-                    });
-                    if (!inputExists) {
-                        const delInput = document.createElement('input');
-                        delInput.type = 'hidden';
-                        delInput.name = 'delete_images[]';
-                        delInput.value = imgId;
-                        form.appendChild(delInput);
-                        console.log(`Added delete_images[] for image ID: ${imgId}`);
-                    }
+        function handleRemoveImage(e) {
+            if (!e.target.matches('.remove-image')) return;
+            const thumb = e.target.closest('.image-thumb');
+            if (!thumb) return;
+            const imgId = thumb.getAttribute('data-img-id');
+            thumb.remove();
+            if (imgId && imgId !== '') {
+                if (!deleteImages.has(imgId)) {
+                    deleteImages.add(imgId);
+                    const delInput = document.createElement('input');
+                    delInput.type = 'hidden';
+                    delInput.name = 'delete_images[]';
+                    delInput.value = imgId;
+                    form.appendChild(delInput);
+                    console.log(`Added delete_images[] for image ID: ${imgId}, current deleteImages:`, Array.from(deleteImages));
                 }
+            } else {
+                const imgSrc = thumb.querySelector('img')?.src;
+                newEditFiles = newEditFiles.filter(file => {
+                    return new Promise(resolve => {
+                        const reader = new FileReader();
+                        reader.onload = e => resolve(e.target.result !== imgSrc);
+                        reader.readAsDataURL(file);
+                    });
+                });
                 syncEditFiles();
-            });
+            }
         }
 
         if (fileInput) {
             fileInput.addEventListener('change', () => {
-                const currentCount = updatedPreview?.querySelectorAll('.image-thumb').length || 0;
+                if (!preview) {
+                    console.error(`Image preview not found for review ID: ${reviewId} during file input change`);
+                    preview = document.getElementById(`imagePreview-${reviewId}`);
+                    if (!preview) {
+                        console.error(`Failed to find preview element for review ID: ${reviewId}`);
+                        return;
+                    }
+                }
+                const currentCount = preview.querySelectorAll('.image-thumb').length;
                 const files = Array.from(fileInput.files);
                 if (currentCount + files.length > 4) {
                     alert('Maximum 4 images allowed');
@@ -306,12 +337,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         const thumb = document.createElement('div');
                         thumb.className = 'image-thumb';
                         thumb.innerHTML = `<img src="${event.target.result}" alt="Preview"><span class="remove-image new">×</span>`;
-                        thumb.querySelector('.remove-image').onclick = () => {
-                            thumb.remove();
-                            newEditFiles = newEditFiles.filter(f => f !== file);
-                            syncEditFiles();
-                        };
-                        if (updatedPreview) updatedPreview.appendChild(thumb);
+                        try {
+                            preview.appendChild(thumb);
+                            console.log(`Added image preview for file: ${file.name}`);
+                        } catch (err) {
+                            console.error(`Error appending image preview for review ID: ${reviewId}`, err);
+                        }
                     };
                     reader.readAsDataURL(file);
                     newEditFiles.push(file);
@@ -322,16 +353,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function syncEditFiles() {
             if (!fileInput) return;
-            const dataTransfer = new DataTransfer();
-            newEditFiles.forEach(f => dataTransfer.items.add(f));
-            fileInput.files = dataTransfer.files;
-            console.log('Synced edit files:', newEditFiles.map(f => f.name));
+            Promise.all(newEditFiles).then(files => {
+                newEditFiles = files;
+                fileInput.files = createFileList(files);
+                console.log('Synced edit files:', files.map(f => f.name));
+            });
         }
+
+        // Initial binding of remove-image listener
+        bindRemoveImageListener();
     }
 
     // Update ratings display
     function updateRatings(avgRating, totalReviews, ratingsCounts) {
-        console.log('Updating ratings:', { avgRating, totalReviews, ratingsCounts });
+        console.log('Update ratings:', { avgRating, totalReviews, ratingsCounts });
         const safeAvgRating = typeof avgRating === 'number' ? avgRating : parseFloat(avgRating) || 0;
         const percentage = (safeAvgRating / 5) * 100;
 
@@ -402,13 +437,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (imagePreview) imagePreview.innerHTML = '';
                 sessionStorage.removeItem('reviewFormData');
                 sessionStorage.removeItem('isReviewTriggeredLogin');
-                formDataCache = null;
                 document.querySelector('.addReview').scrollIntoView({ behavior: 'smooth' });
             }
         })
         .catch(error => console.error('Error checking session:', error));
     }
 
-    // Initialize star ratings
+    // Initialize star ratings and edit forms
     initializeStarRatings();
+    initializeEditForms();
 });

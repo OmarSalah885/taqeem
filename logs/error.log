@@ -1,0 +1,107 @@
+[2025-05-28 16:36:58] add_review.php: Processing 3 images for review ID 550
+[2025-05-28 16:36:58] add_review.php: Uploaded new image 68371f8a3b39f_aboutus.jpg for review ID 550
+[2025-05-28 16:36:58] add_review.php: Uploaded new image 68371f8a3d49a_blogimg (2).jpg for review ID 550
+[2025-05-28 16:36:58] add_review.php: Uploaded new image 68371f8a3ef25_carousel(1).jpg for review ID 550
+[2025-05-28 16:36:58] add_review.php: place_id=15, avg_rating=3, total_reviews=4
+[2025-05-28 16:38:36] add_review.php: Processing 2 images for review ID 551
+[2025-05-28 16:38:36] add_review.php: Uploaded new image 68371fec80fc2_blogimg (2).jpg for review ID 551
+[2025-05-28 16:38:36] add_review.php: Uploaded new image 68371fec82590_carousel(1).jpg for review ID 551
+[2025-05-28 16:38:36] add_review.php: place_id=15, avg_rating=3.5, total_reviews=4
+[2025-05-28 16:38:53] edit_review.php: Received delete_images: 557,557
+[2025-05-28 16:38:53] edit_review.php: Deleted image ID 557 for review ID 551
+[2025-05-28 16:38:53] edit_review.php: Image ID 557 not found for review ID 551
+[2025-05-28 16:38:53] edit_review.php: Processing 1 images for review ID 551
+[2025-05-28 16:38:53] edit_review.php: Uploaded new image 68371ffd882bb_eugene-zhyvchik-vad__5nCLJ8-unsplash.jpg for review ID 551
+[2025-05-28 16:38:53] edit_review.php: place_id=15, avg_rating=2.75, total_reviews=4
+[2025-05-28 16:39:06] edit_review.php: No delete_images provided for review ID 551
+[2025-05-28 16:39:06] edit_review.php: Processing 1 images for review ID 551
+[2025-05-28 16:39:06] edit_review.php: Uploaded new image 6837200a5cb53_logo.png for review ID 551
+[2025-05-28 16:39:06] edit_review.php: place_id=15, avg_rating=2.75, total_reviews=4
+[2025-05-28 16:39:22] edit_review.php: No delete_images provided for review ID 551
+[2025-05-28 16:39:22] edit_review.php: place_id=15, avg_rating=3, total_reviews=4
+[2025-05-28 16:39:53] edit_review.php: Received delete_images: 558,559,560,558,559,560
+[2025-05-28 16:39:53] edit_review.php: Deleted image ID 558 for review ID 551
+[2025-05-28 16:39:53] edit_review.php: Deleted image ID 559 for review ID 551
+[2025-05-28 16:39:53] edit_review.php: Deleted image ID 560 for review ID 551
+[2025-05-28 16:39:53] edit_review.php: Image ID 558 not found for review ID 551
+[2025-05-28 16:39:53] edit_review.php: Image ID 559 not found for review ID 551
+[2025-05-28 16:39:53] edit_review.php: Image ID 560 not found for review ID 551
+[2025-05-28 16:39:53] edit_review.php: place_id=15, avg_rating=3, total_reviews=4
+[2025-05-28 16:40:02] edit_review.php: No delete_images provided for review ID 551
+[2025-05-28 16:40:02] edit_review.php: Processing 2 images for review ID 551
+[2025-05-28 16:40:02] edit_review.php: Uploaded new image 683720426b222_carousel(1).jpg for review ID 551
+[2025-05-28 16:40:02] edit_review.php: Uploaded new image 683720426d128_carousel(2).jpg for review ID 551
+[2025-05-28 16:40:02] edit_review.php: place_id=15, avg_rating=3.5, total_reviews=4
+[2025-05-28 16:40:10] edit_review.php: No delete_images provided for review ID 551
+[2025-05-28 16:40:10] edit_review.php: place_id=15, avg_rating=3.5, total_reviews=4
+[2025-05-28 16:43:12] add_review.php: Processing 1 images for review ID 552
+[2025-05-28 16:43:12] add_review.php: Uploaded new image 68372100ca16b_menu.jpg for review ID 552
+[2025-05-28 16:43:12] add_review.php: place_id=15, avg_rating=3.75, total_reviews=4
+[2025-05-28 16:43:23] edit_review.php: Received delete_images: 563,563
+[2025-05-28 16:43:23] edit_review.php: Deleted image ID 563 for review ID 552
+[2025-05-28 16:43:23] edit_review.php: Image ID 563 not found for review ID 552
+[2025-05-28 16:43:23] edit_review.php: Processing 1 images for review ID 552
+[2025-05-28 16:43:23] edit_review.php: Uploaded new image 6837210b3d638_carousel(1).jpg for review ID 552
+[2025-05-28 16:43:23] edit_review.php: place_id=15, avg_rating=3, total_reviews=4
+[2025-05-28 16:43:35] edit_review.php: No delete_images provided for review ID 552
+[2025-05-28 16:43:35] edit_review.php: Processing 2 images for review ID 552
+[2025-05-28 16:43:35] edit_review.php: Uploaded new image 6837211788da4_logo(2).png for review ID 552
+[2025-05-28 16:43:35] edit_review.php: Uploaded new image 683721178fa04_logo.png for review ID 552
+[2025-05-28 16:43:35] edit_review.php: place_id=15, avg_rating=3.5, total_reviews=4
+[2025-05-28 16:49:35] add_review.php: Processing 1 images for review ID 553
+[2025-05-28 16:49:35] add_review.php: Uploaded new image 6837227f7bb88_aboutus.jpg for review ID 553
+[2025-05-28 16:49:35] add_review.php: place_id=18, avg_rating=4, total_reviews=4
+[2025-05-28 16:49:48] edit_review.php: Received delete_images: 567,567
+[2025-05-28 16:49:48] edit_review.php: Deleted image ID 567 for review ID 553
+[2025-05-28 16:49:48] edit_review.php: Image ID 567 not found for review ID 553
+[2025-05-28 16:49:48] edit_review.php: Processing 2 images for review ID 553
+[2025-05-28 16:49:48] edit_review.php: Uploaded new image 6837228c7195b_carousel(1).jpg for review ID 553
+[2025-05-28 16:49:48] edit_review.php: Uploaded new image 6837228c73892_carousel(2).jpg for review ID 553
+[2025-05-28 16:49:48] edit_review.php: place_id=18, avg_rating=4, total_reviews=4
+[2025-05-28 16:49:56] edit_review.php: No delete_images provided for review ID 553
+[2025-05-28 16:49:56] edit_review.php: place_id=18, avg_rating=4, total_reviews=4
+[2025-05-28 16:54:50] add_review.php: Processing 1 images for review ID 554
+[2025-05-28 16:54:50] add_review.php: Uploaded new image 683723ba9746d_menu.jpg for review ID 554
+[2025-05-28 16:54:50] add_review.php: place_id=18, avg_rating=4, total_reviews=4
+[2025-05-28 16:55:31] edit_review.php: Received delete_images: 570
+[2025-05-28 16:55:31] edit_review.php: Deleted image ID 570 for review ID 554
+[2025-05-28 16:55:31] edit_review.php: place_id=18, avg_rating=3.5, total_reviews=4
+[2025-05-28 16:55:57] edit_review.php: No delete_images provided for review ID 554
+[2025-05-28 16:55:57] edit_review.php: Processing 4 images for review ID 554
+[2025-05-28 16:55:57] edit_review.php: Uploaded new image 683723fd81d5a_blogimg (2).jpg for review ID 554
+[2025-05-28 16:55:57] edit_review.php: Uploaded new image 683723fd83456_aboutus.jpg for review ID 554
+[2025-05-28 16:55:57] edit_review.php: Uploaded new image 683723fd84d4e_carousel(1).jpg for review ID 554
+[2025-05-28 16:55:57] edit_review.php: Uploaded new image 683723fd868bb_carousel(2).jpg for review ID 554
+[2025-05-28 16:55:57] edit_review.php: place_id=18, avg_rating=3.75, total_reviews=4
+[2025-05-28 16:57:37] add_review.php: Processing 2 images for review ID 555
+[2025-05-28 16:57:37] add_review.php: Uploaded new image 683724611f0c6_carousel(1).jpg for review ID 555
+[2025-05-28 16:57:37] add_review.php: Uploaded new image 683724612102d_carousel(2).jpg for review ID 555
+[2025-05-28 16:57:37] add_review.php: place_id=18, avg_rating=4, total_reviews=4
+[2025-05-28 16:57:48] edit_review.php: Received delete_images: 575
+[2025-05-28 16:57:48] edit_review.php: Deleted image ID 575 for review ID 555
+[2025-05-28 16:57:48] edit_review.php: place_id=18, avg_rating=3.5, total_reviews=4
+[2025-05-28 16:57:55] edit_review.php: No delete_images provided for review ID 555
+[2025-05-28 16:57:55] edit_review.php: place_id=18, avg_rating=4, total_reviews=4
+[2025-05-28 17:02:44] add_review.php: Processing 1 images for review ID 556
+[2025-05-28 17:02:44] add_review.php: Uploaded new image 68372594b0b01_blogimg (2).jpg for review ID 556
+[2025-05-28 17:02:44] add_review.php: place_id=18, avg_rating=3.75, total_reviews=4
+[2025-05-28 17:03:04] edit_review.php: Received delete_images: 577
+[2025-05-28 17:03:04] edit_review.php: Deleted image ID 577 for review ID 556
+[2025-05-28 17:03:04] edit_review.php: Processing 2 images for review ID 556
+[2025-05-28 17:03:04] edit_review.php: Uploaded new image 683725a8810ce_rev.jpg for review ID 556
+[2025-05-28 17:03:04] edit_review.php: Uploaded new image 683725a884c91_revi.jpg for review ID 556
+[2025-05-28 17:03:04] edit_review.php: place_id=18, avg_rating=3.25, total_reviews=4
+[2025-05-28 17:03:18] edit_review.php: No delete_images provided for review ID 556
+[2025-05-28 17:03:18] edit_review.php: place_id=18, avg_rating=3.75, total_reviews=4
+[2025-05-28 17:03:29] add_review.php: Processing 1 images for review ID 557
+[2025-05-28 17:03:29] add_review.php: Uploaded new image 683725c168b8d_revi.jpg for review ID 557
+[2025-05-28 17:03:29] add_review.php: place_id=18, avg_rating=3.6, total_reviews=5
+[2025-05-28 17:03:39] edit_review.php: Received delete_images: 580
+[2025-05-28 17:03:39] edit_review.php: Deleted image ID 580 for review ID 557
+[2025-05-28 17:03:39] edit_review.php: Processing 1 images for review ID 557
+[2025-05-28 17:03:39] edit_review.php: Uploaded new image 683725cb3795a_logo(2).png for review ID 557
+[2025-05-28 17:03:39] edit_review.php: place_id=18, avg_rating=3.6, total_reviews=5
+[2025-05-28 17:03:51] edit_review.php: No delete_images provided for review ID 557
+[2025-05-28 17:03:51] edit_review.php: Processing 1 images for review ID 557
+[2025-05-28 17:03:51] edit_review.php: Uploaded new image 683725d7cf69d_revi.jpg for review ID 557
+[2025-05-28 17:03:51] edit_review.php: place_id=18, avg_rating=3.8, total_reviews=5

@@ -1,7 +1,7 @@
 <?php
 require_once 'config.php';
 require_once 'db_connect.php';
-session_start();
+
 
 // Determine which user to edit
 $user_id = isset($_GET['user_id']) ? (int)$_GET['user_id'] : ($_SESSION['user_id'] ?? 0);

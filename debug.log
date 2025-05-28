@@ -225,6 +225,7 @@
 2025-05-28 12:50:56 - submit_comment.php started, method: POST, action: delete
 2025-05-28 12:50:56 - Deleting comment ID: 93
 2025-05-28 12:50:56 - Comment ID: 93 deleted successfully
+<<<<<<< HEAD
 2025-05-28 18:15:30 - submit_comment.php started, method: POST, action: add
 2025-05-28 18:15:30 - Adding comment for blog ID: 10, parent_comment_id: null
 2025-05-28 18:15:30 - Comment added successfully for blog ID: 10, comment ID: 95
@@ -270,3 +271,20 @@
 2025-05-28 19:46:54 - submit_comment.php started, method: POST, action: delete
 2025-05-28 19:46:54 - Deleting comment ID: 99
 2025-05-28 19:46:54 - Comment ID: 99 deleted successfully
+=======
+2025-05-28 16:46:09 - submit_comment.php started, method: POST, action: add
+2025-05-28 16:46:09 - Adding comment for blog ID: 19, parent_comment_id: null
+2025-05-28 16:46:09 - Comment added successfully for blog ID: 19, comment ID: 95
+2025-05-28 16:46:12 - submit_comment.php started, method: POST, action: edit
+2025-05-28 16:46:12 - Editing comment ID: 95
+2025-05-28 16:46:12 - Comment ID: 95 edited successfully
+2025-05-28 16:46:17 - submit_comment.php started, method: POST, action: add
+2025-05-28 16:46:17 - Adding comment for blog ID: 19, parent_comment_id: 95
+2025-05-28 16:46:17 - Comment added successfully for blog ID: 19, comment ID: 96
+2025-05-28 16:46:20 - submit_comment.php started, method: POST, action: delete
+2025-05-28 16:46:20 - Deleting comment ID: 96
+2025-05-28 16:46:20 - Comment ID: 96 deleted successfully
+2025-05-28 16:46:23 - submit_comment.php started, method: POST, action: delete
+2025-05-28 16:46:23 - Deleting comment ID: 95
+2025-05-28 16:46:23 - Comment ID: 95 deleted successfully
+>>>>>>> c92628477a3711ed183723be2fcae5e551ff127e

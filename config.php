@@ -1,8 +1,12 @@
 <?php
 // Secure session settings
 ini_set('session.cookie_httponly', 1); // Prevent JavaScript access to session cookies
-ini_set('session.cookie_secure', 0);  // Use secure cookies (requires HTTPS)
+ini_set('session.cookie_secure', 0);  // Set to 1 if using HTTPS
 ini_set('session.use_strict_mode', 1); // Prevent session fixation attacks
+
+// Start session
+session_start();
+
 // Enable error reporting for debugging
 ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);

@@ -1,7 +1,7 @@
 <?php
 require_once 'config.php';
 require_once 'db_connect.php';
-session_start();
+
 
 // 1. Make sure user is logged in
 if (empty($_SESSION['user_id'])) {

@@ -1,7 +1,7 @@
 <?php
 require_once 'config.php';
 require_once 'db_connect.php';
-session_start();
+
 
 if (!isset($_GET['place_id']) || !is_numeric($_GET['place_id'])) {
     die("Invalid or missing place ID");

@@ -1,7 +1,7 @@
 <?php
 require_once 'config.php';
 require_once 'db_connect.php';
-session_start();
+
 
 $place_id = $_GET['place_id'] ?? null;
 if (!$place_id || !is_numeric($place_id)) {
