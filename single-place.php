@@ -91,7 +91,8 @@ if (empty($_SESSION['csrf_token'])) {
         <button class="gallery-btn right-btn">›</button>
         <?php if ($is_owner || $is_admin): ?>
         <div class="delete_edit-places--div">
-            <a href="edit_place.php?place_id=<?php echo $place['id']; ?>" class="btn__red btn__red--l btn">EDIT PLACE</a>
+            <a href="edit_place.php?place_id=<?php echo $place['id']; ?>" class="btn__red btn__red--l btn">EDIT
+                PLACE</a>
             <form action="delete_place.php" method="POST" style="display:inline;"
                 onsubmit="return confirm('Are you sure you want to delete this place? This action cannot be undone.');">
                 <input type="hidden" name="place_id" value="<?= htmlspecialchars($place['id']) ?>">
@@ -135,7 +136,7 @@ if (empty($_SESSION['csrf_token'])) {
                         <i class="fa-solid fa-star star-rating"></i>
                         <?php endfor; ?>
                     </div>
-                    <span class="extra_rating" id="extra-rating"><?= number_format($avg_rating, 1) ?></span>
+                    <p class="extra_rating" id="extra-rating"><?= number_format($avg_rating, 1) ?></p>
                 </div>
                 <h3 class="extra_price"><?= htmlspecialchars($place['price']) ?></h3>
                 <a href="#" class="extra_category">
@@ -318,11 +319,11 @@ if (empty($_SESSION['csrf_token'])) {
     ?>
 
     <div class="reviews" id="reviews">
-    <h2 class="place-title">REVIEWS</h2>
-    <div class="reviews_overall">
-        <div class="reviews_overall--L" id="reviews-overall-l">
-            <h2>Overall rating</h2>
-            <?php
+        <h2 class="place-title">REVIEWS</h2>
+        <div class="reviews_overall">
+            <div class="reviews_overall--L" id="reviews-overall-l">
+                <h2>Overall rating</h2>
+                <?php
             $rating_query = $conn->prepare("SELECT AVG(rating) AS avg_rating, COUNT(*) AS total_reviews FROM reviews WHERE place_id = ?");
             $rating_query->bind_param("i", $place_id);
             $rating_query->execute();
@@ -333,17 +334,17 @@ if (empty($_SESSION['csrf_token'])) {
             $percentage = ($avg_rating / 5) * 100;
             $rating_query->close();
             ?>
-            <div class="overall_stars" id="overall-stars"
-                style="background: linear-gradient(90deg, #A21111 <?= $percentage ?>%, #D0D0D0 <?= $percentage ?>%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-                <?php for ($i = 0; $i < 5; $i++): ?>
-                <i class="fa-solid fa-star star-rating"></i>
-                <?php endfor; ?>
+                <div class="overall_stars" id="overall-stars"
+                    style="background: linear-gradient(90deg, #A21111 <?= $percentage ?>%, #D0D0D0 <?= $percentage ?>%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                    <?php for ($i = 0; $i < 5; $i++): ?>
+                    <i class="fa-solid fa-star star-rating"></i>
+                    <?php endfor; ?>
+                </div>
+                <p id="overall-rating"><?= number_format($avg_rating, 1) ?> out of 5</p>
+                <p id="total-reviews"><?= $total_reviews ?> reviews</p>
             </div>
-            <p id="overall-rating"><?= number_format($avg_rating, 1) ?> out of 5</p>
-            <p id="total-reviews"><?= $total_reviews ?> reviews</p>
-        </div>
-        <div class="reviews_overall--R" id="reviews-overall-r">
-            <?php
+            <div class="reviews_overall--R" id="reviews-overall-r">
+                <?php
             $ratings_counts = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0];
             $ratings_query = $conn->prepare("SELECT rating, COUNT(*) AS count FROM reviews WHERE place_id = ? GROUP BY rating");
             $ratings_query->bind_param("i", $place_id);
@@ -356,17 +357,17 @@ if (empty($_SESSION['csrf_token'])) {
             foreach (array_reverse(range(1, 5)) as $i):
                 $percent = $total_reviews > 0 ? ($ratings_counts[$i] / $total_reviews) * 100 : 0;
             ?>
-            <div class="stars_p" id="stars-p-<?= $i ?>">
-                <p><?= $i ?> STARS</p>
-                <div class="stars_p--<?= $i ?>">
-                    <div class="stars_p--color" style="width: <?= $percent ?>%;"></div>
+                <div class="stars_p" id="stars-p-<?= $i ?>">
+                    <p><?= $i ?> STARS</p>
+                    <div class="stars_p--<?= $i ?>">
+                        <div class="stars_p--color" style="width: <?= $percent ?>%;"></div>
+                    </div>
                 </div>
+                <?php endforeach; ?>
             </div>
-            <?php endforeach; ?>
         </div>
-    </div>
-    <div class="reviews_container">
-        <?php
+        <div class="reviews_container">
+            <?php
         $reviews_query = $conn->prepare("
             SELECT r.id, r.user_id, r.rating, r.review_text, r.created_at,
                    CONCAT(u.first_name, ' ', u.last_name) AS user_name, u.profile_image
@@ -395,14 +396,14 @@ if (empty($_SESSION['csrf_token'])) {
             endwhile;
         else:
         ?>
-        <p>No reviews available.</p>
-        <?php endif; $reviews_query->close(); ?>
+            <p>No reviews available.</p>
+            <?php endif; $reviews_query->close(); ?>
+        </div>
     </div>
-</div>
 
     <div class="addReview">
         <h2 class="place-title">WRITE A REVIEW</h2>
-        
+
         <form method="POST" id="reviewForm" enctype="multipart/form-data">
             <div class="addReview_container">
                 <div class="addReview_stars">
@@ -422,7 +423,7 @@ if (empty($_SESSION['csrf_token'])) {
                     REVIEW</button>
             </div>
         </form>
-        
+
     </div>
 </main>
 
@@ -480,23 +481,26 @@ window.addEventListener('load', function() {
         const reviewId = formData.get('review_id');
 
         fetch('submit_owner_comment.php', {
-            method: 'POST',
-            body: formData,
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        })
-        .then(response => {
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                const commentId = data.comment_id;
-                const commentText = formData.get('comment');
-                const reviewPlaceComment = document.getElementById(`review_placeComment_${reviewId}`);
-                const commentDiv = document.createElement('div');
-                commentDiv.className = 'single-comment';
-                commentDiv.id = `comment-${commentId}`;
-                commentDiv.innerHTML = `
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    const commentId = data.comment_id;
+                    const commentText = formData.get('comment');
+                    const reviewPlaceComment = document.getElementById(
+                        `review_placeComment_${reviewId}`);
+                    const commentDiv = document.createElement('div');
+                    commentDiv.className = 'single-comment';
+                    commentDiv.id = `comment-${commentId}`;
+                    commentDiv.innerHTML = `
                     <div class="comment_content">
                         <p class="comment_date">${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
                         <p id="comment-text-${commentId}">${commentText}</p>
@@ -508,37 +512,40 @@ window.addEventListener('load', function() {
                         </div>
                     </div>
                 `;
-                const review = document.getElementById(`review_${reviewId}`);
-                if (!review) {
-                    alert('Review not found. Please refresh the page.');
-                    return;
-                }
-                if (reviewPlaceComment) {
-                    reviewPlaceComment.appendChild(commentDiv);
-                } else {
-                    const newCommentSection = document.createElement('div');
-                    newCommentSection.className = 'review_placeComment';
-                    newCommentSection.id = `review_placeComment_${reviewId}`;
-                    newCommentSection.innerHTML = '<h4>Place owner commented</h4>';
-                    newCommentSection.appendChild(commentDiv);
-                    const commentForm = document.getElementById(`commentForm-${reviewId}`);
-                    if (commentForm) {
-                        review.insertBefore(newCommentSection, commentForm);
-                    } else {
-                        review.appendChild(newCommentSection);
+                    const review = document.getElementById(`review_${reviewId}`);
+                    if (!review) {
+                        alert('Review not found. Please refresh the page.');
+                        return;
                     }
+                    if (reviewPlaceComment) {
+                        reviewPlaceComment.appendChild(commentDiv);
+                    } else {
+                        const newCommentSection = document.createElement('div');
+                        newCommentSection.className = 'review_placeComment';
+                        newCommentSection.id = `review_placeComment_${reviewId}`;
+                        newCommentSection.innerHTML = '<h4>Place owner commented</h4>';
+                        newCommentSection.appendChild(commentDiv);
+                        const commentForm = document.getElementById(`commentForm-${reviewId}`);
+                        if (commentForm) {
+                            review.insertBefore(newCommentSection, commentForm);
+                        } else {
+                            review.appendChild(newCommentSection);
+                        }
+                    }
+                    form.reset();
+                    form.style.display = 'none';
+                    commentDiv.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                } else {
+                    alert('Error adding comment: ' + (data.error || 'Unknown error'));
                 }
-                form.reset();
-                form.style.display = 'none';
-                commentDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            } else {
-                alert('Error adding comment: ' + (data.error || 'Unknown error'));
-            }
-        })
-        .catch(error => {
-            console.error('Error adding comment:', error);
-            alert('Error adding comment: ' + error.message);
-        });
+            })
+            .catch(error => {
+                console.error('Error adding comment:', error);
+                alert('Error adding comment: ' + error.message);
+            });
     });
 
     // Review navigation
@@ -550,7 +557,9 @@ window.addEventListener('load', function() {
     const action = params.get('action');
 
     if (rid && document.getElementById(`review_${rid}`)) {
-        document.getElementById(`review_${rid}`).scrollIntoView({ behavior: 'smooth' });
+        document.getElementById(`review_${rid}`).scrollIntoView({
+            behavior: 'smooth'
+        });
         if (action === 'edit' && canEditReview(rid, currentUserId, reviewOwners, isAdmin)) {
             const form = document.getElementById(`editForm-${rid}`);
             if (form) {
@@ -566,23 +575,26 @@ window.addEventListener('load', function() {
     function deleteReview(reviewId) {
         if (!confirm('Are you sure you want to delete your review?')) return;
         fetch('delete_review.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest' },
-            body: `review_id=${encodeURIComponent(reviewId)}&csrf_token=${encodeURIComponent('<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>')}`
-        })
-        .then(response => {
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                document.getElementById(`review_${reviewId}`)?.remove();
-                updateRatingsFromServer();
-            } else {
-                alert('Failed to delete review: ' + (data.error || 'Unknown error'));
-            }
-        })
-        .catch(error => alert('Error deleting review: ' + error.message));
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: `review_id=${encodeURIComponent(reviewId)}&csrf_token=${encodeURIComponent('<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>')}`
+            })
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    document.getElementById(`review_${reviewId}`)?.remove();
+                    updateRatingsFromServer();
+                } else {
+                    alert('Failed to delete review: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => alert('Error deleting review: ' + error.message));
     }
 
     function showCommentForm(reviewId) {
@@ -615,74 +627,78 @@ window.addEventListener('load', function() {
             return;
         }
         fetch('edit_owner_comment.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `comment_id=${encodeURIComponent(commentId)}&comment_text=${encodeURIComponent(newText)}&csrf_token=${encodeURIComponent('<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>')}&update_comment=true`
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                commentText.textContent = newText;
-                commentText.style.display = 'block';
-                editTextarea.style.display = 'none';
-                editButton.style.display = 'inline';
-                saveButton.style.display = 'none';
-            } else {
-                alert('Error saving comment: ' + (data.error || 'Unknown error'));
-            }
-        })
-        .catch(error => alert('Error saving comment: ' + error.message));
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `comment_id=${encodeURIComponent(commentId)}&comment_text=${encodeURIComponent(newText)}&csrf_token=${encodeURIComponent('<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>')}&update_comment=true`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    commentText.textContent = newText;
+                    commentText.style.display = 'block';
+                    editTextarea.style.display = 'none';
+                    editButton.style.display = 'inline';
+                    saveButton.style.display = 'none';
+                } else {
+                    alert('Error saving comment: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => alert('Error saving comment: ' + error.message));
     }
 
     function deleteComment(commentId) {
         if (!confirm('Are you sure you want to delete this comment?')) return;
         fetch('delete_owner_comment.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: `comment_id=${encodeURIComponent(commentId)}&csrf_token=${encodeURIComponent('<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>')}`
-        })
-        .then(response => {
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-            return response.json();
-        })
-        .then(data => {
-            if (data.status === 'success') {
-                const comment = document.getElementById(`comment-${commentId}`);
-                if (!comment) return;
-                const reviewPlaceComment = comment.closest('.review_placeComment');
-                comment.remove();
-                if (reviewPlaceComment && !reviewPlaceComment.querySelector('.single-comment')) {
-                    reviewPlaceComment.remove();
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: `comment_id=${encodeURIComponent(commentId)}&csrf_token=${encodeURIComponent('<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>')}`
+            })
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === 'success') {
+                    const comment = document.getElementById(`comment-${commentId}`);
+                    if (!comment) return;
+                    const reviewPlaceComment = comment.closest('.review_placeComment');
+                    comment.remove();
+                    if (reviewPlaceComment && !reviewPlaceComment.querySelector('.single-comment')) {
+                        reviewPlaceComment.remove();
+                    }
+                } else {
+                    alert('Error deleting comment: ' + (data.error || 'Unknown error'));
                 }
-            } else {
-                alert('Error deleting comment: ' + (data.error || 'Unknown error'));
-            }
-        })
-        .catch(error => {
-            console.error('Error deleting comment:', error);
-            alert('Error deleting comment: ' + error.message);
-        });
+            })
+            .catch(error => {
+                console.error('Error deleting comment:', error);
+                alert('Error deleting comment: ' + error.message);
+            });
     }
 
     function updateRatingsFromServer() {
         fetch(`get_ratings.php?place_id=<?php echo htmlspecialchars($place_id); ?>`, {
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        })
-        .then(res => {
-            if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-            return res.json();
-        })
-        .then(ratings => {
-            if (ratings.success) {
-                updateRatings(ratings.avg_rating, ratings.total_reviews, ratings.ratings_counts);
-            } else {
-                console.error('Failed to fetch ratings:', ratings.error);
-            }
-        })
-        .catch(err => console.error('Error fetching ratings:', err));
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+                return res.json();
+            })
+            .then(ratings => {
+                if (ratings.success) {
+                    updateRatings(ratings.avg_rating, ratings.total_reviews, ratings.ratings_counts);
+                } else {
+                    console.error('Failed to fetch ratings:', ratings.error);
+                }
+            })
+            .catch(err => console.error('Error fetching ratings:', err));
     }
 
     function updateRatings(avgRating, totalReviews, ratingsCounts) {
@@ -692,7 +708,8 @@ window.addEventListener('load', function() {
             const extraStars = extraStarsContainer.querySelector('.extra_stars');
             const extraRating = extraStarsContainer.querySelector('.extra_rating');
             const percentage = (safeAvgRating / 5) * 100;
-            extraStars.style.background = `linear-gradient(90deg, #A21111 ${percentage}%, #D0D0D0 ${percentage}%)`;
+            extraStars.style.background =
+                `linear-gradient(90deg, #A21111 ${percentage}%, #D0D0D0 ${percentage}%)`;
             extraStars.style.webkitBackgroundClip = 'text';
             extraStars.style.webkitTextFillColor = 'transparent';
             if (extraRating) extraRating.textContent = safeAvgRating.toFixed(1);
@@ -704,7 +721,8 @@ window.addEventListener('load', function() {
             const overallRating = overallStarsContainer.querySelector('#overall-rating');
             const totalReviewsEl = overallStarsContainer.querySelector('#total-reviews');
             const percentage = (safeAvgRating / 5) * 100;
-            overallStars.style.background = `linear-gradient(90deg, #A21111 ${percentage}%, #D0D0D0 ${percentage}%)`;
+            overallStars.style.background =
+                `linear-gradient(90deg, #A21111 ${percentage}%, #D0D0D0 ${percentage}%)`;
             overallStars.style.webkitBackgroundClip = 'text';
             overallStars.style.webkitTextFillColor = 'transparent';
             if (overallRating) overallRating.textContent = `${safeAvgRating.toFixed(1)} out of 5`;
@@ -725,26 +743,28 @@ window.addEventListener('load', function() {
 
     function toggleLike(reviewId) {
         fetch('toggle_like.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `review_id=${encodeURIComponent(reviewId)}&csrf_token=${encodeURIComponent('<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>')}`
-        })
-        .then(response => {
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                const button = document.querySelector(`button.like-btn[data-review-id="${reviewId}"]`);
-                const icon = button?.querySelector('i');
-                if (icon) {
-                    icon.className = data.liked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `review_id=${encodeURIComponent(reviewId)}&csrf_token=${encodeURIComponent('<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>')}`
+            })
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    const button = document.querySelector(`button.like-btn[data-review-id="${reviewId}"]`);
+                    const icon = button?.querySelector('i');
+                    if (icon) {
+                        icon.className = data.liked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+                    }
+                } else {
+                    alert('Error toggling like: ' + (data.error || 'Unknown error'));
                 }
-            } else {
-                alert('Error toggling like: ' + (data.error || 'Unknown error'));
-            }
-        })
-        .catch(error => alert('Error toggling like: ' + error.message));
+            })
+            .catch(error => alert('Error toggling like: ' + error.message));
     }
 });
 </script>

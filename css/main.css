@@ -3476,6 +3476,34 @@ body p {
   gap: 1.2rem;
 }
 
+.extra_stars_container {
+  display: flex;
+  gap: 1.2rem;
+  align-items: center;
+}
+.extra_stars_container P {
+  font-size: 1.872rem;
+  color: #4A4444;
+}
+
+.review_placeComment .single-comment {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+.review_placeComment textarea {
+  padding: 2.4rem;
+  font-family: inherit;
+  font-size: 1.6rem;
+  outline: 0.1rem #D0D0D0 solid;
+  border-radius: none;
+  border: none;
+  transition: all 0.3s;
+  height: 24rem;
+  width: 100%;
+  margin-bottom: 1.4rem;
+}
+
 .profile {
   width: 100%;
   padding-right: 15px;
