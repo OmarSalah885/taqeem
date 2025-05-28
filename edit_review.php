@@ -67,50 +67,49 @@ if ($update_query->execute()) {
                 $delete_image_query->bind_param("ii", $image_id, $review_id);
                 $delete_image_query->execute();
             }
-            $delete_query->close();
-            $delete_image_query->close();
         }
+        $delete_query->close();
+        $delete_image_query->close();
     }
 
     // Handle new image uploads
-    // In edit_review.php, replace image upload logic (around line 64)
-if (isset($_FILES['review_images']) && !empty($_FILES['review_images']['name'][0])) {
-    $upload_dir = 'assets/images/review_images/';
-    if (!is_dir($upload_dir)) {
-        mkdir($upload_dir, 0755, true);
-    }
-    $files = $_FILES['review_images'];
-    $file_count = count($files['name']);
-    $existing_images = $conn->prepare("SELECT COUNT(*) as count FROM review_images WHERE review_id = ?");
-    $existing_images->bind_param("i", $review_id);
-    $existing_images->execute();
-    $existing_count = $existing_images->get_result()->fetch_assoc()['count'];
-    $existing_images->close();
-    $allowed_new = 4 - $existing_count;
+    if (isset($_FILES['review_images']) && !empty($_FILES['review_images']['name'][0])) {
+        $upload_dir = 'assets/images/review_images/';
+        if (!is_dir($upload_dir)) {
+            mkdir($upload_dir, 0755, true);
+        }
+        $files = $_FILES['review_images'];
+        $file_count = count($files['name']);
+        $existing_images = $conn->prepare("SELECT COUNT(*) as count FROM review_images WHERE review_id = ?");
+        $existing_images->bind_param("i", $review_id);
+        $existing_images->execute();
+        $existing_count = $existing_images->get_result()->fetch_assoc()['count'];
+        $existing_images->close();
+        $allowed_new = 4 - $existing_count;
 
-    if ($file_count > $allowed_new) {
-        $response['error'] = 'Maximum 4 images allowed in total';
-        sendJsonResponse($response);
-    }
+        if ($file_count > $allowed_new) {
+            $response['error'] = 'Maximum 4 images allowed in total';
+            sendJsonResponse($response);
+        }
 
-    for ($i = 0; $i < $file_count; $i++) {
-        if ($files['error'][$i] === UPLOAD_ERR_OK) {
-            $file_name = uniqid() . '_' . basename($files['name'][$i]);
-            $file_path = $upload_dir . $file_name;
-            if (in_array(strtolower(pathinfo($file_name, PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'gif']) && getimagesize($files['tmp_name'][$i])) {
-                if (move_uploaded_file($files['tmp_name'][$i], $file_path)) {
-                    $image_query = $conn->prepare("INSERT INTO review_images (review_id, image_url) VALUES (?, ?)");
-                    $image_query->bind_param("is", $review_id, $file_path);
-                    $image_query->execute();
-                    $image_query->close();
-                } else {
-                    $response['error'] = 'Failed to upload image';
-                    sendJsonResponse($response);
+        for ($i = 0; $i < $file_count; $i++) {
+            if ($files['error'][$i] === UPLOAD_ERR_OK) {
+                $file_name = uniqid() . '_' . basename($files['name'][$i]);
+                $file_path = $upload_dir . $file_name;
+                if (in_array(strtolower(pathinfo($file_name, PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'gif']) && getimagesize($files['tmp_name'][$i])) {
+                    if (move_uploaded_file($files['tmp_name'][$i], $file_path)) {
+                        $image_query = $conn->prepare("INSERT INTO review_images (review_id, image_url) VALUES (?, ?)");
+                        $image_query->bind_param("is", $review_id, $file_path);
+                        $image_query->execute();
+                        $image_query->close();
+                    } else {
+                        $response['error'] = 'Failed to upload image';
+                        sendJsonResponse($response);
+                    }
                 }
             }
         }
     }
-}
 
     // Fetch updated review data
     $review_query = $conn->prepare("

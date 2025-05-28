@@ -23,24 +23,34 @@ if ($review_id === 0) {
     exit;
 }
 
-// Check if the review is already liked
-$check_like_query = $conn->prepare("SELECT id FROM review_likes WHERE user_id = ? AND review_id = ?");
-$check_like_query->bind_param("ii", $user_id, $review_id);
-$check_like_query->execute();
-$check_like_result = $check_like_query->get_result();
+try {
+    // Check if the review is already liked
+    $check_like_query = $conn->prepare("SELECT id FROM review_likes WHERE user_id = ? AND review_id = ?");
+    $check_like_query->bind_param("ii", $user_id, $review_id);
+    $check_like_query->execute();
+    $check_like_result = $check_like_query->get_result();
 
+    if ($check_like_result->num_rows > 0) {
+        // Unlike the review
+        $delete_like_query = $conn->prepare("DELETE FROM review_likes WHERE user_id = ? AND review_id = ?");
+        $delete_like_query->bind_param("ii", $user_id, $review_id);
+        $delete_like_query->execute();
+        $delete_like_query->close();
+        echo json_encode(['success' => true, 'liked' => false, 'is_liked' => false]);
+    } else {
+        // Like the review
+        $insert_like_query = $conn->prepare("INSERT INTO review_likes (user_id, review_id, created_at) VALUES (?, ?, NOW())");
+        $insert_like_query->bind_param("ii", $user_id, $review_id);
+        $insert_like_query->execute();
+        $insert_like_query->close();
+        echo json_encode(['success' => true, 'liked' => true, 'is_liked' => true]);
+    }
 
-if ($check_like_result->num_rows > 0) {
-    // Unlike the review
-    $delete_like_query = $conn->prepare("DELETE FROM review_likes WHERE user_id = ? AND review_id = ?");
-    $delete_like_query->bind_param("ii", $user_id, $review_id);
-    $delete_like_query->execute();
-    echo json_encode(['success' => true, 'liked' => false, 'is_liked' => false]);
-} else {
-    // Like the review
-    $insert_like_query = $conn->prepare("INSERT INTO review_likes (user_id, review_id, created_at) VALUES (?, ?, NOW())");
-    $insert_like_query->bind_param("ii", $user_id, $review_id);
-    $insert_like_query->execute();
-    echo json_encode(['success' => true, 'liked' => true, 'is_liked' => true]);
+    $check_like_query->close();
+} catch (Exception $e) {
+    error_log("Toggle like error: " . $e->getMessage(), 3, 'logs/error.log');
+    echo json_encode(['success' => false, 'message' => 'Database error occurred']);
+} finally {
+    $conn->close();
 }
 ?>

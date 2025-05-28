@@ -136,5 +136,45 @@ document.addEventListener("DOMContentLoaded", function () {
       updateCarousel(currentIndex);
     });
   });
+  function toggleLike(event, reviewId) {
+    event.preventDefault(); // Prevent default link behavior
+
+    // Find the heart icon for this review
+    const heartIcon = event.currentTarget.querySelector('i');
+
+    // Send AJAX request to toggle_like.php
+    fetch('toggle_like.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `review_id=${encodeURIComponent(reviewId)}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update the heart icon based on the response
+            heartIcon.classList.remove('fa-solid', 'fa-regular', 'fa-heart');
+            heartIcon.classList.add(data.is_liked ? 'fa-solid' : 'fa-regular', 'fa-heart');
+        } else {
+            if (data.message === 'You must be logged in to like a review.') {
+                // Show login overlay if user is not logged in
+                if (typeof window.showLogin === 'function') {
+                    window.showLogin(null, window.location.href);
+                } else {
+                    console.error('showLogin function not found');
+                    alert('Please log in to like a review.');
+                }
+            } else {
+                console.error('Error:', data.message);
+                alert('Error: ' + data.message);
+            }
+        }
+    })
+    .catch(error => {
+        console.error('AJAX error:', error);
+        alert('An error occurred while processing your request.');
+    });
+}
 
 });

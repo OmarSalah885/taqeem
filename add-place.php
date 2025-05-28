@@ -6,6 +6,12 @@ session_start();
 // Check if user is logged in
 $logged_in = isset($_SESSION['user_id']);
 
+if (!$logged_in) {
+    // Redirect to index.php with a parameter to show login overlay
+    $redirect_url = 'index.php?show_login=true&redirect_url=' . urlencode('add-place.php');
+    header("Location: $redirect_url");
+    exit;
+}
 // CSRF token
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));

@@ -1,41 +1,44 @@
 document.addEventListener("DOMContentLoaded", function () {
     function toggleLike(event, reviewId) {
-        event.preventDefault();
+        event.preventDefault(); // Prevent default link behavior
 
-        // Check if the user is logged in
-        if (!isLoggedIn) {
-            // Redirect to login overlay
-            const loginOverlay = document.getElementById("loginOverlay");
-            if (loginOverlay) {
-                loginOverlay.style.display = "block";
+        // Send AJAX request to toggle_like.php
+        fetch('toggle_like.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `review_id=${encodeURIComponent(reviewId)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update all heart icons for this review_id on the page
+                document.querySelectorAll(`a.activity_grid--item_img_like[onclick="toggleLike(event, ${reviewId})"] i`).forEach(icon => {
+                    icon.classList.remove('fa-solid', 'fa-regular', 'fa-heart');
+                    icon.classList.add(data.is_liked ? 'fa-solid' : 'fa-regular', 'fa-heart');
+                });
             } else {
-                alert("You must be logged in to like a review.");
-            }
-            return;
-        }
-
-        // Send AJAX request to toggle like
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", "toggle_like.php", true);
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                const response = JSON.parse(xhr.responseText);
-                if (response.success) {
-                    // Update ALL like icons for this review everywhere on the page
-                    document.querySelectorAll(`button.like-btn[data-review-id="${reviewId}"] i`).forEach(icon => {
-                        icon.className = response.is_liked ? "fa-solid fa-heart" : "fa-regular fa-heart";
-                    });
+                if (data.message === 'You must be logged in to like a review.') {
+                    // Show login overlay if user is not logged in
+                    if (typeof window.showLogin === 'function') {
+                        window.showLogin(null, window.location.href);
+                    } else {
+                        console.error('showLogin function not found');
+                        alert('Please log in to like a review.');
+                    }
                 } else {
-                    alert(response.message);
+                    console.error('Error:', data.message);
+                    alert('Error: ' + data.message);
                 }
             }
-        };
-
-        xhr.send("review_id=" + reviewId);
+        })
+        .catch(error => {
+            console.error('AJAX error:', error);
+            alert('An error occurred while processing your request.');
+        });
     }
 
     // Expose the function globally
     window.toggleLike = toggleLike;
-})
+});

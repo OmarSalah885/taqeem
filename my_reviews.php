@@ -63,17 +63,19 @@ $reviews_query->bind_param("iii", $user_id, $reviews_per_page, $offset);
 $reviews_query->execute();
 $reviews_result = $reviews_query->get_result();
 
-$is_liked_reviews = [];
+
+
+$is_liked = false;
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
-    $liked_reviews_query = $conn->prepare("SELECT review_id FROM review_likes WHERE user_id = ?");
-    $liked_reviews_query->bind_param("i", $user_id);
-    $liked_reviews_query->execute();
-    $liked_reviews_result = $liked_reviews_query->get_result();
-    while ($liked_review = $liked_reviews_result->fetch_assoc()) {
-        $is_liked_reviews[] = $liked_review['review_id'];
-    }
+    $check_like_query = $conn->prepare("SELECT id FROM review_likes WHERE user_id = ? AND review_id = ?");
+    $check_like_query->bind_param("ii", $user_id, $review['review_id']);
+    $check_like_query->execute();
+    $check_like_result = $check_like_query->get_result();
+    $is_liked = $check_like_result->num_rows > 0;
+    $check_like_query->close();
 }
+
 ?>
 
 <main class="my_rev">
@@ -109,8 +111,8 @@ if (isset($_SESSION['user_id'])) {
                     }
                     ?>
                     <a class="activity_grid--item_img_like" href="#" onclick="toggleLike(event, <?php echo $review['review_id']; ?>)">
-                        <i class="<?php echo $is_liked ? 'fa-solid fa-heart' : 'fa-regular fa-heart'; ?>"></i>
-                    </a>
+    <i class="<?php echo $is_liked ? 'fa-solid fa-heart' : 'fa-regular fa-heart'; ?>"></i>
+</a>
                 </div>
                 <div class="activity_grid--item_content">
                     <div class="activity_grid--item_content-info">

@@ -479,103 +479,108 @@ include 'header.php';
         <?php endif; ?>
 
         <!-- LIKED REVIEWS Section -->
-        <?php if ($total_liked_reviews > 0): ?>
-        <div class="profile_main_likeReviews">
-            <h2 class="profile_title">LIKED REVIEWS</h2>
-            <div class="profile_container">
-                <?php
-                $liked_reviews_query = $conn->prepare("
-                    SELECT
-                        rl.review_id,
-                        r.rating,
-                        r.review_text,
-                        r.created_at,
-                        p.id AS place_id,
-                        p.name AS place_name,
-                        p.featured_image AS place_image,
-                        c.id AS category_id,
-                        c.icon AS category_icon,
-                        u.id AS user_id,
-                        u.first_name,
-                        u.last_name,
-                        u.profile_image
-                    FROM review_likes rl
-                    INNER JOIN reviews r ON rl.review_id = r.id
-                    INNER JOIN places p ON r.place_id = p.id
-                    LEFT JOIN categories c ON p.category_id = c.id
-                    INNER JOIN users u ON r.user_id = u.id
-                    WHERE rl.user_id = ?
-                    ORDER BY rl.created_at DESC
-                    LIMIT 2
-                ");
-                $liked_reviews_query->bind_param("i", $profile_user_id);
-                $liked_reviews_query->execute();
-                $liked_reviews_result = $liked_reviews_query->get_result();
+<?php if ($total_liked_reviews > 0): ?>
+<div class="profile_main_likeReviews">
+    <h2 class="profile_title">LIKED REVIEWS</h2>
+    <div class="profile_container">
+        <?php
+        $liked_reviews_query = $conn->prepare("
+            SELECT
+                r.id AS review_id,
+                r.review_text,
+                r.rating,
+                r.created_at,
+                p.id AS place_id,
+                p.name AS place_name,
+                p.featured_image AS place_image,
+                c.id AS category_id,
+                c.icon AS category_icon,
+                u.id AS user_id,
+                u.first_name,
+                u.last_name,
+                u.profile_image
+            FROM review_likes rl
+            INNER JOIN reviews r ON rl.review_id = r.id
+            INNER JOIN places p ON r.place_id = p.id
+            LEFT JOIN categories c ON p.category_id = c.id
+            INNER JOIN users u ON r.user_id = u.id
+            WHERE rl.user_id = ?
+            ORDER BY rl.created_at DESC
+            LIMIT 2
+        ");
+        $liked_reviews_query->bind_param("i", $profile_user_id);
+        $liked_reviews_query->execute();
+        $liked_reviews_result = $liked_reviews_query->get_result();
 
-                while ($liked_review = $liked_reviews_result->fetch_assoc()):
+        while ($liked_review = $liked_reviews_result->fetch_assoc()):
+        ?>
+        <div class="activity_grid--item">
+            <div class="activity_grid--item_img">
+                <a class="activity_grid--item_img_user"
+                    href="profile.php?user_id=<?php echo $liked_review['user_id']; ?>">
+                    <img src="<?php echo htmlspecialchars($liked_review['profile_image'] ?? 'assets/images/profiles/pro_null.png'); ?>"
+                        alt="User Image">
+                    <p><?php echo htmlspecialchars($liked_review['first_name'] . ' ' . $liked_review['last_name']); ?>
+                    </p>
+                </a>
+                <a
+                    href="single-place.php?place_id=<?php echo $liked_review['place_id']; ?>#review_<?php echo $liked_review['review_id']; ?>">
+                    <img class="activity_grid--item_img_user-img"
+                        src="<?php echo htmlspecialchars($liked_review['place_image'] ?? 'assets/images/listing.jpg'); ?>"
+                        alt="Place Image">
+                </a>
+                <?php
+                $is_liked = false;
+                if (isset($_SESSION['user_id'])) {
+                    $user_id = $_SESSION['user_id'];
+                    $check_like_query = $conn->prepare("SELECT id FROM review_likes WHERE user_id = ? AND review_id = ?");
+                    $check_like_query->bind_param("ii", $user_id, $liked_review['review_id']);
+                    $check_like_query->execute();
+                    $check_like_result = $check_like_query->get_result();
+                    $is_liked = $check_like_result->num_rows > 0;
+                    $check_like_query->close();
+                }
                 ?>
-                <div class="activity_grid--item">
-                    <div class="activity_grid--item_img">
-                        <a class="activity_grid--item_img_user"
-                            href="profile.php?user_id=<?php echo $liked_review['user_id']; ?>">
-                            <img src="<?php echo htmlspecialchars($liked_review['profile_image'] ?? 'assets/images/profiles/pro_null.png'); ?>"
-                                alt="User Image">
-                            <p><?php echo htmlspecialchars($liked_review['first_name'] . ' ' . $liked_review['last_name']); ?>
-                            </p>
+                <a class="activity_grid--item_img_like" href="#"
+                    onclick="toggleLike(event, <?php echo $liked_review['review_id']; ?>)">
+                    <i class="<?php echo $is_liked ? 'fa-solid fa-heart' : 'fa-regular fa-heart'; ?>"></i>
+                </a>
+            </div>
+            <div class="activity_grid--item_content">
+                <div class="activity_grid--item_content-info">
+                    <div class="activity_grid--item_content-info_name">
+                        <a href="single-place.php?place_id=<?php echo $liked_review['place_id']; ?>">
+                            <h3><?php echo htmlspecialchars($liked_review['place_name']); ?></h3>
                         </a>
-                        <a
-                            href="single-place.php?place_id=<?php echo $liked_review['place_id']; ?>#review_<?php echo $liked_review['review_id']; ?>">
-                            <img class="activity_grid--item_img_user-img"
-                                src="<?php echo htmlspecialchars($liked_review['place_image'] ?? 'assets/images/listing.jpg'); ?>"
-                                alt="Place Image">
-                        </a>
-                        <?php
-                        if ($is_owner) {
-                            $is_liked = in_array($liked_review['review_id'], array_column($saved_places, 'review_id')) || in_array($liked_review['review_id'], array_column($saved_places, 'review_id'));
-                        } else {
-                            $is_liked = false;
-                        }
-                        ?>
-                        <a class="activity_grid--item_img_like" href="#"
-                            onclick="toggleLike(event, <?php echo $liked_review['review_id']; ?>)">
-                            <i class="<?php echo $is_liked ? 'fa-solid fa-heart' : 'fa-regular fa-heart'; ?>"></i>
-                        </a>
-                    </div>
-                    <div class="activity_grid--item_content">
-                        <div class="activity_grid--item_content-info">
-                            <div class="activity_grid--item_content-info_name">
-                                <a href="place.php?place_id=<?php echo $liked_review['place_id']; ?>">
-                                    <h3><?php echo htmlspecialchars($liked_review['place_name']); ?></h3>
-                                </a>
-                                <div class="activity_stars">
-                                    <?php
-                                    $rating = (int)$liked_review['rating'];
-                                    for ($i = 0; $i < $rating; $i++): ?>
-                                    <i class="fa-solid fa-star"></i>
-                                    <?php endfor; ?>
-                                    <?php for ($i = $rating; $i < 5; $i++): ?>
-                                    <i class="fa-regular fa-star"></i>
-                                    <?php endfor; ?>
-                                </div>
-                            </div>
+                        <div class="activity_stars">
+                            <?php
+                            $rating = (int)$liked_review['rating'];
+                            for ($i = 0; $i < $rating; $i++): ?>
+                            <i class="fa-solid fa-star"></i>
+                            <?php endfor; ?>
+                            <?php for ($i = $rating; $i < 5; $i++): ?>
+                            <i class="fa-regular fa-star"></i>
+                            <?php endfor; ?>
                         </div>
-                        <p>
-                            <?php echo htmlspecialchars(substr($liked_review['review_text'], 0, 150)); ?>
-                            <?php if (strlen($liked_review['review_text']) > 150): ?>
-                            <a href="single-place.php?place_id=<?php echo $liked_review['place_id']; ?>#review_<?php echo $liked_review['review_id']; ?>"
-                                class="read-more">Read more</a>
-                            <?php endif; ?>
-                        </p>
                     </div>
                 </div>
-                <?php endwhile; ?>
-                <?php if ($total_liked_reviews > 2): ?>
-                <a href="liked_rev.php?user_id=<?php echo $profile_user_id; ?>&page=1"
-                    class="btn__red--l btn__red btn">see all</a>
-                <?php endif; ?>
+                <p>
+                    <?php echo htmlspecialchars(substr($liked_review['review_text'], 0, 150)); ?>
+                    <?php if (strlen($liked_review['review_text']) > 150): ?>
+                    <a href="single-place.php?place_id=<?php echo $liked_review['place_id']; ?>#review_<?php echo $liked_review['review_id']; ?>"
+                        class="read-more">Read more</a>
+                    <?php endif; ?>
+                </p>
             </div>
         </div>
+        <?php endwhile; ?>
+        <?php if ($total_liked_reviews > 2): ?>
+        <a href="liked_rev.php?user_id=<?php echo $profile_user_id; ?>&page=1"
+            class="btn__red--l btn__red btn">see all</a>
         <?php endif; ?>
+    </div>
+</div>
+<?php endif; ?>
 
         <!-- MY COLLECTIONS Section -->
         <?php if ($total_saved_places > 0): ?>

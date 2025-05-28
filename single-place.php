@@ -121,7 +121,7 @@ if (empty($_SESSION['csrf_token'])) {
                 $rating_query = $conn->prepare("SELECT AVG(rating) AS avg_rating, COUNT(*) AS total_reviews FROM reviews WHERE place_id = ?");
                 $rating_query->bind_param("i", $place_id);
                 $rating_query->execute();
-                $rating_result = $rating_query->get_result(); // Fixed: Use $rating_query instead of $conn
+                $rating_result = $rating_query->get_result();
                 $rating_data = $rating_result->fetch_assoc();
                 $avg_rating = $rating_data['avg_rating'] ?? 0;
                 $total_reviews = $rating_data['total_reviews'] ?? 0;
@@ -428,10 +428,8 @@ if (empty($_SESSION['csrf_token'])) {
 
 <?php include 'footer.php'; ?>
 
-
-
 <script>
-window.addEventListener('load', function() { // Changed from 'DOMContentLoaded' to 'load'
+window.addEventListener('load', function() {
     // FAQ toggle
     document.querySelectorAll('.faq-question').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -439,18 +437,6 @@ window.addEventListener('load', function() { // Changed from 'DOMContentLoaded' 
             answer.style.display = answer.style.display === 'block' ? 'none' : 'block';
         });
     });
-
-    // Bind star ratings for add review form
-    if (typeof bindStarRating === 'function') { // Added check for function existence
-        bindStarRating('.addReview_container .addReview_stars');
-
-        // Bind star ratings for all edit forms
-        document.querySelectorAll('.edit-review-form .addReview_stars').forEach(container => {
-            bindStarRating(`#${container.closest('.edit-review-form').id} .addReview_stars`);
-        });
-    } else {
-        console.error('bindStarRating function is not defined. Ensure ajax_review.js is loaded correctly.');
-    }
 
     // Event delegation for review and comment buttons
     document.querySelector('.reviews_container').addEventListener('click', function(e) {
@@ -466,11 +452,6 @@ window.addEventListener('load', function() { // Changed from 'DOMContentLoaded' 
             const form = document.getElementById(`editForm-${reviewId}`);
             if (form) {
                 form.style.display = form.style.display === 'block' ? 'none' : 'block';
-                if (typeof bindStarRating === 'function') { // Added check
-                    bindStarRating(`#editForm-${reviewId} .addReview_stars`);
-                } else {
-                    console.error('bindStarRating function is not defined for edit form.');
-                }
             }
         } else if (target.matches('.delete-review')) {
             deleteReview(reviewId);
@@ -574,11 +555,6 @@ window.addEventListener('load', function() { // Changed from 'DOMContentLoaded' 
             const form = document.getElementById(`editForm-${rid}`);
             if (form) {
                 form.style.display = 'block';
-                if (typeof bindStarRating === 'function') { // Added check
-                    bindStarRating(`#editForm-${rid} .addReview_stars`);
-                } else {
-                    console.error('bindStarRating function is not defined for edit action.');
-                }
             }
         }
     }
