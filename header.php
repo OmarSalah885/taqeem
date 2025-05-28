@@ -41,6 +41,7 @@ if (isset($_SESSION['user_id']) && (!isset($_SESSION['profile_image']) || !isset
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -61,11 +62,14 @@ if (isset($_SESSION['user_id']) && (!isset($_SESSION['profile_image']) || !isset
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <title>Taqeem</title>
     <script>
-        const isLoggedIn = <?php echo isset($_SESSION['user_id']) ? 'true' : 'false'; ?>;
-        const hasLoginErrors = <?php echo !empty($_SESSION['login_errors']) && !isset($_SESSION['user_id']) ? 'true' : 'false'; ?>;
-        const hasSignupErrors = <?php echo !empty($_SESSION['signup_errors']) && !isset($_SESSION['user_id']) ? 'true' : 'false'; ?>;
+    const isLoggedIn = <?php echo isset($_SESSION['user_id']) ? 'true' : 'false'; ?>;
+    const hasLoginErrors =
+        <?php echo !empty($_SESSION['login_errors']) && !isset($_SESSION['user_id']) ? 'true' : 'false'; ?>;
+    const hasSignupErrors =
+        <?php echo !empty($_SESSION['signup_errors']) && !isset($_SESSION['user_id']) ? 'true' : 'false'; ?>;
     </script>
 </head>
+
 <body>
     <nav>
         <div class="navbar">
@@ -80,10 +84,13 @@ if (isset($_SESSION['user_id']) && (!isset($_SESSION['profile_image']) || !isset
                     <a href="index.php"><img src="assets/images/logo.png" alt="logo"></a>
                 </div>
                 <div class="navbar_container--menu-R">
-                    <a class="btn__red--m btn__red btn" id="search-btn" href="#"><i class="fa-solid fa-magnifying-glass"></i></a>
+                    <a class="btn__red--m btn__red btn" id="search-btn" href="#"><i
+                            class="fa-solid fa-magnifying-glass"></i></a>
                     <?php if (isset($_SESSION['user_id'])): ?>
-                    <a href="profile.php?user_id=<?php echo htmlspecialchars($_SESSION['user_id']); ?>" class="navbar_profile">
-                        <img src="<?php echo htmlspecialchars($_SESSION['profile_image']) . '?v=' . time(); ?>" alt="User Profile">
+                    <a href="profile.php?user_id=<?php echo htmlspecialchars($_SESSION['user_id']); ?>"
+                        class="navbar_profile">
+                        <img src="<?php echo htmlspecialchars($_SESSION['profile_image']) . '?v=' . time(); ?>"
+                            alt="User Profile">
                         <span><?php echo htmlspecialchars($_SESSION['first_name'] . ' ' . $_SESSION['last_name']); ?></span>
                     </a>
                     <a class="navbar_container--menu-R_links" href="logout.php">Log Out</a>
@@ -154,8 +161,10 @@ if (isset($_SESSION['user_id']) && (!isset($_SESSION['profile_image']) || !isset
                 <!-- Login Form -->
                 <form class="LogOverlay__content--login" action="login_handler.php" method="POST" id="login_form">
                     <?php $login_errors = $_SESSION['login_errors'] ?? []; $login_data = $_SESSION['login_data'] ?? []; ?>
-                    <input type="hidden" name="redirect_url" value="<?php echo htmlspecialchars($_SERVER['REQUEST_URI']); ?>">
-                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
+                    <input type="hidden" name="redirect_url"
+                        value="<?php echo htmlspecialchars($_SERVER['REQUEST_URI']); ?>">
+                    <input type="hidden" name="csrf_token"
+                        value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                     <?php if (!empty($login_errors)): ?>
                     <div class="error-container">
                         <?php foreach ($login_errors as $error): ?>
@@ -163,16 +172,19 @@ if (isset($_SESSION['user_id']) && (!isset($_SESSION['profile_image']) || !isset
                         <?php endforeach; ?>
                     </div>
                     <?php endif; ?>
-                    <input type="email" name="email" placeholder="EMAIL" value="<?php echo htmlspecialchars($login_data['email'] ?? ''); ?>" required>
+                    <input type="email" name="email" placeholder="EMAIL"
+                        value="<?php echo htmlspecialchars($login_data['email'] ?? ''); ?>" required>
                     <input type="password" name="password" placeholder="PASSWORD" required>
-                    <p>Forgot your password? <a href="#">RESET PASSWORD.</a></p>
+
                     <button type="submit" class="btn__red--l btn__red btn">Sign In</button>
                 </form>
                 <!-- Signup Form -->
                 <form class="LogOverlay__content--signup" action="signup_handler.php" method="POST" id="signup_form">
                     <?php $signup_errors = $_SESSION['signup_errors'] ?? []; $signup_data = $_SESSION['signup_data'] ?? []; ?>
-                    <input type="hidden" name="redirect_url" value="<?php echo htmlspecialchars($_SERVER['REQUEST_URI']); ?>">
-                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
+                    <input type="hidden" name="redirect_url"
+                        value="<?php echo htmlspecialchars($_SERVER['REQUEST_URI']); ?>">
+                    <input type="hidden" name="csrf_token"
+                        value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                     <?php if (!empty($signup_errors)): ?>
                     <div class="error-container">
                         <?php foreach ($signup_errors as $error): ?>
@@ -181,10 +193,13 @@ if (isset($_SESSION['user_id']) && (!isset($_SESSION['profile_image']) || !isset
                     </div>
                     <?php endif; ?>
                     <div class="LogOverlay__content--signup_name">
-                        <input type="text" name="first_name" placeholder="FIRST NAME" value="<?php echo htmlspecialchars($signup_data['first_name'] ?? ''); ?>" required>
-                        <input type="text" name="last_name" placeholder="LAST NAME" value="<?php echo htmlspecialchars($signup_data['last_name'] ?? ''); ?>" required>
+                        <input type="text" name="first_name" placeholder="FIRST NAME"
+                            value="<?php echo htmlspecialchars($signup_data['first_name'] ?? ''); ?>" required>
+                        <input type="text" name="last_name" placeholder="LAST NAME"
+                            value="<?php echo htmlspecialchars($signup_data['last_name'] ?? ''); ?>" required>
                     </div>
-                    <input type="email" name="email" placeholder="EMAIL" value="<?php echo htmlspecialchars($signup_data['email'] ?? ''); ?>" required>
+                    <input type="email" name="email" placeholder="EMAIL"
+                        value="<?php echo htmlspecialchars($signup_data['email'] ?? ''); ?>" required>
                     <input type="password" name="password" placeholder="PASSWORD" required>
                     <input type="password" name="confirm_password" placeholder="CONFIRM PASSWORD" required>
                     <button type="submit" class="btn__red--l btn__red btn">Sign up</button>
@@ -196,8 +211,10 @@ if (isset($_SESSION['user_id']) && (!isset($_SESSION['profile_image']) || !isset
                 <a class="mobile_overlay--content-close" id="mobile_emnu-close" href="#">X</a>
                 <div class="mobile_overlay--content_links">
                     <?php if (isset($_SESSION['user_id'])): ?>
-                    <a href="profile.php?user_id=<?php echo htmlspecialchars($_SESSION['user_id']); ?>" class="navbar_profile">
-                        <img src="<?php echo htmlspecialchars($_SESSION['profile_image']) . '?v=' . time(); ?>" alt="User Profile">
+                    <a href="profile.php?user_id=<?php echo htmlspecialchars($_SESSION['user_id']); ?>"
+                        class="navbar_profile">
+                        <img src="<?php echo htmlspecialchars($_SESSION['profile_image']) . '?v=' . time(); ?>"
+                            alt="User Profile">
                         <span><?php echo htmlspecialchars($_SESSION['first_name'] . ' ' . $_SESSION['last_name']); ?></span>
                     </a>
                     <a href="index.php">home</a>
@@ -219,4 +236,5 @@ if (isset($_SESSION['user_id']) && (!isset($_SESSION['profile_image']) || !isset
         </div>
     </nav>
 </body>
+
 </html>
