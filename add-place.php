@@ -240,7 +240,7 @@ function normalizeName($name) {
                 }
 
                 $conn->commit();
-                header("Location: add_place.php?success=1");
+                header("Location: single-place.php?place_id=" . $place_id);
                 exit;
             } catch (Exception $e) {
                 $conn->rollback();
