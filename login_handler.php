@@ -3,23 +3,24 @@ require_once 'config.php';
 require_once 'db_connect.php';
 session_start();
 
-$response = ['success' => false, 'error' => ''];
-
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    $response['error'] = 'Invalid request method';
-    sendJsonResponse($response);
+    $_SESSION['login_errors'] = ['general' => 'Invalid request method'];
+    header('Location: index.php');
+    exit;
 }
 
 $email = trim($_POST['email'] ?? '');
 $password = trim($_POST['password'] ?? '');
 $redirect_url = $_POST['redirect_url'] ?? 'index.php';
 $csrf_token = $_POST['csrf_token'] ?? '';
+$is_review_triggered = $_POST['is_review_triggered'] ?? 'false';
 
 // Validate CSRF token
 if (!verify_csrf_token($csrf_token)) {
     error_log("CSRF validation failed for login: token=$csrf_token, session={$_SESSION['csrf_token']}", 3, 'logs/error.log');
-    $response['error'] = 'Invalid CSRF token';
-    sendJsonResponse($response);
+    $_SESSION['login_errors'] = ['general' => 'Invalid CSRF token'];
+    header("Location: $redirect_url");
+    exit;
 }
 
 // Validate inputs
@@ -32,8 +33,10 @@ if (empty($password)) {
 }
 
 if (!empty($errors)) {
-    $response['error'] = implode(' ', $errors);
-    sendJsonResponse($response);
+    $_SESSION['login_errors'] = $errors;
+    $_SESSION['login_data'] = $_POST;
+    header("Location: $redirect_url");
+    exit;
 }
 
 // Check user
@@ -62,34 +65,37 @@ try {
         unset($_SESSION['signup_errors']);
         unset($_SESSION['signup_data']);
 
-        $response['success'] = true;
-        $response['redirect_url'] = trim(strtolower($user['role'])) === 'admin' ? "profile.php?user_id={$user['id']}" : $redirect_url;
-        sendJsonResponse($response);
+        // Determine redirect URL
+        if ($is_review_triggered === 'true') {
+            $redirect_url = filter_var($redirect_url, FILTER_SANITIZE_URL);
+            if (!$redirect_url) {
+                $redirect_url = 'index.php';
+            }
+        } else {
+            if (trim(strtolower($user['role'])) === 'admin') {
+                $redirect_url = "profile.php?user_id={$user['id']}";
+            } else {
+                $redirect_url = filter_var($redirect_url, FILTER_SANITIZE_URL);
+                if (!$redirect_url) {
+                    $redirect_url = 'index.php';
+                }
+            }
+        }
+        header("Location: $redirect_url");
+        exit;
     } else {
         $errors['email'] = 'Invalid email or password.';
         error_log("Login failed for email: $email", 3, 'logs/error.log');
-        $response['error'] = 'Invalid email or password';
-        sendJsonResponse($response);
+        $_SESSION['login_errors'] = $errors;
+        $_SESSION['login_data'] = $_POST;
+        header("Location: $redirect_url");
+        exit;
     }
 } catch (Exception $e) {
     error_log("Login error: " . $e->getMessage(), 3, 'logs/error.log');
-    $response['error'] = 'Database error occurred';
-    sendJsonResponse($response);
-}
-
-function sendJsonResponse($response) {
-    header('Content-Type: application/json');
-    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
-        echo json_encode($response);
-    } else {
-        // Fallback for non-AJAX requests
-        global $errors, $redirect_url;
-        if (!$response['success']) {
-            $_SESSION['login_errors'] = $errors ?: ['general' => $response['error']];
-            $_SESSION['login_data'] = $_POST;
-        }
-        header("Location: $redirect_url");
-    }
+    $_SESSION['login_errors'] = ['general' => 'Database error occurred'];
+    $_SESSION['login_data'] = $_POST;
+    header("Location: $redirect_url");
     exit;
 }
 ?>

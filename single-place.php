@@ -428,8 +428,10 @@ if (empty($_SESSION['csrf_token'])) {
 
 <?php include 'footer.php'; ?>
 
+
+
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+window.addEventListener('load', function() { // Changed from 'DOMContentLoaded' to 'load'
     // FAQ toggle
     document.querySelectorAll('.faq-question').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -437,6 +439,18 @@ document.addEventListener('DOMContentLoaded', function() {
             answer.style.display = answer.style.display === 'block' ? 'none' : 'block';
         });
     });
+
+    // Bind star ratings for add review form
+    if (typeof bindStarRating === 'function') { // Added check for function existence
+        bindStarRating('.addReview_container .addReview_stars');
+
+        // Bind star ratings for all edit forms
+        document.querySelectorAll('.edit-review-form .addReview_stars').forEach(container => {
+            bindStarRating(`#${container.closest('.edit-review-form').id} .addReview_stars`);
+        });
+    } else {
+        console.error('bindStarRating function is not defined. Ensure ajax_review.js is loaded correctly.');
+    }
 
     // Event delegation for review and comment buttons
     document.querySelector('.reviews_container').addEventListener('click', function(e) {
@@ -452,10 +466,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById(`editForm-${reviewId}`);
             if (form) {
                 form.style.display = form.style.display === 'block' ? 'none' : 'block';
-                const rating = parseInt(form.querySelector(`#rating-${reviewId}`).value);
-                form.querySelectorAll('.addReview_stars i').forEach(star => {
-                    star.style.color = parseInt(star.getAttribute('data-value')) <= rating ? '#A21111' : '#D0D0D0';
-                });
+                if (typeof bindStarRating === 'function') { // Added check
+                    bindStarRating(`#editForm-${reviewId} .addReview_stars`);
+                } else {
+                    console.error('bindStarRating function is not defined for edit form.');
+                }
             }
         } else if (target.matches('.delete-review')) {
             deleteReview(reviewId);
@@ -559,10 +574,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById(`editForm-${rid}`);
             if (form) {
                 form.style.display = 'block';
-                const rating = parseInt(form.querySelector(`#rating-${rid}`).value);
-                form.querySelectorAll('.addReview_stars i').forEach(star => {
-                    star.style.color = parseInt(star.getAttribute('data-value')) <= rating ? '#A21111' : '#D0D0D0';
-                });
+                if (typeof bindStarRating === 'function') { // Added check
+                    bindStarRating(`#editForm-${rid} .addReview_stars`);
+                } else {
+                    console.error('bindStarRating function is not defined for edit action.');
+                }
             }
         }
     }
@@ -646,7 +662,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!confirm('Are you sure you want to delete this comment?')) return;
         fetch('delete_owner_comment.php', {
             method: 'POST',
-            headers: { 
+            headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'X-Requested-With': 'XMLHttpRequest'
             },

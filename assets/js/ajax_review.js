@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add Review Form Submission
     const reviewForm = document.getElementById('reviewForm');
     let formDataCache = null;
-    let newFiles = []; // Preserve newFiles in outer scope
+    let newFiles = [];
 
     if (reviewForm) {
         reviewForm.addEventListener('submit', async function(event) {
@@ -10,11 +10,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Cache form data
             formDataCache = new FormData(this);
+            // Store text data and file names in sessionStorage
             sessionStorage.setItem('reviewFormData', JSON.stringify({
                 review_text: formDataCache.get('review_text'),
                 rating: formDataCache.get('rating'),
                 place_id: formDataCache.get('place_id'),
-                csrf_token: formDataCache.get('csrf_token')
+                csrf_token: formDataCache.get('csrf_token'),
+                image_names: newFiles.map(f => f.name)
             }));
 
             // Log form data for debugging
@@ -23,87 +25,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 rating: formDataCache.get('rating'),
                 place_id: formDataCache.get('place_id'),
                 csrf_token: formDataCache.get('csrf_token'),
-                images: formDataCache.getAll('review_images[]').map(f => f.name)
+                images: newFiles.map(f => f.name)
             });
 
-            // Check client-side login status first
+            // Check client-side login status
             console.log('Client-side isLoggedIn:', isLoggedIn);
             if (isLoggedIn) {
-                syncFiles(); // Ensure files are synced
+                syncFiles();
                 submitReviewForm();
                 return;
             }
 
-            // Fallback to server-side check if client-side indicates not logged in
-            try {
-                const response = await fetch('check_session.php', {
-                    method: 'GET',
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                });
-                const data = await response.json();
-                console.log('Server-side isLoggedIn:', data.isLoggedIn);
-                const isLoggedInServer = data.isLoggedIn === true;
-
-                if (!isLoggedInServer) {
-                    sessionStorage.setItem('isReviewTriggeredLogin', 'true');
-                    if (typeof showLogin === 'function') {
-                        showLogin(() => {
-                            // Submit review directly after login
-                            syncFiles();
-                            submitReviewForm();
-                        });
-                    } else {
-                        console.error('showLogin function is not defined. Ensure auth.js is loaded.');
-                        const overlay = document.querySelector('.LogOverlay');
-                        const loginForm = document.querySelector('.LogOverlay__content--login');
-                        const signupForm = document.querySelector('.LogOverlay__content--signup');
-                        const loginLinkDiv = document.getElementById('login-overlay__div');
-                        const signupLinkDiv = document.getElementById('signup-overlay__div');
-                        if (overlay && loginForm && signupForm && loginLinkDiv && signupLinkDiv) {
-                            overlay.classList.add('show');
-                            loginForm.classList.add('show');
-                            signupForm.classList.remove('show');
-                            loginLinkDiv.classList.add('active');
-                            signupLinkDiv.classList.remove('active');
-                        } else {
-                            console.error('Login overlay elements not found in DOM.');
-                        }
-                    }
-                    return false;
-                }
-
-                // Proceed with form submission if logged in
-                syncFiles();
-                submitReviewForm();
-            } catch (error) {
-                console.error('Error checking login status:', error);
-                alert('Error checking login state: ' + error.message);
-            }
+            // Store files temporarily
+            window.reviewImagesTemp = newFiles;
+            sessionStorage.setItem('isReviewTriggeredLogin', 'true');
+            const redirectUrl = window.location.href;
+            showLogin(null, redirectUrl, true); // Pass isReviewTriggered
         });
     }
 
-    // Function to submit review form
+    // Submit review form
     function submitReviewForm() {
         if (!formDataCache) {
-            const cachedData = sessionStorage.getItem('reviewFormData');
-            if (cachedData) {
-                const parsedData = JSON.parse(cachedData);
-                formDataCache = new FormData();
-                for (const key in parsedData) {
-                    formDataCache.append(key, parsedData[key]);
-                }
-                // Re-append images from newFiles
-                newFiles.forEach(file => formDataCache.append('review_images[]', file));
-            } else {
-                console.error('No form data available to submit');
-                return;
-            }
+            console.error('No form data available to submit');
+            return;
         }
 
-        // Ensure CSRF token is present
         if (!formDataCache.get('csrf_token')) {
-            console.error('CSRF token missing in form data');
-            alert('Security error: CSRF token missing');
+            console.error('CSRF token missing');
             return;
         }
 
@@ -147,9 +96,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (imagePreview) {
                     imagePreview.innerHTML = '';
                 }
-                console.log('newFiles before reset:', newFiles.map(f => f.name));
                 newFiles = [];
-                console.log('newFiles after reset:', newFiles);
+                window.reviewImagesTemp = null;
                 bindStarRating(`#editForm-${data.review_id} .addReview_stars`);
                 const newEditForm = document.getElementById(`editForm-${data.review_id}`);
                 if (newEditForm) bindEditForm(newEditForm);
@@ -166,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Check if login was triggered by review form (fallback for page reloads)
+    // Check if login was triggered by review
     if (sessionStorage.getItem('isReviewTriggeredLogin') === 'true') {
         fetch('check_session.php', {
             method: 'GET',
@@ -175,10 +123,9 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then(response => response.json())
         .then(data => {
-            if (data.isLoggedIn === true) {
+            if (data.isLoggedIn) {
                 const textarea = reviewForm?.querySelector('textarea[name="review_text"]');
                 if (textarea) {
-                    // Restore form data (text only, images are lost)
                     const cachedData = sessionStorage.getItem('reviewFormData');
                     if (cachedData) {
                         const parsedData = JSON.parse(cachedData);
@@ -187,11 +134,22 @@ document.addEventListener('DOMContentLoaded', () => {
                         const stars = reviewForm.querySelectorAll('.addReview_stars i');
                         stars.forEach(star => {
                             star.classList.toggle('selected', parseInt(star.getAttribute('data-value')) <= parseInt(parsedData.rating));
+                            star.style.color = parseInt(star.getAttribute('data-value')) <= parseInt(parsedData.rating) ? '#A21111' : '#D0D0D0';
                         });
                     }
-                    textarea.focus();
+                    // Clear images
+                    window.reviewImagesTemp = null;
+                    newFiles = [];
+                    const imageInput = document.getElementById('imageInput');
+                    const imagePreview = document.getElementById('imagePreview');
+                    if (imageInput) imageInput.value = '';
+                    if (imagePreview) imagePreview.innerHTML = '';
+                    // Clear sessionStorage
+                    sessionStorage.removeItem('reviewFormData');
                     sessionStorage.removeItem('isReviewTriggeredLogin');
-                    alert('Images were not saved. Please re-upload images and submit again.');
+                    formDataCache = null;
+                    // Scroll to review form
+                    document.querySelector('.addReview').scrollIntoView({ behavior: 'smooth' });
                 }
             }
         })
@@ -235,6 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
             newFiles.forEach(f => dataTransfer.items.add(f));
             imageInput.files = dataTransfer.files;
             console.log('Synced files:', newFiles.map(f => f.name));
+            window.reviewImagesTemp = newFiles;
         }
     }
 
@@ -248,6 +207,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const preview = document.getElementById(`imagePreview-${reviewId}`);
         const fileInput = document.getElementById(`imageInput-${reviewId}`);
         let newEditFiles = [];
+
+        bindStarRating(`#editForm-${reviewId} .addReview_stars`);
 
         if (preview) {
             preview.addEventListener('click', e => {
@@ -283,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         thumb.innerHTML = `<img src="${event.target.result}" alt="Preview"><span class="remove-image new">×</span>`;
                         thumb.querySelector('.remove-image.new').onclick = () => {
                             thumb.remove();
-                            newEditFiles = newFiles.filter(f => f !== file);
+                            newEditFiles = newEditFiles.filter(f => f !== file);
                             syncEditFiles();
                         };
                         if (preview) {
@@ -328,9 +289,9 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .then(data => {
                 if (data.success) {
-                    const reviewElement = document.getElementById(`review_${data.review_id}`);
+                    const reviewElement = document.getElementById(`Review_${data.review_id}`);
                     if (reviewElement) {
-                        reviewElement.outerHTML = data.html;
+                        reviewElement.innerHTML = data.html;
                     }
                     const newEditForm = document.getElementById(`editForm-${data.review_id}`);
                     if (newEditForm) bindEditForm(newEditForm);
@@ -350,20 +311,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function bindStarRating(selector) {
         const container = document.querySelector(selector);
-        if (!container) return;
+        if (!container) {
+            console.error(`Star rating container not found for selector: ${selector}`);
+            return;
+        }
         const stars = container.querySelectorAll('i');
         const reviewId = container.getAttribute('data-review-id');
-        const ratingInput = reviewId ? document.getElementById(`rating-${reviewId}`) : container.querySelector('input[name="rating"]');
-        if (!ratingInput) return;
+        const ratingInput = reviewId ? document.getElementById(`rating-${reviewId}`) : container.closest('form').querySelector('input[name="rating"]');
+        if (!ratingInput) {
+            console.error(`Rating input not found for selector: ${selector}`);
+            return;
+        }
 
         stars.forEach(star => {
             star.addEventListener('click', function() {
                 const value = parseInt(this.getAttribute('data-value'));
                 ratingInput.value = value;
                 stars.forEach(s => {
-                    s.classList.toggle('selected', parseInt(s.getAttribute('data-value')) <= value);
+                    const starValue = parseInt(s.getAttribute('data-value'));
+                    s.classList.toggle('selected', starValue <= value);
+                    s.style.color = starValue <= value ? '#A21111' : '#D0D0D0';
                 });
             });
+        });
+
+        const currentRating = parseInt(ratingInput.value) || 0;
+        stars.forEach(s => {
+            const starValue = parseInt(s.getAttribute('data-value'));
+            s.classList.toggle('selected', starValue <= currentRating);
+            s.style.color = starValue <= currentRating ? '#A21111' : '#D0D0D0';
         });
     }
 
@@ -391,14 +367,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const percentage = (safeAvgRating / 5) * 100;
             if (overallStars) {
                 overallStars.style.background = `linear-gradient(90deg, #A21111 ${percentage}%, #D0D0D0 ${percentage}%)`;
-                overallStars.style.webkitBackgroundClip = 'text';
-                overallStars.style.webkitTextFillColor = 'transparent';
+                extraStars.style.webkitBackgroundClip = 'text';
+                extraStars.style.webkitTextFillColor = 'transparent';
             }
             if (overallRating) overallRating.textContent = `${safeAvgRating.toFixed(1)} out of 5`;
-            if (totalReviewsContainer) totalReviewsContainer.textContent = `${totalReviews} reviews`;
+            if (totalReviewsContainer) totalReviewsContainer.textContent = `${totalReviews} `;
         }
 
-        const overallR = document.getElementById('reviews-overall-r');
+        const overallR = document.getElementById('overall-r');
         if (overallR) {
             for (let i = 5; i >= 1; i--) {
                 const starsP = document.getElementById(`stars-p-${i}`);

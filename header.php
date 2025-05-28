@@ -218,3 +218,5 @@ if (isset($_SESSION['user_id']) && (!isset($_SESSION['profile_image']) || !isset
             </div>
         </div>
     </nav>
+</body>
+</html>
