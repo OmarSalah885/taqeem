@@ -1,7 +1,7 @@
 <?php
 require_once 'config.php';
 require_once 'db_connect.php';
-session_start();
+
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     $_SESSION['login_errors'] = ['general' => 'Invalid request method'];

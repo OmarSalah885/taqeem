@@ -3,7 +3,7 @@ ob_start();
 
 require_once 'config.php';
 require_once 'db_connect.php';
-session_start();
+
 $response = ['success' => false, 'error' => ''];
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['review_id']) || !is_numeric($_POST['review_id']) || !isset($_SESSION['user_id'])) {
@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['review_id']) || !is_
     sendJsonResponse($response);
 }
 
-if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+if (!isset($_POST['csrf_token']) || !verify_csrf_token($_POST['csrf_token'])) {
     $response['error'] = 'Invalid CSRF token';
     sendJsonResponse($response);
 }
@@ -53,6 +53,7 @@ $update_query->bind_param("isi", $rating, $review_text, $review_id);
 if ($update_query->execute()) {
     // Handle image deletions
     if (isset($_POST['delete_images']) && is_array($_POST['delete_images'])) {
+        log_error("edit_review.php: Received delete_images: " . implode(',', $_POST['delete_images']));
         $delete_query = $conn->prepare("SELECT image_url FROM review_images WHERE id = ? AND review_id = ?");
         $delete_image_query = $conn->prepare("DELETE FROM review_images WHERE id = ? AND review_id = ?");
         foreach ($_POST['delete_images'] as $image_id) {
@@ -66,15 +67,21 @@ if ($update_query->execute()) {
                 }
                 $delete_image_query->bind_param("ii", $image_id, $review_id);
                 $delete_image_query->execute();
+                log_error("edit_review.php: Deleted image ID $image_id for review ID $review_id");
+            } else {
+                log_error("edit_review.php: Image ID $image_id not found for review ID $review_id");
             }
         }
         $delete_query->close();
         $delete_image_query->close();
+    } else {
+        log_error("edit_review.php: No delete_images provided for review ID $review_id");
     }
 
     // Handle new image uploads
     if (isset($_FILES['review_images']) && !empty($_FILES['review_images']['name'][0])) {
-        $upload_dir = 'assets/images/review_images/';
+        log_error("edit_review.php: Processing " . count($_FILES['review_images']['name']) . " images for review ID $review_id");
+        $upload_dir = UPLOAD_DIR . 'review_images/';
         if (!is_dir($upload_dir)) {
             mkdir($upload_dir, 0755, true);
         }
@@ -96,17 +103,24 @@ if ($update_query->execute()) {
             if ($files['error'][$i] === UPLOAD_ERR_OK) {
                 $file_name = uniqid() . '_' . basename($files['name'][$i]);
                 $file_path = $upload_dir . $file_name;
-                if (in_array(strtolower(pathinfo($file_name, PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'gif']) && getimagesize($files['tmp_name'][$i])) {
+                $extension = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+                if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif']) && getimagesize($files['tmp_name'][$i])) {
                     if (move_uploaded_file($files['tmp_name'][$i], $file_path)) {
                         $image_query = $conn->prepare("INSERT INTO review_images (review_id, image_url) VALUES (?, ?)");
                         $image_query->bind_param("is", $review_id, $file_path);
                         $image_query->execute();
                         $image_query->close();
+                        log_error("edit_review.php: Uploaded new image $file_name for review ID $review_id");
                     } else {
+                        log_error("edit_review.php: Failed to move uploaded file $file_name");
                         $response['error'] = 'Failed to upload image';
                         sendJsonResponse($response);
                     }
+                } else {
+                    log_error("edit_review.php: Invalid file type or image for $file_name");
                 }
+            } else {
+                log_error("edit_review.php: Upload error code {$files['error'][$i]} for file {$files['name'][$i]}");
             }
         }
     }
@@ -141,7 +155,7 @@ if ($update_query->execute()) {
     $avg_rating = (float)($rating_data['avg_rating'] ?? 0);
     $total_reviews = (int)($rating_data['total_reviews'] ?? 0);
     $rating_query->close();
-    error_log("edit_review.php: place_id=$place_id, avg_rating=$avg_rating, total_reviews=$total_reviews");
+    log_error("edit_review.php: place_id=$place_id, avg_rating=$avg_rating, total_reviews=$total_reviews");
 
     $ratings_counts = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0];
     $ratings_query = $conn->prepare("SELECT rating, COUNT(*) AS count FROM reviews WHERE place_id = ? GROUP BY rating");
@@ -184,8 +198,8 @@ if ($update_query->execute()) {
         <input type="file" name="review_images[]" id="imageInput-<?= $review_id ?>" multiple accept="image/*" style="display: none;">
         <div class="image-preview" id="imagePreview-<?= $review_id ?>">
             <?php foreach ($images as $image): ?>
-            <div class="image-thumb" data-img-id="<?= htmlspecialchars($image['id']) ?>">
-                <img src="<?= htmlspecialchars($image['image_url']) ?>" alt="Review Image">
+            <div class="image-thumb" data-img-id="<?= htmlspecialchars($image['id'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+                <img src="<?= htmlspecialchars($image['image_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>" alt="Review Image">
                 <span class="remove-image existing">×</span>
             </div>
             <?php endforeach; ?>

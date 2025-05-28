@@ -1,7 +1,9 @@
 <?php
 require_once 'config.php';
 require_once 'db_connect.php';
-session_start();
+
+
+
 
 // Check if user is logged in
 $logged_in = isset($_SESSION['user_id']);
@@ -62,8 +64,7 @@ function normalizeName($name) {
     return strtolower(trim(preg_replace('/[^a-zA-Z0-9]+/', '_', $name)));
 }
 
-// Fetch categories and handle form submission only if logged in
-if ($logged_in) {
+
     // Fetch categories
     $cat_stmt = $conn->prepare("SELECT id, name FROM categories ORDER BY name ASC");
     $cat_stmt->execute();
@@ -247,7 +248,7 @@ if ($logged_in) {
             }
         }
     }
-}
+
 ?>
 
 <?php if ($logged_in): ?>
@@ -283,7 +284,7 @@ if ($logged_in) {
             <a href="#add-place-faqs">FAQs</a>
         </div>
 
-        <form class="add-place_main" method="POST" action="add_place.php" enctype="multipart/form-data">
+        <form class="add-place_main" method="POST" action="add-place.php" enctype="multipart/form-data">
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
 
             <!-- GENERAL SECTION -->
@@ -704,7 +705,7 @@ if ($logged_in) {
                         <p>${item.description}</p>
                         <p>${item.price}</p>
                     </div>
-                    <a href="#" class="delete-menu-item">Delete</a>
+                    <a href="#" class="delete-menu-item">X</a>
                     <a href="#" class="edit-menu-item"><i class="fa fa-edit"></i></a>
                 `;
                 menuItemsContainer.appendChild(div);
@@ -782,7 +783,7 @@ if ($logged_in) {
             faqsContainer.innerHTML = '';
             faqs.forEach((faq, index) => {
                 const div = document.createElement('div');
-                div.className = 'added-faqs--grid_item';
+                div.className = 'added-faqs-grid_item';
                 div.innerHTML = `
                     <h4>${escapeHtml(faq.question)}</h4>
                     <p>${escapeHtml(faq.answer)}</p>
@@ -841,34 +842,3 @@ if ($logged_in) {
 <?php endif; ?>
 
 <?php include 'footer.php'; ?>
-<!-- JavaScript to show login overlay if not logged in -->
-<script>
-window.addEventListener('load', () => {
-    console.log('add-place.php: window.onload fired'); // Debug log
-    <?php if (!$logged_in): ?>
-        if (typeof window.showLogin === 'function') {
-            console.log('Calling showLogin from auth.js');
-            window.showLogin();
-        } else {
-            console.error('showLogin is not defined. Falling back to local implementation.');
-            // Fallback showLogin
-            const logOverlay = document.querySelector('.LogOverlay');
-            const loginForm = document.querySelector('.LogOverlay__content--login');
-            const signupForm = document.querySelector('.LogOverlay__content--signup');
-            const loginLinkOverlayDiv = document.getElementById('login-overlay__div');
-            const signupLinkOverlayDiv = document.getElementById('signup-overlay__div');
-            if (logOverlay && loginForm && signupForm && loginLinkOverlayDiv && signupLinkOverlayDiv) {
-                logOverlay.classList.add('show');
-                loginForm.classList.add('show');
-                signupForm.classList.remove('show');
-                loginLinkOverlayDiv.classList.add('active');
-                signupLinkOverlayDiv.classList.remove('active');
-                loginForm.reset();
-                document.querySelectorAll('.error-container').forEach(container => container.remove());
-            } else {
-                console.error('Login overlay elements not found in DOM');
-            }
-        }
-    <?php endif; ?>
-});
-</script>

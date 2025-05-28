@@ -1,7 +1,7 @@
 <?php
 require_once 'config.php';
 require_once 'db_connect.php';
-session_start();
+
 
 // Helper: delete files safely
 function deleteFiles(array $paths) {

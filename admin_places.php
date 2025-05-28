@@ -2,7 +2,9 @@
 require_once 'config.php';
 require_once 'db_connect.php';
 
-session_start();
+
+
+
 
 // 1. Only admins
 if (empty($_SESSION['role']) || strtolower($_SESSION['role']) !== 'admin') {
