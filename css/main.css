@@ -3839,6 +3839,9 @@ body p {
   justify-content: center;
   gap: 3.2rem;
 }
+.edit-profile .form-group {
+  width: 100%;
+}
 
 .add-place {
   display: grid;

@@ -101,35 +101,45 @@ include 'header.php';
         <h2 class="edit-profile_title">PROFILE</h2>
 
         <div class="edit-profile_info--img">
-            <p>Your Profile Photo <a href="#" onclick="document.getElementById('profile_image').click(); return false;">ADD/EDIT</a></p>
+            <p>Your Profile Photo <a href="#"
+                    onclick="document.getElementById('profile_image').click(); return false;">ADD/EDIT</a></p>
             <div class="edit-profile_img">
-                <img src="<?php echo htmlspecialchars($user['profile_image'] ?? 'assets/images/profiles/pro_null.png'); ?>" alt="Profile Image">
+                <img src="<?php echo htmlspecialchars($user['profile_image'] ?? 'assets/images/profiles/pro_null.png'); ?>"
+                    alt="Profile Image">
             </div>
             <input type="file" name="profile_image" id="profile_image" style="display:none;" accept="image/*">
 
             <?php if (!empty($user['profile_image']) && $user['profile_image'] !== 'assets/images/profiles/pro_null.png'): ?>
-                <p><a href="#" id="deleteProfileImageLink">Delete profile image</a></p>
+            <p><a href="#" id="deleteProfileImageLink">Delete profile image</a></p>
             <?php endif; ?>
             <input type="checkbox" name="delete_image" id="delete_image_checkbox" style="display:none;">
         </div>
 
-        <input type="text" name="first_name" placeholder="FIRST NAME" class="edit-profile_input" value="<?php echo htmlspecialchars($user['first_name']); ?>">
-        <input type="text" name="last_name" placeholder="LAST NAME" class="edit-profile_input" value="<?php echo htmlspecialchars($user['last_name']); ?>">
-        <textarea name="about_me" placeholder="ABOUT ME ..." class="edit-profile_textarea"><?php echo htmlspecialchars($user['about_me']); ?></textarea>
+        <input type="text" name="first_name" placeholder="FIRST NAME" class="edit-profile_input"
+            value="<?php echo htmlspecialchars($user['first_name']); ?>">
+        <input type="text" name="last_name" placeholder="LAST NAME" class="edit-profile_input"
+            value="<?php echo htmlspecialchars($user['last_name']); ?>">
+        <textarea name="about_me" placeholder="ABOUT ME ..."
+            class="edit-profile_textarea"><?php echo htmlspecialchars($user['about_me']); ?></textarea>
 
         <!-- Gender -->
         <label class="gender-select">Gender
-            <label><input type="radio" name="gender" value="male" <?php if (strtolower(trim($user['gender'])) === 'male') echo 'checked'; ?> required> Male</label>
-            <label><input type="radio" name="gender" value="female" <?php if (strtolower(trim($user['gender'])) === 'female') echo 'checked'; ?>> Female</label>
+            <label><input type="radio" name="gender" value="male"
+                    <?php if (strtolower(trim($user['gender'])) === 'male') echo 'checked'; ?> required> Male</label>
+            <label><input type="radio" name="gender" value="female"
+                    <?php if (strtolower(trim($user['gender'])) === 'female') echo 'checked'; ?>> Female</label>
         </label>
 
         <!-- Visibility -->
         <label class="gender-select">Public
-            <label><input type="radio" name="visibility" value="public" <?php if ($user['visibility'] === 'public') echo 'checked'; ?> required> Public</label>
-            <label><input type="radio" name="visibility" value="private" <?php if ($user['visibility'] === 'private') echo 'checked'; ?>> Private</label>
+            <label><input type="radio" name="visibility" value="public"
+                    <?php if ($user['visibility'] === 'public') echo 'checked'; ?> required> Public</label>
+            <label><input type="radio" name="visibility" value="private"
+                    <?php if ($user['visibility'] === 'private') echo 'checked'; ?>> Private</label>
         </label>
 
-        <input type="text" name="location" placeholder="Location" class="edit-profile_input" value="<?php echo htmlspecialchars($user['location']); ?>">
+        <input type="text" name="location" placeholder="Location" class="edit-profile_input"
+            value="<?php echo htmlspecialchars($user['location']); ?>">
         <button class="btn__red--l btn__red btn" type="submit">SAVE CHANGES</button>
     </form>
 
@@ -142,32 +152,35 @@ include 'header.php';
         <h2 class="edit-profile_title">UPDATE YOUR PASSWORD</h2>
 
         <?php if (isset($_SESSION['success'])): ?>
-            <p class="success"><?php echo htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?></p>
+        <p class="success"><?php echo htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?></p>
         <?php endif; ?>
 
         <div class="form-group">
-            <input type="password" name="current_password" placeholder="CURRENT PASSWORD" class="edit-profile_input" required>
+            <input type="password" name="current_password" placeholder="CURRENT PASSWORD" class="edit-profile_input"
+                required>
             <?php if (isset($change_password_errors['current_password'])): ?>
-                <p class="error"><?php echo htmlspecialchars($change_password_errors['current_password']); ?></p>
+            <p class="error"><?php echo htmlspecialchars($change_password_errors['current_password']); ?></p>
             <?php endif; ?>
+
         </div>
 
         <div class="form-group">
             <input type="password" name="new_password" placeholder="NEW PASSWORD" class="edit-profile_input" required>
             <?php if (isset($change_password_errors['new_password'])): ?>
-                <p class="error"><?php echo htmlspecialchars($change_password_errors['new_password']); ?></p>
+            <p class="error"><?php echo htmlspecialchars($change_password_errors['new_password']); ?></p>
             <?php endif; ?>
         </div>
 
         <div class="form-group">
-            <input type="password" name="confirm_password" placeholder="VERIFY NEW PASSWORD" class="edit-profile_input" required>
+            <input type="password" name="confirm_password" placeholder="VERIFY NEW PASSWORD" class="edit-profile_input"
+                required>
             <?php if (isset($change_password_errors['confirm_password'])): ?>
-                <p class="error"><?php echo htmlspecialchars($change_password_errors['confirm_password']); ?></p>
+            <p class="error"><?php echo htmlspecialchars($change_password_errors['confirm_password']); ?></p>
             <?php endif; ?>
         </div>
 
         <?php if (isset($change_password_errors['general'])): ?>
-            <p class="error"><?php echo htmlspecialchars($change_password_errors['general']); ?></p>
+        <p class="error"><?php echo htmlspecialchars($change_password_errors['general']); ?></p>
         <?php endif; ?>
 
         <button class="btn__red--l btn__red btn" type="submit">CHANGE PASSWORD</button>
@@ -177,37 +190,40 @@ include 'header.php';
 <?php include 'footer.php'; ?>
 
 <script>
-    // Trigger form submission when a file is selected
-    document.getElementById('profile_image').addEventListener('change', function() {
+// Trigger form submission when a file is selected
+document.getElementById('profile_image').addEventListener('change', function() {
+    document.querySelector('.edit-profile_info').submit();
+});
+
+// Handle profile image deletion
+document.getElementById('deleteProfileImageLink')?.addEventListener('click', function(event) {
+    event.preventDefault();
+    if (confirm("Are you sure you want to delete your profile image?")) {
+        document.getElementById('delete_image_checkbox').checked = true;
         document.querySelector('.edit-profile_info').submit();
-    });
+    }
+});
 
-    // Handle profile image deletion
-    document.getElementById('deleteProfileImageLink')?.addEventListener('click', function(event) {
-        event.preventDefault();
-        if (confirm("Are you sure you want to delete your profile image?")) {
-            document.getElementById('delete_image_checkbox').checked = true;
-            document.querySelector('.edit-profile_info').submit();
-        }
-    });
+// Validate radio selections for profile form
+document.querySelector('.edit-profile_info').addEventListener('submit', function(e) {
+    const genderChecked = document.querySelector('input[name="gender"]:checked');
+    const visibilityChecked = document.querySelector('input[name="visibility"]:checked');
+    if (!genderChecked || !visibilityChecked) {
+        e.preventDefault();
+        alert('Please select your gender and visibility preference.');
+    }
+});
 
-    // Validate radio selections for profile form
-    document.querySelector('.edit-profile_info').addEventListener('submit', function(e) {
-        const genderChecked = document.querySelector('input[name="gender"]:checked');
-        const visibilityChecked = document.querySelector('input[name="visibility"]:checked');
-        if (!genderChecked || !visibilityChecked) {
-            e.preventDefault();
-            alert('Please select your gender and visibility preference.');
+// Scroll to password form on error
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof hasChangePasswordErrors !== 'undefined' && hasChangePasswordErrors) {
+        const passwordForm = document.querySelector('.edit-profile_password');
+        if (passwordForm) {
+            passwordForm.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
         }
-    });
-
-    // Scroll to password form on error
-    document.addEventListener('DOMContentLoaded', function() {
-        if (typeof hasChangePasswordErrors !== 'undefined' && hasChangePasswordErrors) {
-            const passwordForm = document.querySelector('.edit-profile_password');
-            if (passwordForm) {
-                passwordForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
-    });
+    }
+});
 </script>
