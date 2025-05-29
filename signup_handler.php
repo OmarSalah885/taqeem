@@ -1,222 +1,107 @@
 <?php
-// Regenerate session ID to prevent fixation attacks
-if (!isset($_SESSION['CREATED'])) {
-    $_SESSION['CREATED'] = time();
-} elseif (time() - $_SESSION['CREATED'] > 1800) {
-    session_regenerate_id(true);
-    $_SESSION['CREATED'] = time();
+require_once 'config.php';
+require_once 'db_connect.php';
+session_start();
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: index.php');
+    exit;
 }
 
-// Implement session timeout
-if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 1800)) {
-    session_unset();
-    session_destroy();
-    $redirect_url = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] . (parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY) ? '&' : '?') . 'timeout=true' : 'index.php?timeout=true';
+// Retrieve and sanitize inputs
+$first_name = trim($_POST['first_name'] ?? '');
+$last_name = trim($_POST['last_name'] ?? '');
+$email = trim($_POST['email'] ?? '');
+$password = $_POST['password'] ?? '';
+$confirm_password = $_POST['confirm_password'] ?? '';
+$redirect_url = $_POST['redirect_url'] ?? 'index.php';
+$csrf_token = $_POST['csrf_token'] ?? '';
+
+// Validate CSRF token
+if (!verify_csrf_token($csrf_token)) {
+    $_SESSION['signup_errors'] = ['general' => 'Invalid CSRF token.'];
     header("Location: $redirect_url");
     exit;
 }
-$_SESSION['LAST_ACTIVITY'] = time();
 
-// Generate CSRF token
-if (!isset($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+// Validate inputs
+$errors = [];
+if (empty($first_name)) {
+    $errors['first_name'] = 'First name is required.';
+} elseif (strlen($first_name) > 50) {
+    $errors['first_name'] = 'First name cannot exceed 50 characters.';
+}
+if (empty($last_name)) {
+    $errors['last_name'] = 'Last name is required.';
+} elseif (strlen($last_name) > 50) {
+    $errors['last_name'] = 'Last name cannot exceed 50 characters.';
+}
+if (empty($email)) {
+    $errors['email'] = 'Email is required.';
+} elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $errors['email'] = 'Invalid email format.';
+} elseif (strlen($email) > 100) {
+    $errors['email'] = 'Email cannot exceed 100 characters.';
+}
+if (empty($password)) {
+    $errors['password'] = 'Password is required.';
+} elseif (strlen($password) < 8) {
+    $errors['password'] = 'Password must be at least 8 characters long.';
+} elseif (!preg_match('/[A-Z]/', $password) || !preg_match('/[a-z]/', $password) || 
+         !preg_match('/[0-9]/', $password) || !preg_match('/[^A-Za-z0-9]/', $password)) {
+    $errors['password'] = 'Password must include uppercase, lowercase, number, and special character.';
+}
+if ($password !== $confirm_password) {
+    $errors['confirm_password'] = 'Passwords do not match.';
 }
 
-// Fetch user profile if logged in
-if (isset($_SESSION['user_id']) && (!isset($_SESSION['profile_image']) || !isset($_SESSION['first_name']) || !isset($_SESSION['last_name']))) {
-    require_once 'db_connect.php';
-    $user_id = $_SESSION['user_id'];
-    $stmt = $conn->prepare("SELECT profile_image, first_name, last_name FROM users WHERE id = ?");
-    $stmt->bind_param("i", $user_id);
+// Check if email already exists
+if (empty($errors)) {
+    $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+    $stmt->bind_param("s", $email);
     $stmt->execute();
-    $result = $stmt->get_result();
-    if ($headerUser = $result->fetch_assoc()) {
-        $_SESSION['profile_image'] = $headerUser['profile_image'] ?: 'assets/images/profiles/pro_null.png';
-        $_SESSION['first_name'] = $headerUser['first_name'];
-        $_SESSION['last_name'] = $headerUser['last_name'];
+    if ($stmt->get_result()->fetch_assoc()) {
+        $errors['email'] = 'This email is already registered.';
     }
     $stmt->close();
 }
-?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="css/main.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com" rel="preconnect">
-    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lexend+Tera:wght@100..900&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/3024-day.min.css">
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <title>Taqeem</title>
-    <script>
-        const isLoggedIn = <?php echo isset($_SESSION['user_id']) ? 'true' : 'false'; ?>;
-        const hasLoginErrors = <?php echo !empty($_SESSION['login_errors']) && !isset($_SESSION['user_id']) ? 'true' : 'false'; ?>;
-        const hasSignupErrors = <?php echo !empty($_SESSION['signup_errors']) && !isset($_SESSION['user_id']) ? 'true' : 'false'; ?>;
-    </script>
-</head>
-<body>
-    <nav>
-        <div class="navbar">
-            <div class="navbar_container">
-                <div class="navbar_container--menu-L">
-                    <a href="./index.php">home</a>
-                    <a href="blogs.php">blogs</a>
-                    <a href="listing.php">categories</a>
-                    <a href="./index.php#aboutUs">about us</a>
-                </div>
-                <div class="navbar_container--logo">
-                    <a href="index.php"><img src="assets/images/logo.png" alt="logo"></a>
-                </div>
-                <div class="navbar_container--menu-R">
-                    <a class="btn__red--m btn__red btn" id="search-btn" href="#"><i class="fa-solid fa-magnifying-glass"></i></a>
-                    <?php if (isset($_SESSION['user_id'])): ?>
-                    <a href="profile.php?user_id=<?php echo htmlspecialchars($_SESSION['user_id']); ?>" class="navbar_profile">
-                        <img src="<?php echo htmlspecialchars($_SESSION['profile_image']) . '?v=' . time(); ?>" alt="User Profile">
-                        <span><?php echo htmlspecialchars($_SESSION['first_name'] . ' ' . $_SESSION['last_name']); ?></span>
-                    </a>
-                    <a class="navbar_container--menu-R_links" href="logout.php">Log Out</a>
-                    <?php else: ?>
-                    <a class="navbar_container--menu-R_links" id="login-nav" href="#">Log In</a>
-                    <a class="navbar_container--menu-R_links" id="signup-nav" href="#">Sign Up</a>
-                    <?php endif; ?>
-                    <a class="btn__red--m btn__red btn" href="add-place.php">Add Place</a>
-                </div>
-            </div>
-        </div>
-        <div class="navbar_mobile">
-            <div class="navbar_mobile--logo">
-                <a href="index.php"><img src="assets/images/logo.png" alt="logo"></a>
-            </div>
-            <form class="navbar_mobile--search" id="mobile-search-form" method="GET">
-                <input type="text" name="search_term" id="mobile-search-term" placeholder="Search">
-                <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
-            </form>
-            <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const currentPage = window.location.pathname;
-                const searchForm = document.getElementById('mobile-search-form');
-                const searchInput = document.getElementById('mobile-search-term');
-                let formAction = 'listing.php';
-                let placeholderText = 'Search places or tags';
-                if (currentPage.includes('blogs.php') || currentPage.includes('single-blog.php')) {
-                    formAction = 'blogs.php';
-                    placeholderText = 'Search blogs or tags';
-                }
-                searchForm.setAttribute('action', formAction);
-                searchInput.setAttribute('placeholder', placeholderText);
-            });
-            </script>
-            <a class="navbar_mobile--menu" id="mobile_emnu-open" href="#"><i class="fa-solid fa-bars"></i></a>
-        </div>
-        <div class="navbar_search--overlay" id="search-overlay">
-            <a id="close-btn" href="#">X</a>
-            <form class="navbar_search--overlay-content" method="GET">
-                <input type="text" name="search_term" id="search-term" placeholder="Search places or tags">
-                <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
-            </form>
-        </div>
-        <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const currentPage = window.location.pathname;
-            const searchForm = document.querySelector('.navbar_search--overlay-content');
-            const searchInput = document.getElementById('search-term');
-            let formAction = 'listing.php';
-            let placeholderText = 'Search places or tags';
-            if (currentPage.includes('blogs.php') || currentPage.includes('single-blog.php')) {
-                formAction = 'blogs.php';
-                placeholderText = 'Search blogs or tags';
-            }
-            searchForm.setAttribute('action', formAction);
-            searchInput.setAttribute('placeholder', placeholderText);
-        });
-        </script>
-        <div class="LogOverlay">
-            <div class="LogOverlay__content">
-                <div class="LogOverlay__content--links">
-                    <div class="LogOverlay__content--links_logins">
-                        <div class="active" id="login-overlay__div"><a id="login-overlay" href="#">Log in</a></div>
-                        <div id="signup-overlay__div"><a id="signup-overlay" href="#">Sign Up</a></div>
-                    </div>
-                    <a class="LogOverlay__content--links_close" href="#">X</a>
-                </div>
-                <!-- Login Form -->
-                <form class="LogOverlay__content--login" action="login_handler.php" method="POST" id="login_form">
-                    <?php $login_errors = $_SESSION['login_errors'] ?? []; $login_data = $_SESSION['login_data'] ?? []; ?>
-                    <input type="hidden" name="redirect_url" value="<?php echo htmlspecialchars($_SERVER['REQUEST_URI']); ?>">
-                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
-                    <?php if (!empty($login_errors)): ?>
-                    <div class="error-container">
-                        <?php foreach ($login_errors as $error): ?>
-                        <p class="error"><?php echo htmlspecialchars($error); ?></p>
-                        <?php endforeach; ?>
-                    </div>
-                    <?php endif; ?>
-                    <input type="email" name="email" placeholder="EMAIL" value="<?php echo htmlspecialchars($login_data['email'] ?? ''); ?>" required>
-                    <input type="password" name="password" placeholder="PASSWORD" required>
-                    <p>Forgot your password? <a href="#">RESET PASSWORD.</a></p>
-                    <button type="submit" class="btn__red--l btn__red btn">Sign In</button>
-                </form>
-                <!-- Signup Form -->
-                <form class="LogOverlay__content--signup" action="signup_handler.php" method="POST" id="signup_form">
-                    <?php $signup_errors = $_SESSION['signup_errors'] ?? []; $signup_data = $_SESSION['signup_data'] ?? []; ?>
-                    <input type="hidden" name="redirect_url" value="<?php echo htmlspecialchars($_SERVER['REQUEST_URI']); ?>">
-                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
-                    <?php if (!empty($signup_errors)): ?>
-                    <div class="error-container">
-                        <?php foreach ($signup_errors as $error): ?>
-                        <p class="error"><?php echo htmlspecialchars($error); ?></p>
-                        <?php endforeach; ?>
-                    </div>
-                    <?php endif; ?>
-                    <div class="LogOverlay__content--signup_name">
-                        <input type="text" name="first_name" placeholder="FIRST NAME" value="<?php echo htmlspecialchars($signup_data['first_name'] ?? ''); ?>" required>
-                        <input type="text" name="last_name" placeholder="LAST NAME" value="<?php echo htmlspecialchars($signup_data['last_name'] ?? ''); ?>" required>
-                    </div>
-                    <input type="email" name="email" placeholder="EMAIL" value="<?php echo htmlspecialchars($signup_data['email'] ?? ''); ?>" required>
-                    <input type="password" name="password" placeholder="PASSWORD" required>
-                    <input type="password" name="confirm_password" placeholder="CONFIRM PASSWORD" required>
-                    <button type="submit" class="btn__red--l btn__red btn">Sign up</button>
-                </form>
-            </div>
-        </div>
-        <div class="mobile_overlay" id="mobile_overlay">
-            <div class="mobile_overlay--content">
-                <a class="mobile_overlay--content-close" id="mobile_emnu-close" href="#">X</a>
-                <div class="mobile_overlay--content_links">
-                    <?php if (isset($_SESSION['user_id'])): ?>
-                    <a href="profile.php?user_id=<?php echo htmlspecialchars($_SESSION['user_id']); ?>" class="navbar_profile">
-                        <img src="<?php echo htmlspecialchars($_SESSION['profile_image']) . '?v=' . time(); ?>" alt="User Profile">
-                        <span><?php echo htmlspecialchars($_SESSION['first_name'] . ' ' . $_SESSION['last_name']); ?></span>
-                    </a>
-                    <a href="index.php">home</a>
-                    <a href="add-place.php">add place</a>
-                    <a href="listing.php">categories</a>
-                    <a href="blogs.php">blog</a>
-                    <a href="index.php#aboutUs">about us</a>
-                    <a href="logout.php">log out</a>
-                    <?php else: ?>
-                    <a id="login-nav_m" href="#">log in</a>
-                    <a id="signup-nav_m" href="#">sign up</a>
-                    <a href="add-place.php">add place</a>
-                    <a href="listing.php">categories</a>
-                    <a href="blogs.php">blog</a>
-                    <a href="index.php#aboutUs">about us</a>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
-    </nav>
-</body>
-</html>
+if (!empty($errors)) {
+    $_SESSION['signup_errors'] = $errors;
+    $_SESSION['signup_data'] = $_POST;
+    header("Location: $redirect_url");
+    exit;
+}
+
+// Hash password and insert user
+$hashed_password = password_hash($password, PASSWORD_DEFAULT);
+$default_profile_image = 'assets/images/profiles/pro_null.png';
+$stmt = $conn->prepare("INSERT INTO users (first_name, last_name, email, password, profile_image, role, created_at) VALUES (?, ?, ?, ?, ?, 'user', NOW())");
+$stmt->bind_param("sssss", $first_name, $last_name, $email, $hashed_password, $default_profile_image);
+
+if ($stmt->execute()) {
+    $user_id = $stmt->insert_id;
+    // Log in the new user
+    $_SESSION['user_id'] = $user_id;
+    $_SESSION['first_name'] = $first_name;
+    $_SESSION['last_name'] = $last_name;
+    $_SESSION['email'] = $email;
+    $_SESSION['role'] = 'user';
+    $_SESSION['profile_image'] = $default_profile_image;
+
+    unset($_SESSION['signup_errors']);
+    unset($_SESSION['signup_data']);
+    unset($_SESSION['login_errors']);
+    unset($_SESSION['login_data']);
+
+    header("Location: $redirect_url");
+    exit;
+} else {
+    $errors['general'] = 'Error creating account: ' . $stmt->error;
+    $_SESSION['signup_errors'] = $errors;
+    $_SESSION['signup_data'] = $_POST;
+    $stmt->close();
+    header("Location: $redirect_url");
+    exit;
+}
+?>

@@ -182,38 +182,9 @@ if ($update_query->execute()) {
     include 'review_template.php';
     $review_html = ob_get_clean();
 
-    ob_start();
-    ?>
-    <form id="editForm-<?= $review_id ?>" method="POST" action="edit_review.php" enctype="multipart/form-data" style="display: none;" class="edit-review-form">
-        <input type="hidden" name="review_id" value="<?= $review_id ?>">
-        <input type="hidden" name="place_id" value="<?= $place_id ?>">
-        <input type="hidden" name="rating" id="rating-<?= $review_id ?>" value="<?= $review['rating'] ?>">
-        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-        <div class="addReview_stars" data-review-id="<?= $review_id ?>">
-            <?php for ($i = 1; $i <= 5; $i++): ?>
-            <i class="fa-solid fa-star <?= $i <= $review['rating'] ? 'selected' : '' ?>" data-value="<?= $i ?>"></i>
-            <?php endfor; ?>
-        </div>
-        <a class="btn__transparent--s btn__transparent btn" href="#" onclick="document.getElementById('imageInput-<?= $review_id ?>').click(); return false;">add photos</a>
-        <input type="file" name="review_images[]" id="imageInput-<?= $review_id ?>" multiple accept="image/*" style="display: none;">
-        <div class="image-preview" id="imagePreview-<?= $review_id ?>">
-            <?php foreach ($images as $image): ?>
-            <div class="image-thumb" data-img-id="<?= htmlspecialchars($image['id'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
-                <img src="<?= htmlspecialchars($image['image_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>" alt="Review Image">
-                <span class="remove-image existing">×</span>
-            </div>
-            <?php endforeach; ?>
-        </div>
-        <textarea name="review_text" required><?= htmlspecialchars($review['review_text']) ?></textarea>
-        <button type="submit" class="btn__red--s btn__red btn">Save Changes</button>
-    </form>
-    <?php
-    $edit_form_html = ob_get_clean();
-
-    $combined_html = $review_html . $edit_form_html;
     $response = [
         'success' => true,
-        'html' => $combined_html,
+        'html' => $review_html,
         'review_id' => $review_id,
         'avg_rating' => $avg_rating,
         'total_reviews' => $total_reviews,
